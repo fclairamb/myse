@@ -12,4 +12,6 @@ public abstract class File {
 	public abstract List<File> listFiles() throws Exception;
 
 	public abstract String getPath();
+
+	public abstract Source getSource();
 }

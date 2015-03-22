@@ -1,7 +1,10 @@
 package com.webingenia.cifstest.db.model;
 
+import com.webingenia.cifstest.access.File;
+import com.webingenia.cifstest.access.Source;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
@@ -75,11 +78,11 @@ public class DBDescFile implements Serializable {
 		this.source = source;
 	}
 
-	public String getFilePath() {
+	public String getPath() {
 		return filePath;
 	}
 
-	public void setFilePath(String filePath) {
+	public void setPath(String filePath) {
 		this.filePath = filePath;
 	}
 
@@ -138,22 +141,30 @@ public class DBDescFile implements Serializable {
 		this.toAnalyze = toAnalyze;
 	}
 
-	public static DBDescFile get(DBDescSource source, String path, EntityManager em) {
+	public static DBDescFile get(File file, EntityManager em) {
 		for (DBDescFile f : em.createQuery("SELECT f FROM DBDescFile f WHERE f.source = :source AND f.filePath = :path", DBDescFile.class)
-				.setParameter("source", source)
-				.setParameter("path", path).getResultList()) {
+				.setParameter("source", file.getSource().getDesc())
+				.setParameter("path", file.getPath()).getResultList()) {
 			return f;
 		}
 		return null;
 	}
 
-	public static DBDescFile getOrCreate(DBDescSource source, String path, EntityManager em) {
-		DBDescFile df = get(source, path, em);
+	public static List<DBDescFile> listFiles(DBDescSource s, boolean dir, int limit, EntityManager em) {
+		return em.createQuery("SELECT f FROM DBDescFile f WHERE f.source = :source AND f.directory = :dir ORDER BY f.nextAnalysis", DBDescFile.class)
+				.setParameter("source", s)
+				.setParameter("dir", dir)
+				.setMaxResults(limit)
+				.getResultList();
+	}
+
+	public static DBDescFile getOrCreate(File file, EntityManager em) {
+		DBDescFile df = get(file, em);
 
 		if (df == null) {
 			df = new DBDescFile();
-			df.setSource(source);
-			df.setFilePath(path);
+			df.setSource(file.getSource().getDesc());
+			df.setPath(file.getPath());
 		}
 
 		return df;

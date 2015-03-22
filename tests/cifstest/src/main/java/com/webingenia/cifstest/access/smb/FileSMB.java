@@ -1,6 +1,7 @@
 package com.webingenia.cifstest.access.smb;
 
 import com.webingenia.cifstest.access.File;
+import com.webingenia.cifstest.access.Source;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -10,11 +11,11 @@ import jcifs.smb.SmbFile;
 public class FileSMB extends File {
 
 	private final SmbFile file;
-	private final int cut;
+	private final SourceSMB source;
 
-	public FileSMB(SmbFile file, int cut) {
+	public FileSMB(SmbFile file, SourceSMB source) {
 		this.file = file;
-		this.cut = cut;
+		this.source = source;
 	}
 
 	@Override
@@ -31,14 +32,23 @@ public class FileSMB extends File {
 	public List<File> listFiles() throws SmbException {
 		List<File> list = new ArrayList<>();
 		for (SmbFile f : file.listFiles()) {
-			list.add(new FileSMB(f, cut));
+			list.add(new FileSMB(f, source));
 		}
 		return list;
 	}
 
+	public SmbFile getFile() {
+		return file;
+	}
+
+	@Override
+	public Source getSource() {
+		return source;
+	}
+
 	@Override
 	public String getPath() {
-		return file.getPath().substring(cut);
+		return file.getPath().substring(source.getPathOffset());
 	}
 
 }

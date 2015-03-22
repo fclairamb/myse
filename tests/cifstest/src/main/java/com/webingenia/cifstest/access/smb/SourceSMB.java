@@ -21,20 +21,39 @@ public class SourceSMB extends Source {
 		super(desc);
 	}
 
+	private String getRootPath() {
+		Map<String, String> props = desc.getProperties();
+		String user = props.get(PROP_USER),
+				pass = props.get(PROP_PASS),
+				host = props.get(PROP_HOST),
+				dir = props.get(PROP_DIR);
+		return String.format("smb://%s:%s@%s/%s/", user, pass, host, dir);
+	}
+
 	@Override
-	public File getRootDir() {
+	public FileSMB getRootDir() {
 		try {
-			Map<String, String> props = desc.getProperties();
-			String user = props.get(PROP_USER),
-					pass = props.get(PROP_PASS),
-					host = props.get(PROP_HOST),
-					dir = props.get(PROP_DIR);
-			SmbFile root = new SmbFile(String.format("smb://%s:%s@%s/%s/", user, pass, host, dir));
+
+			SmbFile root = new SmbFile(getRootPath());
 			int length = root.getPath().length();
-			return new FileSMB(root, length);
+			return new FileSMB(root, this);
 		} catch (MalformedURLException ex) {
 			LOG.error("Could not create SMB root dir", ex);
 			return null;
 		}
+	}
+
+	private int pathOffset;
+
+	int getPathOffset() {
+		if (pathOffset == 0) {
+			pathOffset = getRootDir().getFile().getPath().length();
+		}
+		return pathOffset;
+	}
+
+	@Override
+	public File getFile(String path) throws MalformedURLException {
+		return new FileSMB(new SmbFile(getRootPath() + path), this);
 	}
 }

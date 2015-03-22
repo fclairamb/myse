@@ -35,5 +35,13 @@ public abstract class Source {
 		return list;
 	}
 
-	public abstract File getRootDir();
+	public abstract File getRootDir() throws Exception;
+
+	public abstract File getFile(String path) throws Exception;
+
+	@Override
+	public String toString() {
+		DBDescSource d = getDesc();
+		return "Source{" + d.getType() + " : " + d.getName() + "}";
+	}
 }
