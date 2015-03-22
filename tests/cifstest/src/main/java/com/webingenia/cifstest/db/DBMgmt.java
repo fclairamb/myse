@@ -7,6 +7,7 @@ import java.util.HashMap;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.FlushModeType;
 import javax.persistence.Persistence;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.h2.tools.Server;
@@ -108,9 +109,10 @@ public class DBMgmt {
 
 	private static EntityManager em;
 
-	public static EntityManager getEntityManager() {
+	public static EntityManager getDefaultEntityManager() {
 		if (em == null) {
 			em = getEntityManagerFactory().createEntityManager();
+			em.setFlushMode(FlushModeType.AUTO);
 		}
 		return em;
 	}

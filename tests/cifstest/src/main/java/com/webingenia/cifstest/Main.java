@@ -2,7 +2,7 @@ package com.webingenia.cifstest;
 
 import static com.webingenia.cifstest.common.LOG.LOG;
 import com.webingenia.cifstest.db.DBMgmt;
-import com.webingenia.cifstest.db.SmbHelper;
+import com.webingenia.cifstest.common.SmbHelper;
 import java.util.Date;
 import jcifs.smb.SmbFile;
 

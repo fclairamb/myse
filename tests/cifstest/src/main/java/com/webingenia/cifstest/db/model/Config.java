@@ -1,12 +1,14 @@
-package com.webingenia.cifstest.model;
+package com.webingenia.cifstest.db.model;
 
 import com.webingenia.cifstest.db.DBMgmt;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "config")
 public class Config implements Serializable {
 
 	@Column(name = "NAME")
@@ -40,7 +42,7 @@ public class Config implements Serializable {
 		}
 
 		c.setValue(value);
-		DBMgmt.getEntityManager().persist(c);
+		DBMgmt.getDefaultEntityManager().persist(c);
 	}
 
 	public static String get(String name, String defaultValue) {
@@ -49,7 +51,7 @@ public class Config implements Serializable {
 	}
 
 	private static Config getConfig(String name) {
-		for (Config c : DBMgmt.getEntityManager().createQuery("SELECT c FROM Config c WHERE c.name = :name", Config.class).setParameter("name", name).getResultList()) {
+		for (Config c : DBMgmt.getDefaultEntityManager().createQuery("SELECT c FROM Config c WHERE c.name = :name", Config.class).setParameter("name", name).getResultList()) {
 			return c;
 		}
 		return null;

@@ -1,4 +1,4 @@
-package com.webingenia.cifstest.db;
+package com.webingenia.cifstest.common;
 
 import java.util.ArrayList;
 import java.util.List;
