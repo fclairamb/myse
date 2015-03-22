@@ -4,7 +4,12 @@ import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -14,31 +19,36 @@ import javax.persistence.TemporalType;
 public class DBDescFile implements Serializable {
 
 	@Id
+	@Column(name = "file_id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
+	@JoinColumn(name = "source_id")
+	@ManyToOne
+	private DBDescSource source;
 	/**
 	 * Path of the file
 	 */
-	@Column
+	@Column(name = "file_path")
 	private String filePath;
 
 	/**
 	 * If the file is a directory.
 	 */
-	@Column
+	@Column(name = "directory")
 	private boolean directory;
 
 	/**
 	 * Modification date
 	 */
-	@Column
+	@Column(name = "date_mod")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date dateMod;
 
 	/**
 	 * Previous modification date
 	 */
-	@Column
+	@Column(name = "date_mod_prev")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date datePreviousMod;
 
@@ -46,9 +56,12 @@ public class DBDescFile implements Serializable {
 	 * Next planned analysis. This is not an absolute date, it is used to
 	 * prioritize which analysis should be performed first.
 	 */
-	@Column
+	@Column(name = "date_next_analysis")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date nextAnalysis;
+
+	@Column(name = "to_analyze")
+	private boolean toAnalyze;
 
 	@Column
 	private int nbErrors;
@@ -61,12 +74,12 @@ public class DBDescFile implements Serializable {
 		this.id = id;
 	}
 
-	public boolean isDirectory() {
-		return directory;
+	public DBDescSource getSource() {
+		return source;
 	}
 
-	public void setDirectory(boolean directory) {
-		this.directory = directory;
+	public void setSource(DBDescSource source) {
+		this.source = source;
 	}
 
 	public String getFilePath() {
@@ -77,12 +90,28 @@ public class DBDescFile implements Serializable {
 		this.filePath = filePath;
 	}
 
+	public boolean isDirectory() {
+		return directory;
+	}
+
+	public void setDirectory(boolean directory) {
+		this.directory = directory;
+	}
+
 	public Date getLastModification() {
 		return dateMod;
 	}
 
-	public void setLastModification(Date lastModification) {
-		this.dateMod = lastModification;
+	public void setLastModification(Date date) {
+
+		if (dateMod == null || date.compareTo(dateMod) > 0) {
+			this.toAnalyze = true;
+			this.datePreviousMod = this.dateMod != null ? this.dateMod : new Date(System.currentTimeMillis() - 30 * 24 * 3600 * 1000);
+			this.dateMod = date;
+		}
+
+		long elapsed = (dateMod.getTime() - datePreviousMod.getTime()) + nbErrors * 3600 * 1000;
+		nextAnalysis = new Date(System.currentTimeMillis() + elapsed);
 	}
 
 	public Date getNextAnalysis() {
@@ -101,20 +130,41 @@ public class DBDescFile implements Serializable {
 		this.dateMod = dateMod;
 	}
 
-	public Date getDatePreviousMod() {
-		return datePreviousMod;
-	}
-
-	public void setDatePreviousMod(Date datePreviousMod) {
-		this.datePreviousMod = datePreviousMod;
-	}
-
 	public int getNbErrors() {
 		return nbErrors;
 	}
 
 	public void setNbErrors(int nbErrors) {
 		this.nbErrors = nbErrors;
+	}
+
+	public boolean isToAnalyze() {
+		return toAnalyze;
+	}
+
+	public void setToAnalyze(boolean toAnalyze) {
+		this.toAnalyze = toAnalyze;
+	}
+
+	public static DBDescFile get(DBDescSource source, String path, EntityManager em) {
+		for (DBDescFile f : em.createQuery("SELECT f FROM DBDescFile f WHERE f.source = :source AND f.filePath = :path", DBDescFile.class)
+				.setParameter("source", source)
+				.setParameter("path", path).getResultList()) {
+			return f;
+		}
+		return null;
+	}
+
+	public static DBDescFile getOrCreate(DBDescSource source, String path, EntityManager em) {
+		DBDescFile df = get(source, path, em);
+
+		if (df == null) {
+			df = new DBDescFile();
+			df.setSource(source);
+			df.setFilePath(path);
+		}
+
+		return df;
 	}
 
 }

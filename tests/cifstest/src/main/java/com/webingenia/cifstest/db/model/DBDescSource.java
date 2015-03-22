@@ -5,8 +5,12 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.persistence.ElementCollection;
+import javax.persistence.EntityManager;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.MapKeyColumn;
@@ -18,23 +22,27 @@ public class DBDescSource implements Serializable {
 
 	@Id
 	@Column(name = "source_id")
-	private long sourceId;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long id;
 
-	@Column
+	@Column(name = "name")
 	private String name;
 
+	@Column(name = "type")
+	private String type;
+
 	@ElementCollection
-	@JoinTable(name = "SOURCE_PROPERTY", joinColumns = @JoinColumn(name = "source_id"))
-	@MapKeyColumn(name = "id")
-	@Column(name = "VALUE")
+	@JoinTable(name = "source_property", joinColumns = @JoinColumn(name = "source_id"))
+	@MapKeyColumn(name = "name")
+	@Column(name = "value")
 	private Map<String, String> properties = new HashMap<>();
 
-	public long getSourceId() {
-		return sourceId;
+	public long getId() {
+		return id;
 	}
 
-	public void setSourceId(long sourceId) {
-		this.sourceId = sourceId;
+	public void setId(long sourceId) {
+		this.id = sourceId;
 	}
 
 	public String getName() {
@@ -45,11 +53,23 @@ public class DBDescSource implements Serializable {
 		this.name = name;
 	}
 
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
 	public Map<String, String> getProperties() {
 		return properties;
 	}
 
 	public void setProperties(Map<String, String> properties) {
 		this.properties = properties;
+	}
+
+	public static List<DBDescSource> all(EntityManager em) {
+		return em.createQuery("SELECT s FROM DBDescSource s", DBDescSource.class).getResultList();
 	}
 }

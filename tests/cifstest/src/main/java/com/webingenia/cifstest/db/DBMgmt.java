@@ -107,13 +107,17 @@ public class DBMgmt {
 		return emf;
 	}
 
-	private static EntityManager em;
+	public static EntityManager getEntityManager() {
+		return getEntityManagerFactory().createEntityManager();
+	}
+
+	private static EntityManager defaultEm;
 
 	public static EntityManager getDefaultEntityManager() {
-		if (em == null) {
-			em = getEntityManagerFactory().createEntityManager();
-			em.setFlushMode(FlushModeType.AUTO);
+		if (defaultEm == null) {
+			defaultEm = getEntityManager();
+			defaultEm.setFlushMode(FlushModeType.AUTO);
 		}
-		return em;
+		return defaultEm;
 	}
 }
