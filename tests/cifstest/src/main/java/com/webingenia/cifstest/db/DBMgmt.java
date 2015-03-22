@@ -81,8 +81,11 @@ public class DBMgmt {
 	}
 
 	public static void start() throws SQLException {
-		startH2Server();
-		getEntityManagerFactory();
+		try {
+			startH2Server();
+		} catch (Exception ex) {
+			LOG.error("DBMgmt.start", ex);
+		}
 	}
 
 	public static void stop() {
@@ -110,5 +113,5 @@ public class DBMgmt {
 			em = getEntityManagerFactory().createEntityManager();
 		}
 		return em;
-	} 
+	}
 }

@@ -1,7 +1,7 @@
 package com.webingenia.cifstest.model;
 
+import com.webingenia.cifstest.db.DBMgmt;
 import java.io.Serializable;
-import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -32,29 +32,26 @@ public class Config implements Serializable {
 		this.value = value;
 	}
 
-	@Override
-	public int hashCode() {
-		int hash = 7;
-		hash = 59 * hash + Objects.hashCode(this.name);
-		hash = 59 * hash + Objects.hashCode(this.value);
-		return hash;
+	public static void set(String name, String value) {
+		Config c = getConfig(name);
+		if (c == null) {
+			c = new Config();
+			c.setName(name);
+		}
+
+		c.setValue(value);
+		DBMgmt.getEntityManager().persist(c);
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null) {
-			return false;
+	public static String get(String name, String defaultValue) {
+		Config c = getConfig(name);
+		return c != null ? c.getValue() : null;
+	}
+
+	private static Config getConfig(String name) {
+		for (Config c : DBMgmt.getEntityManager().createQuery("SELECT c FROM Config c WHERE c.name = :name", Config.class).setParameter("name", name).getResultList()) {
+			return c;
 		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		final Config other = (Config) obj;
-		if (!Objects.equals(this.name, other.name)) {
-			return false;
-		}
-		if (!Objects.equals(this.value, other.value)) {
-			return false;
-		}
-		return true;
+		return null;
 	}
 }
