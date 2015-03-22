@@ -46,13 +46,6 @@ public class DBDescFile implements Serializable {
 	private Date dateMod;
 
 	/**
-	 * Previous modification date
-	 */
-	@Column(name = "date_mod_prev")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date datePreviousMod;
-
-	/**
 	 * Next planned analysis. This is not an absolute date, it is used to
 	 * prioritize which analysis should be performed first.
 	 */
@@ -106,11 +99,10 @@ public class DBDescFile implements Serializable {
 
 		if (dateMod == null || date.compareTo(dateMod) > 0) {
 			this.toAnalyze = true;
-			this.datePreviousMod = this.dateMod != null ? this.dateMod : new Date(System.currentTimeMillis() - 30 * 24 * 3600 * 1000);
 			this.dateMod = date;
 		}
 
-		long elapsed = (dateMod.getTime() - datePreviousMod.getTime()) + nbErrors * 3600 * 1000;
+		long elapsed = (System.currentTimeMillis() - dateMod.getTime()) + nbErrors * 3600 * 1000;
 		nextAnalysis = new Date(System.currentTimeMillis() + elapsed);
 	}
 
