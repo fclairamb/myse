@@ -1,5 +1,6 @@
 package com.webingenia.cifstest.db.model;
 
+import com.webingenia.cifstest.access.AccessException;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -9,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import javax.persistence.ElementCollection;
 import javax.persistence.EntityManager;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.JoinColumn;
@@ -30,6 +33,13 @@ public class DBDescSource implements Serializable {
 
 	@Column(name = "type")
 	private String type;
+
+	@Column(name = "scan_period")
+	private int scanPeriod;
+
+	@Column(name = "state")
+	@Enumerated(EnumType.STRING)
+	private AccessException.AccessState state;
 
 	@ElementCollection
 	@JoinTable(name = "source_property", joinColumns = @JoinColumn(name = "source_id"))
@@ -67,6 +77,22 @@ public class DBDescSource implements Serializable {
 
 	public void setProperties(Map<String, String> properties) {
 		this.properties = properties;
+	}
+
+	public int getScanPeriod() {
+		return scanPeriod;
+	}
+
+	public void setScanPeriod(int scanPeriod) {
+		this.scanPeriod = scanPeriod;
+	}
+
+	public AccessException.AccessState getState() {
+		return state;
+	}
+
+	public void setState(AccessException.AccessState state) {
+		this.state = state;
 	}
 
 	public static List<DBDescSource> all(EntityManager em) {

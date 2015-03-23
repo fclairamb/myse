@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
 import javax.persistence.FlushModeType;
 import javax.persistence.Persistence;
 import org.h2.jdbcx.JdbcConnectionPool;
@@ -71,7 +70,7 @@ public class DBMgmt {
 		return pool;
 	}
 
-	static synchronized Connection getConnection() throws SQLException {
+	public static synchronized Connection getConnection() throws SQLException {
 		try {
 			return getPool().getConnection();
 		} catch (SQLException ex) {

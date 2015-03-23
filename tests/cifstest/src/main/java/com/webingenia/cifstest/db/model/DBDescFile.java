@@ -1,5 +1,6 @@
 package com.webingenia.cifstest.db.model;
 
+import com.webingenia.cifstest.access.AccessException;
 import com.webingenia.cifstest.access.File;
 import com.webingenia.cifstest.access.Source;
 import java.io.Serializable;
@@ -94,11 +95,11 @@ public class DBDescFile implements Serializable {
 		this.directory = directory;
 	}
 
-	public Date getLastModification() {
+	public Date getLastModified() {
 		return dateMod;
 	}
 
-	public void setLastModification(Date date) {
+	public void setLastModified(Date date) {
 
 		if (dateMod == null || date.compareTo(dateMod) > 0) {
 			this.toAnalyze = true;
@@ -158,16 +159,22 @@ public class DBDescFile implements Serializable {
 				.getResultList();
 	}
 
-	public static DBDescFile getOrCreate(File file, EntityManager em) {
+	public static DBDescFile getOrCreate(File file, EntityManager em) throws AccessException {
 		DBDescFile df = get(file, em);
 
 		if (df == null) {
 			df = new DBDescFile();
 			df.setSource(file.getSource().getDesc());
 			df.setPath(file.getPath());
+			df.setDirectory(file.isDirectory());
 		}
 
 		return df;
+	}
+
+	@Override
+	public String toString() {
+		return "DescFile{" + getPath() + "}";
 	}
 
 }

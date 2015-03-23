@@ -5,11 +5,11 @@ import java.util.List;
 
 public abstract class File {
 
-	public abstract boolean isDirectory() throws Exception;
+	public abstract boolean isDirectory() throws AccessException;
 
-	public abstract Date getModifiedDate() throws Exception;
+	public abstract Date getLastModified() throws AccessException;
 
-	public abstract List<File> listFiles() throws Exception;
+	public abstract List<File> listFiles() throws AccessException;
 
 	public abstract String getPath();
 

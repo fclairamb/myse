@@ -1,10 +1,12 @@
 package com.webingenia.cifstest.explore;
 
+import com.webingenia.cifstest.access.AccessException;
 import com.webingenia.cifstest.access.File;
 import com.webingenia.cifstest.access.Source;
 import static com.webingenia.cifstest.common.LOG.LOG;
 import com.webingenia.cifstest.db.DBMgmt;
 import com.webingenia.cifstest.db.model.DBDescFile;
+import com.webingenia.cifstest.db.model.DBDescSource;
 import javax.persistence.EntityManager;
 
 public class DirExplorer implements Runnable {
@@ -19,23 +21,71 @@ public class DirExplorer implements Runnable {
 	public void run() {
 		LOG.info("DirExplorer on " + source + " : STARTING !");
 		EntityManager em = DBMgmt.getEntityManager();
+		DBDescSource sd = source.getDesc();
 		try {
 			em.getTransaction().begin();
-			for (DBDescFile desc : DBDescFile.listFiles(source.getDesc(), true, 100, em)) {
-				File file = source.getFile(desc.getPath());
-				LOG.info("Analysing " + file.getPath() + "...");
-				if (file.getModifiedDate().compareTo(desc.getLastModification()) > 0) {
-					LOG.info("Dir " + desc.getPath() + " was modified !");
-				}
-				desc.setLastModification(file.getModifiedDate());
-				em.persist(desc);
+
+			{ // We always start by a root dir analysis
+				DBDescFile df = DBDescFile.getOrCreate(source.getRootDir(), em);
+				analyseFile(df, em, true);
 			}
-			em.getTransaction().commit();
-		} catch (Exception ex) {
+
+			boolean again = true;
+
+			for (int pass = 0; pass < 10 && again; pass++) {
+				LOG.info("Analysis pass {}", pass);
+				// We analyse all the previously listed dirs
+				for (DBDescFile desc : DBDescFile.listFiles(sd, true, 100, em)) {
+					if (analyseFile(desc, em, true)) {
+						again = true;
+					}
+				}
+			}
+		} catch (AccessException ex) {
+			sd.setState(AccessException.AccessState.DENIED);
 			LOG.error("DirExplorer issue", ex);
+		} catch (Exception ex) {
+			sd.setState(AccessException.AccessState.ERROR);
 		} finally {
+			em.getTransaction().commit();
 			em.close();
 		}
 	}
 
+	private boolean analyseFile(DBDescFile desc, EntityManager em, boolean sub) throws Exception {
+		File file = source.getFile(desc.getPath());
+		boolean dir = file.isDirectory();
+		LOG.info("Analysing {} \"{}\" : {}", dir ? "dir" : "file", file.getPath(), file.getLastModified());
+
+		boolean again = false;
+
+		if (desc.getLastModified() == null) {
+			again = true;
+		}
+
+		desc.setLastModified(file.getLastModified());
+
+		em.persist(desc);
+
+		if (dir) {
+			if (sub) {
+				try {
+					for (File f : file.listFiles()) {
+						try {
+							DBDescFile df = DBDescFile.getOrCreate(f, em);
+							if (analyseFile(df, em, false)) {
+								again = true;
+							}
+						} catch (AccessException ex) {
+							LOG.warn("analyse.file: " + ex);
+						}
+					}
+				} catch (AccessException ex) {
+					LOG.warn("analyse.listing: " + ex);
+				}
+			}
+		}
+
+		return again;
+	}
 }

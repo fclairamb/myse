@@ -25,7 +25,7 @@ public class Main {
 		List<Source> allSources = Source.all(em);
 		if (allSources.isEmpty()) {
 			em.getTransaction().begin();
-			{
+			if (false) {
 				DBDescSource smb = new DBDescSource();
 				smb.setName("Sample SMB share");
 				smb.setType(SourceSMB.TYPE);
@@ -36,21 +36,32 @@ public class Main {
 				props.put(SourceSMB.PROP_DIR, "Desktop");
 				em.persist(smb);
 			}
+			{
+				DBDescSource smb = new DBDescSource();
+				smb.setName("Sample SMB share");
+				smb.setType(SourceSMB.TYPE);
+				Map<String, String> props = smb.getProperties();
+				props.put(SourceSMB.PROP_USER, "User");
+				props.put(SourceSMB.PROP_PASS, "aze");
+				props.put(SourceSMB.PROP_HOST, "192.168.1.109");
+				props.put(SourceSMB.PROP_DIR, "c/Users");
+				em.persist(smb);
+			}
 			em.getTransaction().commit();
 			allSources = Source.all(em);
 		}
 
 		for (Source source : allSources) {
-			File rootDir = source.getRootDir();
-			em.getTransaction().begin();
-			for (File f : AccessHelper.listAll(rootDir)) {
-				DBDescFile df = DBDescFile.getOrCreate(f, em);
-				LOG.info("File " + f.getPath() + " / " + f.getModifiedDate());
-				df.setLastModification(f.getModifiedDate());
-				df.setDirectory(f.isDirectory());
-				em.persist(df);
-			}
-			em.getTransaction().commit();
+//			File rootDir = source.getRootDir();
+//			em.getTransaction().begin();
+//			for (File f : AccessHelper.listAll(rootDir)) {
+//				DBDescFile df = DBDescFile.getOrCreate(f, em);
+//				LOG.info("File " + f.getPath() + " / " + f.getModifiedDate());
+//				df.setLastModification(f.getModifiedDate());
+//				df.setDirectory(f.isDirectory());
+//				em.persist(df);
+//			}
+//			em.getTransaction().commit();
 
 			Tasks.getService().scheduleWithFixedDelay(new DirExplorer(source), 0, 10, TimeUnit.SECONDS);
 		}
