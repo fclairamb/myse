@@ -32,7 +32,7 @@ public class DirExplorer implements Runnable {
 
 			boolean again = true;
 
-			for (int pass = 0; pass < 10 && again; pass++) {
+			for (int pass = 0; pass < 2 && again; pass++) {
 				LOG.info("Analysis pass {}", pass);
 				// We analyse all the previously listed dirs
 				for (DBDescFile desc : DBDescFile.listFiles(sd, true, 100, em)) {
@@ -83,7 +83,7 @@ public class DirExplorer implements Runnable {
 					LOG.warn("analyse.listing: " + ex);
 				}
 				// We don't have to analyse it again, it's done
-				desc.setToAnalyze(false);
+//				desc.setToAnalyze(false);
 			}
 		}
 

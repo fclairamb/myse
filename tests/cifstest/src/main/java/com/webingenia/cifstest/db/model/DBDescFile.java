@@ -173,6 +173,7 @@ public class DBDescFile implements Serializable {
 
 	public void performingAnalysis() {
 		nbAnalysis += 1;
+		toAnalyse = false;
 	}
 
 }

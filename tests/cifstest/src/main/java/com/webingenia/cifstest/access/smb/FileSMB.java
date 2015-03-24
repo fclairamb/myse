@@ -3,7 +3,8 @@ package com.webingenia.cifstest.access.smb;
 import com.webingenia.cifstest.access.AccessException;
 import com.webingenia.cifstest.access.File;
 import com.webingenia.cifstest.access.Source;
-import com.webingenia.cifstest.db.model.DBDescSource;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +28,10 @@ public class FileSMB extends File {
 			default:
 				return new AccessException(AccessException.AccessState.UNKNOWN, ex);
 		}
+	}
+
+	private AccessException convertException(IOException ex) {
+		return new AccessException(AccessException.AccessState.ERROR, ex);
 	}
 
 	@Override
@@ -73,6 +78,15 @@ public class FileSMB extends File {
 	@Override
 	public String getPath() {
 		return file.getPath().substring(source.getPathOffset());
+	}
+
+	@Override
+	public InputStream getInputStream() throws AccessException {
+		try {
+			return file.getInputStream();
+		} catch (IOException ex) {
+			throw convertException(ex);
+		}
 	}
 
 }

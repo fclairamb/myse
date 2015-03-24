@@ -1,5 +1,6 @@
 package com.webingenia.cifstest.access;
 
+import com.webingenia.cifstest.access.disk.SourceDisk;
 import com.webingenia.cifstest.access.smb.SourceSMB;
 import com.webingenia.cifstest.db.model.DBDescSource;
 import java.util.ArrayList;
@@ -22,6 +23,8 @@ public abstract class Source {
 		switch (source.getType()) {
 			case SourceSMB.TYPE:
 				return new SourceSMB(source);
+			case SourceDisk.TYPE:
+				return new SourceDisk(source);
 			default:
 				return null;
 		}
@@ -35,9 +38,9 @@ public abstract class Source {
 		return list;
 	}
 
-	public abstract File getRootDir() throws Exception;
+	public abstract File getRootDir() throws AccessException;
 
-	public abstract File getFile(String path) throws Exception;
+	public abstract File getFile(String path) throws AccessException;
 
 	@Override
 	public String toString() {

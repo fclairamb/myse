@@ -2,6 +2,7 @@ package com.webingenia.cifstest;
 
 import com.webingenia.cifstest.access.File;
 import com.webingenia.cifstest.access.Source;
+import com.webingenia.cifstest.access.disk.SourceDisk;
 import com.webingenia.cifstest.access.smb.SourceSMB;
 import com.webingenia.cifstest.common.AccessHelper;
 import static com.webingenia.cifstest.common.LOG.LOG;
@@ -9,6 +10,7 @@ import com.webingenia.cifstest.db.DBMgmt;
 import com.webingenia.cifstest.db.model.DBDescFile;
 import com.webingenia.cifstest.db.model.DBDescSource;
 import com.webingenia.cifstest.explore.DirExplorer;
+import com.webingenia.cifstest.explore.FileIndexer;
 import com.webingenia.cifstest.tasks.Tasks;
 import java.util.List;
 import java.util.Map;
@@ -25,18 +27,15 @@ public class Main {
 		List<Source> allSources = Source.all(em);
 		if (allSources.isEmpty()) {
 			em.getTransaction().begin();
-			if (false) {
-				DBDescSource smb = new DBDescSource();
-				smb.setName("Sample SMB share");
-				smb.setType(SourceSMB.TYPE);
-				Map<String, String> props = smb.getProperties();
-				props.put(SourceSMB.PROP_USER, "User");
-				props.put(SourceSMB.PROP_PASS, "aze");
-				props.put(SourceSMB.PROP_HOST, "192.168.1.109");
-				props.put(SourceSMB.PROP_DIR, "Desktop");
-				em.persist(smb);
-			}
 			{
+				DBDescSource disk = new DBDescSource();
+				disk.setName("Disk access");
+				disk.setType(SourceDisk.TYPE);
+				Map<String, String> props = disk.getProperties();
+				props.put(SourceDisk.PROP_PATH, "/home/florent");
+				em.persist(disk);
+			}
+			if (false) {
 				DBDescSource smb = new DBDescSource();
 				smb.setName("Sample SMB share");
 				smb.setType(SourceSMB.TYPE);
@@ -63,7 +62,8 @@ public class Main {
 //			}
 //			em.getTransaction().commit();
 
-			Tasks.getService().scheduleWithFixedDelay(new DirExplorer(source), 0, 10, TimeUnit.SECONDS);
+			Tasks.getService().scheduleWithFixedDelay(new DirExplorer(source), 0, 1, TimeUnit.MINUTES);
+			Tasks.getService().scheduleWithFixedDelay(new FileIndexer(source), 0, 10, TimeUnit.SECONDS);
 		}
 	}
 }

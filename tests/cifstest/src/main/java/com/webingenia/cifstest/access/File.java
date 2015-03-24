@@ -1,5 +1,6 @@
 package com.webingenia.cifstest.access;
 
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
@@ -47,4 +48,12 @@ public abstract class File {
 	 * @return Source of the file
 	 */
 	public abstract Source getSource();
+
+	/**
+	 * Get the input stream of the file
+	 *
+	 * @return InputStream of the file
+	 * @throws com.webingenia.cifstest.access.AccessException
+	 */
+	public abstract InputStream getInputStream() throws AccessException;
 }

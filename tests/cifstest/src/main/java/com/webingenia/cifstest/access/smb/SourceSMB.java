@@ -1,5 +1,6 @@
 package com.webingenia.cifstest.access.smb;
 
+import com.webingenia.cifstest.access.AccessException;
 import com.webingenia.cifstest.access.File;
 import com.webingenia.cifstest.access.Source;
 import static com.webingenia.cifstest.common.LOG.LOG;
@@ -53,7 +54,11 @@ public class SourceSMB extends Source {
 	}
 
 	@Override
-	public File getFile(String path) throws MalformedURLException {
-		return new FileSMB(new SmbFile(getRootPath() + path), this);
+	public File getFile(String path) throws AccessException {
+		try {
+			return new FileSMB(new SmbFile(getRootPath() + path), this);
+		} catch (MalformedURLException ex) {
+			throw new AccessException(AccessException.AccessState.ERROR, ex);
+		}
 	}
 }
