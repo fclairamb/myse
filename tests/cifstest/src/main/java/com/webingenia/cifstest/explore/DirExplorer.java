@@ -65,11 +65,10 @@ public class DirExplorer implements Runnable {
 
 		desc.setLastModified(file.getLastModified());
 
-		em.persist(desc);
-
 		if (dir) {
 			if (sub) {
 				try {
+					desc.performingAnalysis();
 					for (File f : file.listFiles()) {
 						try {
 							DBDescFile df = DBDescFile.getOrCreate(f, em);
@@ -83,8 +82,12 @@ public class DirExplorer implements Runnable {
 				} catch (AccessException ex) {
 					LOG.warn("analyse.listing: " + ex);
 				}
+				// We don't have to analyse it again, it's done
+				desc.setToAnalyze(false);
 			}
 		}
+
+		em.persist(desc);
 
 		return again;
 	}

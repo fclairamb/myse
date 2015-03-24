@@ -50,17 +50,19 @@ public class DBDescFile implements Serializable {
 	private Date dateMod;
 
 	/**
-	 * Next planned analysis. This is not an absolute date, it is used to
-	 * prioritize which analysis should be performed first.
+	 * Next planned analysis. This is used to prioritize when the next analysis
+	 * will happen
 	 */
-	@Column(name = "date_next_analysis")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date nextAnalysis;
+	@Column(name = "next_analysis")
+	private int nextAnalysis;
 
-	@Column(name = "to_analyze")
-	private boolean toAnalyze;
+	@Column(name = "to_analyse")
+	private boolean toAnalyse;
 
-	@Column
+	@Column(name = "nb_analysis")
+	private int nbAnalysis;
+
+	@Column(name = "nb_errors")
 	private int nbErrors;
 
 	public long getId() {
@@ -102,20 +104,12 @@ public class DBDescFile implements Serializable {
 	public void setLastModified(Date date) {
 
 		if (dateMod == null || date.compareTo(dateMod) > 0) {
-			this.toAnalyze = true;
+			this.toAnalyse = true;
 			this.dateMod = date;
 		}
 
 		long elapsed = (System.currentTimeMillis() - dateMod.getTime()) + nbErrors * 3600 * 1000;
-		nextAnalysis = new Date(System.currentTimeMillis() + elapsed);
-	}
-
-	public Date getNextAnalysis() {
-		return nextAnalysis;
-	}
-
-	public void setNextAnalysis(Date nextAnalysis) {
-		this.nextAnalysis = nextAnalysis;
+		nextAnalysis += Math.log(elapsed);
 	}
 
 	public Date getDateMod() {
@@ -135,11 +129,11 @@ public class DBDescFile implements Serializable {
 	}
 
 	public boolean isToAnalyze() {
-		return toAnalyze;
+		return toAnalyse;
 	}
 
 	public void setToAnalyze(boolean toAnalyze) {
-		this.toAnalyze = toAnalyze;
+		this.toAnalyse = toAnalyze;
 	}
 
 	public static DBDescFile get(File file, EntityManager em) {
@@ -152,7 +146,7 @@ public class DBDescFile implements Serializable {
 	}
 
 	public static List<DBDescFile> listFiles(DBDescSource s, boolean dir, int limit, EntityManager em) {
-		return em.createQuery("SELECT f FROM DBDescFile f WHERE f.source = :source AND f.directory = :dir ORDER BY f.nextAnalysis", DBDescFile.class)
+		return em.createQuery("SELECT f FROM DBDescFile f WHERE f.source = :source AND f.directory = :dir ORDER BY f.toAnalyse DESC, f.nextAnalysis ASC", DBDescFile.class)
 				.setParameter("source", s)
 				.setParameter("dir", dir)
 				.setMaxResults(limit)
@@ -175,6 +169,10 @@ public class DBDescFile implements Serializable {
 	@Override
 	public String toString() {
 		return "DescFile{" + getPath() + "}";
+	}
+
+	public void performingAnalysis() {
+		nbAnalysis += 1;
 	}
 
 }
