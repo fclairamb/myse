@@ -1,8 +1,8 @@
-package com.webingenia.cifstest.access.smb;
+package com.webingenia.myse.access.smb;
 
-import com.webingenia.cifstest.access.AccessException;
-import com.webingenia.cifstest.access.File;
-import com.webingenia.cifstest.access.Source;
+import com.webingenia.myse.access.AccessException;
+import com.webingenia.myse.access.File;
+import com.webingenia.myse.access.Source;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;

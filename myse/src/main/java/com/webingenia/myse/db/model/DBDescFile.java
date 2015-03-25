@@ -1,8 +1,8 @@
-package com.webingenia.cifstest.db.model;
+package com.webingenia.myse.db.model;
 
-import com.webingenia.cifstest.access.AccessException;
-import com.webingenia.cifstest.access.File;
-import com.webingenia.cifstest.access.Source;
+import com.webingenia.myse.access.AccessException;
+import com.webingenia.myse.access.File;
+import com.webingenia.myse.access.Source;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;

@@ -1,6 +1,6 @@
-package com.webingenia.cifstest.tasks;
+package com.webingenia.myse.tasks;
 
-import static com.webingenia.cifstest.common.LOG.LOG;
+import static com.webingenia.myse.common.LOG.LOG;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;

@@ -1,4 +1,4 @@
-package com.webingenia.cifstest.common;
+package com.webingenia.myse.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

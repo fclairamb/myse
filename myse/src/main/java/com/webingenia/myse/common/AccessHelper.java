@@ -1,6 +1,6 @@
-package com.webingenia.cifstest.common;
+package com.webingenia.myse.common;
 
-import com.webingenia.cifstest.access.File;
+import com.webingenia.myse.access.File;
 import java.util.ArrayList;
 import java.util.List;
 

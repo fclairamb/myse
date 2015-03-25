@@ -1,17 +1,14 @@
-package com.webingenia.cifstest;
+package com.webingenia.myse;
 
-import com.webingenia.cifstest.access.File;
-import com.webingenia.cifstest.access.Source;
-import com.webingenia.cifstest.access.disk.SourceDisk;
-import com.webingenia.cifstest.access.smb.SourceSMB;
-import com.webingenia.cifstest.common.AccessHelper;
-import static com.webingenia.cifstest.common.LOG.LOG;
-import com.webingenia.cifstest.db.DBMgmt;
-import com.webingenia.cifstest.db.model.DBDescFile;
-import com.webingenia.cifstest.db.model.DBDescSource;
-import com.webingenia.cifstest.explore.DirExplorer;
-import com.webingenia.cifstest.explore.FileIndexer;
-import com.webingenia.cifstest.tasks.Tasks;
+import com.webingenia.myse.access.Source;
+import com.webingenia.myse.access.disk.SourceDisk;
+import com.webingenia.myse.access.smb.SourceSMB;
+import com.webingenia.myse.db.DBMgmt;
+import com.webingenia.myse.db.model.DBDescSource;
+import com.webingenia.myse.embeddedes.EmbeddedElasticSearch;
+import com.webingenia.myse.explore.DirExplorer;
+import com.webingenia.myse.explore.FileIndexer;
+import com.webingenia.myse.tasks.Tasks;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -21,6 +18,7 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 		DBMgmt.start();
+		EmbeddedElasticSearch.start();
 
 		EntityManager em = DBMgmt.getEntityManager();
 

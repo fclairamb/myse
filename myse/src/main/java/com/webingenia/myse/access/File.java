@@ -1,4 +1,4 @@
-package com.webingenia.cifstest.access;
+package com.webingenia.myse.access;
 
 import java.io.InputStream;
 import java.util.Date;
@@ -53,7 +53,7 @@ public abstract class File {
 	 * Get the input stream of the file
 	 *
 	 * @return InputStream of the file
-	 * @throws com.webingenia.cifstest.access.AccessException
+	 * @throws com.webingenia.myse.access.AccessException
 	 */
 	public abstract InputStream getInputStream() throws AccessException;
 }

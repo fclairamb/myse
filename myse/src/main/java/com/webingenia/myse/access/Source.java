@@ -1,8 +1,8 @@
-package com.webingenia.cifstest.access;
+package com.webingenia.myse.access;
 
-import com.webingenia.cifstest.access.disk.SourceDisk;
-import com.webingenia.cifstest.access.smb.SourceSMB;
-import com.webingenia.cifstest.db.model.DBDescSource;
+import com.webingenia.myse.access.disk.SourceDisk;
+import com.webingenia.myse.access.smb.SourceSMB;
+import com.webingenia.myse.db.model.DBDescSource;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;

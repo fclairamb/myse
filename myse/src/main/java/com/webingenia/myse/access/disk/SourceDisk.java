@@ -1,9 +1,9 @@
-package com.webingenia.cifstest.access.disk;
+package com.webingenia.myse.access.disk;
 
-import com.webingenia.cifstest.access.AccessException;
-import com.webingenia.cifstest.access.File;
-import com.webingenia.cifstest.access.Source;
-import com.webingenia.cifstest.db.model.DBDescSource;
+import com.webingenia.myse.access.AccessException;
+import com.webingenia.myse.access.File;
+import com.webingenia.myse.access.Source;
+import com.webingenia.myse.db.model.DBDescSource;
 
 public class SourceDisk extends Source {
 

@@ -1,12 +1,12 @@
-package com.webingenia.cifstest.explore;
+package com.webingenia.myse.explore;
 
-import com.webingenia.cifstest.access.AccessException;
-import com.webingenia.cifstest.access.File;
-import com.webingenia.cifstest.access.Source;
-import static com.webingenia.cifstest.common.LOG.LOG;
-import com.webingenia.cifstest.db.DBMgmt;
-import com.webingenia.cifstest.db.model.DBDescFile;
-import com.webingenia.cifstest.db.model.DBDescSource;
+import com.webingenia.myse.access.AccessException;
+import com.webingenia.myse.access.File;
+import com.webingenia.myse.access.Source;
+import static com.webingenia.myse.common.LOG.LOG;
+import com.webingenia.myse.db.DBMgmt;
+import com.webingenia.myse.db.model.DBDescFile;
+import com.webingenia.myse.db.model.DBDescSource;
 import javax.persistence.EntityManager;
 
 public class DirExplorer implements Runnable {

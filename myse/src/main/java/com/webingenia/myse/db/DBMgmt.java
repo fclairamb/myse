@@ -1,6 +1,6 @@
-package com.webingenia.cifstest.db;
+package com.webingenia.myse.db;
 
-import static com.webingenia.cifstest.common.LOG.LOG;
+import static com.webingenia.myse.common.LOG.LOG;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;

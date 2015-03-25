@@ -1,10 +1,10 @@
-package com.webingenia.cifstest.access.smb;
+package com.webingenia.myse.access.smb;
 
-import com.webingenia.cifstest.access.AccessException;
-import com.webingenia.cifstest.access.File;
-import com.webingenia.cifstest.access.Source;
-import static com.webingenia.cifstest.common.LOG.LOG;
-import com.webingenia.cifstest.db.model.DBDescSource;
+import com.webingenia.myse.access.AccessException;
+import com.webingenia.myse.access.File;
+import com.webingenia.myse.access.Source;
+import static com.webingenia.myse.common.LOG.LOG;
+import com.webingenia.myse.db.model.DBDescSource;
 import java.net.MalformedURLException;
 import java.util.Map;
 import jcifs.smb.SmbFile;

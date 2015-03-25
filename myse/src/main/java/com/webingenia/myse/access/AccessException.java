@@ -1,4 +1,4 @@
-package com.webingenia.cifstest.access;
+package com.webingenia.myse.access;
 
 public class AccessException extends Exception {
 

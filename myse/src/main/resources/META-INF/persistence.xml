@@ -2,9 +2,9 @@
 <persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
   <persistence-unit name="h2">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-    <class>com.webingenia.cifstest.db.model.Config</class>
-    <class>com.webingenia.cifstest.db.model.DBDescFile</class>
-    <class>com.webingenia.cifstest.db.model.DBDescSource</class>
+    <class>com.webingenia.myse.db.model.Config</class>
+    <class>com.webingenia.myse.db.model.DBDescFile</class>
+    <class>com.webingenia.myse.db.model.DBDescSource</class>
     <shared-cache-mode>ALL</shared-cache-mode>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:h2:tcp://localhost/~/myse"/>

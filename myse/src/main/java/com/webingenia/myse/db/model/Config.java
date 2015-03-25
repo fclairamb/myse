@@ -1,6 +1,6 @@
-package com.webingenia.cifstest.db.model;
+package com.webingenia.myse.db.model;
 
-import com.webingenia.cifstest.db.DBMgmt;
+import com.webingenia.myse.db.DBMgmt;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;

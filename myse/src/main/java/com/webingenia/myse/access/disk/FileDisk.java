@@ -1,8 +1,8 @@
-package com.webingenia.cifstest.access.disk;
+package com.webingenia.myse.access.disk;
 
-import com.webingenia.cifstest.access.AccessException;
-import com.webingenia.cifstest.access.File;
-import com.webingenia.cifstest.access.Source;
+import com.webingenia.myse.access.AccessException;
+import com.webingenia.myse.access.File;
+import com.webingenia.myse.access.Source;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;

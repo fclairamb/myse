@@ -1,6 +1,6 @@
-package com.webingenia.cifstest.db.model;
+package com.webingenia.myse.db.model;
 
-import com.webingenia.cifstest.access.AccessException;
+import com.webingenia.myse.access.AccessException;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;

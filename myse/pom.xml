@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.webingenia</groupId>
-	<artifactId>cifstest</artifactId>
+	<artifactId>myse</artifactId>
 	<version>1.0</version>
 	<packaging>jar</packaging>
 	<dependencies>
@@ -22,6 +22,11 @@
 			<version>1.4.186</version>
 		</dependency>
 		<dependency>
+			<groupId>org.elasticsearch</groupId>
+			<artifactId>elasticsearch</artifactId>
+			<version>1.4.4</version>
+		</dependency>
+		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<version>1.1.2</version>
@@ -37,11 +42,11 @@
 			<version>4.10</version>
 			<scope>test</scope>
 		</dependency>
-	 <dependency>
-	  <groupId>org.apache.tika</groupId>
-	  <artifactId>tika-parsers</artifactId>
-	  <version>1.7</version>
-	 </dependency>
+		<dependency>
+			<groupId>org.apache.tika</groupId>
+			<artifactId>tika-parsers</artifactId>
+			<version>1.7</version>
+		</dependency>
 	</dependencies>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -55,7 +60,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>com.webingenia.cifstest.Main</mainClass>
+							<mainClass>com.webingenia.myse.Main</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>
@@ -90,4 +95,5 @@
 			</resource>
 		</resources>
 	</build>
+	<name>myse</name>
 </project>
