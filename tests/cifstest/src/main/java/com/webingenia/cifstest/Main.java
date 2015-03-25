@@ -62,8 +62,8 @@ public class Main {
 //			}
 //			em.getTransaction().commit();
 
-			Tasks.getService().scheduleWithFixedDelay(new DirExplorer(source), 0, 1, TimeUnit.MINUTES);
-			Tasks.getService().scheduleWithFixedDelay(new FileIndexer(source), 0, 10, TimeUnit.SECONDS);
+			Tasks.getService().scheduleWithFixedDelay(new DirExplorer(source), 5, 60, TimeUnit.SECONDS);
+			Tasks.getService().scheduleWithFixedDelay(new FileIndexer(source), 10, 10, TimeUnit.SECONDS);
 		}
 	}
 }
