@@ -12,6 +12,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -19,7 +20,14 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
-@Table(name = "file")
+@Table(
+		name = "file",
+		indexes = {
+			@Index(name = "path", columnList = "source_id,file_path", unique = true),
+			@Index(name = "next", columnList = "source_id,directory,to_analyse,date_mod", unique = false),
+			@Index(name = "date_mod", columnList = "date_mod", unique = false)
+		}
+)
 public class DBDescFile implements Serializable {
 
 	@Id
