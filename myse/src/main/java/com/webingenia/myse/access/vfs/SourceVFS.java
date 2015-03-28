@@ -5,6 +5,7 @@ import com.webingenia.myse.access.Source;
 import static com.webingenia.myse.common.LOG.LOG;
 import com.webingenia.myse.db.model.DBDescSource;
 import java.util.Map;
+import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileSystemOptions;
 import org.apache.commons.vfs2.impl.StandardFileSystemManager;
@@ -50,6 +51,7 @@ public class SourceVFS extends Source {
 					case "ftpes":
 						props.put(PROP_SCHEME, "ftps");
 						FtpsFileSystemConfigBuilder.getInstance().setFtpsType(fsOpts, "explicit");
+						FtpsFileSystemConfigBuilder.getInstance().setPassiveMode(fsOpts, true);
 						break;
 				}
 			} catch (FileSystemException ex) {
