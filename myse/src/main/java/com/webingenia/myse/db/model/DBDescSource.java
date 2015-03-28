@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.persistence.CollectionTable;
 import javax.persistence.ElementCollection;
 import javax.persistence.EntityManager;
 import javax.persistence.EnumType;
@@ -42,6 +43,7 @@ public class DBDescSource implements Serializable {
 	private AccessException.AccessState state;
 
 	@ElementCollection
+	@CollectionTable(name = "source_property")
 	@JoinTable(name = "source_property", joinColumns = @JoinColumn(name = "source_id"))
 	@MapKeyColumn(name = "name")
 	@Column(name = "value")

@@ -2,7 +2,6 @@ package com.webingenia.myse.db.model;
 
 import com.webingenia.myse.access.AccessException;
 import com.webingenia.myse.access.File;
-import com.webingenia.myse.access.Source;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -63,6 +62,10 @@ public class DBDescFile implements Serializable {
 	 */
 	@Column(name = "next_analysis")
 	private int nextAnalysis;
+
+	@Column(name = "last_analysis")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date lastAnalysis;
 
 	@Column(name = "to_analyse")
 	private boolean toAnalyse;
@@ -182,6 +185,7 @@ public class DBDescFile implements Serializable {
 	public void performingAnalysis() {
 		nbAnalysis += 1;
 		toAnalyse = false;
+		lastAnalysis = new Date();
 	}
 
 }
