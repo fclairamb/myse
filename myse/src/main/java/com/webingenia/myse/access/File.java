@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * File access.
+ * Generic file access object.
  */
 public abstract class File {
 
@@ -56,4 +56,9 @@ public abstract class File {
 	 * @throws com.webingenia.myse.access.AccessException
 	 */
 	public abstract InputStream getInputStream() throws AccessException;
+
+	@Override
+	public String toString() {
+		return "File{" + getPath() + "}";
+	}
 }

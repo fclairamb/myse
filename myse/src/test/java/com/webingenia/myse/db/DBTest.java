@@ -1,6 +1,5 @@
-package com.webingenia.cifstest.db;
+package com.webingenia.myse.db;
 
-import com.webingenia.myse.db.DBMgmt;
 import com.webingenia.myse.db.model.Config;
 import java.sql.SQLException;
 import junit.framework.Assert;

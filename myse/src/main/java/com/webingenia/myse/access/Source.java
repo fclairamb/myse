@@ -1,7 +1,9 @@
 package com.webingenia.myse.access;
 
 import com.webingenia.myse.access.disk.SourceDisk;
+import com.webingenia.myse.access.ftps.SourceFTPS;
 import com.webingenia.myse.access.smb.SourceSMB;
+import com.webingenia.myse.access.vfs.SourceVFS;
 import com.webingenia.myse.db.model.DBDescSource;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +27,11 @@ public abstract class Source {
 				return new SourceSMB(source);
 			case SourceDisk.TYPE:
 				return new SourceDisk(source);
+			case SourceVFS.TYPE:
+				return new SourceVFS(source);
+			case SourceFTPS.TYPE_EXPLICIT:
+			case SourceFTPS.TYPE_IMPLICIT:
+				return new SourceFTPS(source);
 			default:
 				return null;
 		}

@@ -1,13 +1,11 @@
 package com.webingenia.myse.explore;
 
-import com.webingenia.myse.access.AccessException;
 import com.webingenia.myse.access.File;
 import com.webingenia.myse.access.Source;
 import static com.webingenia.myse.common.LOG.LOG;
 import com.webingenia.myse.db.DBMgmt;
 import com.webingenia.myse.db.model.DBDescFile;
 import java.io.InputStream;
-import java.net.URLConnection;
 import javax.persistence.EntityManager;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.TikaCoreProperties;
@@ -62,6 +60,7 @@ public class FileIndexer implements Runnable {
 				}
 				LOG.info("Mime: " + metadata.get(Metadata.CONTENT_TYPE));
 				LOG.info("Title: " + metadata.get(TikaCoreProperties.TITLE));
+				LOG.info("Content: " + contenthandler.toString());
 				//System.out.println("content: " + contenthandler.toString());
 			} finally {
 				// Whatever happens, we save

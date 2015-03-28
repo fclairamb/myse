@@ -16,7 +16,7 @@ public class SourceSMB extends Source {
 	public static final String PROP_USER = "user",
 			PROP_PASS = "pass",
 			PROP_HOST = "host",
-			PROP_DIR = "dir";
+			PROP_PATH = "path";
 
 	public SourceSMB(DBDescSource desc) {
 		super(desc);
@@ -27,7 +27,7 @@ public class SourceSMB extends Source {
 		String user = props.get(PROP_USER),
 				pass = props.get(PROP_PASS),
 				host = props.get(PROP_HOST),
-				dir = props.get(PROP_DIR);
+				dir = props.get(PROP_PATH);
 		return String.format("smb://%s:%s@%s/%s/", user, pass, host, dir);
 	}
 

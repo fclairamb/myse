@@ -1,5 +1,15 @@
 package com.webingenia.myse.access;
 
+/**
+ * Access exception. This is a general-purpose access exception. It allows to
+ * differentiate some general issues:
+ * <ul>
+ * <li>Access denied (bad credential)</li>
+ * <li>Communication error (connection refused or lost)</li>
+ * <li>Temporary issue that should be handled with a retry</li>
+ * <li>Unknown issue</li>
+ * </ul>
+ */
 public class AccessException extends Exception {
 
 	private final AccessState state;
@@ -11,7 +21,6 @@ public class AccessException extends Exception {
 
 	public enum AccessState {
 
-		OK,
 		DENIED,
 		ERROR,
 		TEMPORARY_ISSUE,
