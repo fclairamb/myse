@@ -64,6 +64,7 @@ public class DirExplorer implements Runnable {
 		}
 
 		desc.setLastModified(file.getLastModified());
+		desc.setDirectory(dir);
 
 		if (dir) {
 			if (sub) {
