@@ -28,7 +28,7 @@ public class DBMgmt {
 	private static Server h2Server;
 
 	public synchronized static void startH2Server() throws SQLException {
-		LOG.debug("Starting H2 server...");
+		LOG.debug("Starting H2 server... (" + getJdbcUrl() + ")");
 		if (h2Server == null) {
 			h2Server = Server.createTcpServer(new String[]{"-tcp"});
 			h2Server.start();
