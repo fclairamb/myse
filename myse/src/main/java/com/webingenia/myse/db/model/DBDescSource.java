@@ -100,4 +100,8 @@ public class DBDescSource implements Serializable {
 	public static List<DBDescSource> all(EntityManager em) {
 		return em.createQuery("SELECT s FROM DBDescSource s", DBDescSource.class).getResultList();
 	}
+
+	public String getEsIndexName() {
+		return "source_" + getId();
+	}
 }

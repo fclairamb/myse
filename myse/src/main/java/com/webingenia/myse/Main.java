@@ -5,9 +5,9 @@ import com.webingenia.myse.access.Source;
 import static com.webingenia.myse.common.LOG.LOG;
 import com.webingenia.myse.db.DBMgmt;
 import com.webingenia.myse.db.model.DBDescSource;
-import com.webingenia.myse.embeddedes.EmbeddedElasticSearch;
-import com.webingenia.myse.explore.DirExplorer;
-import com.webingenia.myse.explore.FileIndexer;
+import com.webingenia.myse.embeddedes.ElasticSearch;
+import com.webingenia.myse.direxplore.DirExplorer;
+import com.webingenia.myse.fileexplore.FileIndexer;
 import com.webingenia.myse.tasks.Tasks;
 import com.webingenia.myse.webserver.JettyServer;
 import java.io.FileInputStream;
@@ -22,12 +22,12 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 		DBMgmt.start();
-		EmbeddedElasticSearch.start();
+		ElasticSearch.start();
 		JettyServer.start();
 
 		EntityManager em = DBMgmt.getEntityManager();
 
-		List<Source> allSources = Source.all(em);
+		List<DBDescSource> allSources = DBDescSource.all(em);
 		if (allSources.isEmpty()) {
 			em.getTransaction().begin();
 
@@ -48,24 +48,17 @@ public class Main {
 
 			em.persist(smb);
 			em.getTransaction().commit();
-			allSources = Source.all(em);
+			allSources = DBDescSource.all(em);
 		}
 
-		for (Source source : allSources) {
-//			File rootDir = source.getRootDir();
-//			em.getTransaction().begin();
-//			for (File f : AccessHelper.listAll(rootDir)) {
-//				DBDescFile df = DBDescFile.getOrCreate(f, em);
-//				LOG.info("File " + f.getPath() + " / " + f.getModifiedDate());
-//				df.setLastModification(f.getModifiedDate());
-//				df.setDirectory(f.isDirectory());
-//				em.persist(df);
-//			}
-//			em.getTransaction().commit();
-			File rootDir = source.getRootDir();
-			LOG.info("files.size: " + rootDir.listFiles().size());
-			Tasks.getService().scheduleWithFixedDelay(new DirExplorer(source), 0, 10, TimeUnit.SECONDS);
-			Tasks.getService().scheduleWithFixedDelay(new FileIndexer(source), 30, 10, TimeUnit.SECONDS);
+		for (DBDescSource dbSource : allSources) {
+			// We make sure ES has an index for it
+			ElasticSearch.prepare(dbSource);
+
+			// We start the indexing tasks
+			Source source = Source.get(dbSource);
+			Tasks.getService().scheduleWithFixedDelay(new DirExplorer(source), 5, 10, TimeUnit.SECONDS);
+			Tasks.getService().scheduleWithFixedDelay(new FileIndexer(source), 5, 5, TimeUnit.SECONDS);
 		}
 	}
 }

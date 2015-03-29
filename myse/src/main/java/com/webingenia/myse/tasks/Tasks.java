@@ -9,7 +9,7 @@ public class Tasks {
 
 	private static int counter;
 
-	private static final ScheduledThreadPoolExecutor tasks = new ScheduledThreadPoolExecutor(8, new ThreadFactory() {
+	private static final ScheduledThreadPoolExecutor tasks = new ScheduledThreadPoolExecutor(4, new ThreadFactory() {
 		@Override
 		public Thread newThread(Runnable r) {
 			Thread t = new Thread(r, "MYSE-Tasks" + (counter++));

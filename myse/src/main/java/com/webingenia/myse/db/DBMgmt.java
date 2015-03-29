@@ -21,24 +21,9 @@ public class DBMgmt {
 		}
 	}
 
-	private static final String DB_NAME = "myse";
-
 	private static String getJdbcUrl() {
-		return "jdbc:h2:tcp://localhost/~/" + DB_NAME + (test ? "-test" : "");
+		return "jdbc:h2:tcp://localhost/./data/h2/main";
 	}
-
-	private static boolean ddlRun;
-
-	public static void setLogging(boolean logging) {
-
-	}
-
-	public static void cleanupDatabase() {
-		LOG.warn("Cleaning up database !!!");
-		ddlRun = true;
-	}
-
-	private static boolean test;
 
 	private static Server h2Server;
 

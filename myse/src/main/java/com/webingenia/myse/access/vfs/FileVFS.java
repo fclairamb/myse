@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
@@ -41,10 +43,11 @@ public class FileVFS extends File {
 	}
 
 	/**
-	 * VFS file listing.
-	 * It doesn't work for many implementations. See http://commons.apache.org/proper/commons-vfs/filesystems.html
+	 * VFS file listing. It doesn't work for many implementations. See
+	 * http://commons.apache.org/proper/commons-vfs/filesystems.html
+	 *
 	 * @return
-	 * @throws AccessException 
+	 * @throws AccessException
 	 */
 	@Override
 	public List<File> listFiles() throws AccessException {
@@ -79,6 +82,15 @@ public class FileVFS extends File {
 	public InputStream getInputStream() throws AccessException {
 		try {
 			return file.getContent().getInputStream();
+		} catch (FileSystemException ex) {
+			throw source.convertException(ex);
+		}
+	}
+
+	@Override
+	public long getSize() throws AccessException {
+		try {
+			return file.getContent().getSize();
 		} catch (FileSystemException ex) {
 			throw source.convertException(ex);
 		}

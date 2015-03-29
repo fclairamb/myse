@@ -58,4 +58,9 @@ public class FileDisk extends File {
 		}
 	}
 
+	@Override
+	public long getSize() throws AccessException {
+		return file.length();
+	}
+
 }

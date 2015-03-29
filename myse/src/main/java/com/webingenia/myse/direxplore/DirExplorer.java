@@ -1,4 +1,4 @@
-package com.webingenia.myse.explore;
+package com.webingenia.myse.direxplore;
 
 import com.webingenia.myse.access.AccessException;
 import com.webingenia.myse.access.File;
@@ -13,6 +13,8 @@ public class DirExplorer implements Runnable {
 
 	private final Source source;
 
+	private int nbFilesToFetch = 100;
+
 	public DirExplorer(Source source) {
 		this.source = source;
 	}
@@ -25,20 +27,27 @@ public class DirExplorer implements Runnable {
 		try {
 			em.getTransaction().begin();
 
-			{ // We always start by a root dir analysis
+			try { // We always start by a root dir analysis
 				DBDescFile df = DBDescFile.getOrCreate(source.getRootDir(), em);
 				analyseFile(df, em, true);
+			} finally {
+				em.getTransaction().commit();
 			}
 
 			boolean again = true;
 
-			for (int pass = 0; pass < 1 && again; pass++) {
+			for (int pass = 0; pass < 3 && again; pass++) {
 				LOG.info("Analysis pass {}", pass);
 				// We analyse all the previously listed dirs
-				for (DBDescFile desc : DBDescFile.listFiles(sd, true, 100, em)) {
-					if (analyseFile(desc, em, true)) {
-						again = true;
+				em.getTransaction().begin();
+				try {
+					for (DBDescFile desc : DBDescFile.listFiles(sd, true, nbFilesToFetch, em)) {
+						if (analyseFile(desc, em, true)) {
+							again = true;
+						}
 					}
+				} finally {
+					em.getTransaction().commit();
 				}
 			}
 		} catch (AccessException ex) {
@@ -47,7 +56,6 @@ public class DirExplorer implements Runnable {
 		} catch (Exception ex) {
 			sd.setState(AccessException.AccessState.ERROR);
 		} finally {
-			em.getTransaction().commit();
 			em.close();
 		}
 	}
@@ -65,6 +73,11 @@ public class DirExplorer implements Runnable {
 
 		desc.setLastModified(file.getLastModified());
 		desc.setDirectory(dir);
+		if ( ! dir ) {
+			desc.setSize(file.getSize());
+		}
+		
+		desc.updateNextAnalysis();
 
 		if (dir) {
 			if (sub) {
@@ -83,8 +96,6 @@ public class DirExplorer implements Runnable {
 				} catch (AccessException ex) {
 					LOG.warn("analyse.listing: " + ex);
 				}
-				// We don't have to analyse it again, it's done
-//				desc.setToAnalyze(false);
 			}
 		}
 

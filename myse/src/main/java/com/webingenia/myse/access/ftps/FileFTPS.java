@@ -84,4 +84,9 @@ public class FileFTPS extends File {
 		}
 	}
 
+	@Override
+	public long getSize() throws AccessException {
+		return file.getSize();
+	}
+
 }

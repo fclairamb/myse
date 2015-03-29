@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 
@@ -85,6 +87,15 @@ public class FileSMB extends File {
 		try {
 			return file.getInputStream();
 		} catch (IOException ex) {
+			throw convertException(ex);
+		}
+	}
+
+	@Override
+	public long getSize() throws AccessException {
+		try {
+			return file.length();
+		} catch (SmbException ex) {
 			throw convertException(ex);
 		}
 	}

@@ -29,10 +29,17 @@ public abstract class File {
 	 * List all the files of a directory. This can only be applied to a
 	 * directory.
 	 *
-	 * @return a list of all the files in a directory.
+	 * @return A list of all the files in a directory.
 	 * @throws AccessException
 	 */
 	public abstract List<File> listFiles() throws AccessException;
+
+	/**
+	 * Get the file size.
+	 * @return File's size
+	 * @throws AccessException 
+	 */
+	public abstract long getSize() throws AccessException;
 
 	/**
 	 * Get the RELATIVE path of the file. The path must absolutely be relative

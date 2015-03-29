@@ -43,6 +43,9 @@ public class DBDescFile implements Serializable {
 	@Column(name = "file_path")
 	private String filePath;
 
+	@Column(name = "file_size")
+	private long fileSize;
+
 	/**
 	 * If the file is a directory.
 	 */
@@ -100,6 +103,14 @@ public class DBDescFile implements Serializable {
 		this.filePath = filePath;
 	}
 
+	public long getSize() {
+		return fileSize;
+	}
+
+	public void setSize(long fileSize) {
+		this.fileSize = fileSize;
+	}
+
 	public boolean isDirectory() {
 		return directory;
 	}
@@ -118,9 +129,17 @@ public class DBDescFile implements Serializable {
 			this.toAnalyse = true;
 			this.dateMod = date;
 		}
+	}
 
-		long elapsed = (System.currentTimeMillis() - dateMod.getTime()) + nbErrors * 3600 * 1000;
-		nextAnalysis += Math.log(elapsed);
+	public void updateNextAnalysis() {
+		{ // We increment it by its age
+			long elapsed = (System.currentTimeMillis() - dateMod.getTime()) + nbErrors * 3600 * 1000;
+			nextAnalysis += Math.log(elapsed);
+		}
+
+		{ // And by its size
+			nextAnalysis += Math.log(fileSize);
+		}
 	}
 
 	public Date getDateMod() {
