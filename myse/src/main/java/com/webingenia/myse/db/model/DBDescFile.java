@@ -2,6 +2,7 @@ package com.webingenia.myse.db.model;
 
 import com.webingenia.myse.access.AccessException;
 import com.webingenia.myse.access.File;
+import com.webingenia.myse.common.Hashing;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -131,6 +132,36 @@ public class DBDescFile implements Serializable {
 		}
 	}
 
+	public String getExtension() {
+		String path = getPath();
+		int p = path.lastIndexOf(".");
+		return path.substring(p + 1).toLowerCase();
+	}
+
+	public String getName() {
+		String path = getPath();
+		int p = path.lastIndexOf(".");
+		return path.substring(p + 1).toLowerCase();
+	}
+
+	private static int extensionToPriority(String extension) {
+		switch (extension) {
+			case "doc":
+			case "docx":
+			case "pdf":
+			case "odt":
+				return 0;
+			case "xls":
+			case "xlsx":
+				return 10;
+			case "html":
+			case "txt":
+				return 30;
+			default:
+				return 50;
+		}
+	}
+
 	public void updateNextAnalysis() {
 		{ // We increment it by its age
 			long elapsed = (System.currentTimeMillis() - dateMod.getTime()) + nbErrors * 3600 * 1000;
@@ -139,6 +170,11 @@ public class DBDescFile implements Serializable {
 
 		{ // And by its size
 			nextAnalysis += Math.log(fileSize);
+		}
+
+		{ // And by its extension
+			int priority = extensionToPriority(getExtension());
+			nextAnalysis += priority;
 		}
 	}
 
@@ -207,4 +243,8 @@ public class DBDescFile implements Serializable {
 		lastAnalysis = new Date();
 	}
 
+	public String getDocId() {
+		String fullId = source.getShortName() + "-" + getPath();
+		return Hashing.toSHA1(fullId);
+	}
 }

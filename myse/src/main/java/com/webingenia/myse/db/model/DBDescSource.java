@@ -15,13 +15,19 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "source")
+@Table(
+		name = "source",
+		indexes = {
+			@Index(name = "shortName", columnList = "shortName", unique = true)
+		}
+)
 public class DBDescSource implements Serializable {
 
 	@Id
@@ -31,6 +37,9 @@ public class DBDescSource implements Serializable {
 
 	@Column(name = "name")
 	private String name;
+
+	@Column(name = "short_name")
+	private String shortName;
 
 	@Column(name = "type")
 	private String type;
@@ -63,6 +72,13 @@ public class DBDescSource implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+		if (this.shortName == null) {
+			this.shortName = this.name.replaceAll("[\\s]", "_").replaceAll("[^\\w]", "");
+		}
+	}
+
+	public String getShortName() {
+		return this.shortName;
 	}
 
 	public String getType() {
@@ -101,7 +117,7 @@ public class DBDescSource implements Serializable {
 		return em.createQuery("SELECT s FROM DBDescSource s", DBDescSource.class).getResultList();
 	}
 
-	public String getEsIndexName() {
-		return "source_" + getId();
-	}
+//	public String getEsIndexName() {
+//		return "source_" + getId();
+//	}
 }

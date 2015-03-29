@@ -2,6 +2,7 @@ package com.webingenia.myse.embeddedes;
 
 import com.webingenia.myse.common.LOG;
 import com.webingenia.myse.db.model.DBDescSource;
+import com.webingenia.myse.fileexplore.FileIndexer;
 import java.io.IOException;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
@@ -13,6 +14,9 @@ import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 
 public class ElasticSearch {
+
+	private ElasticSearch() {
+	}
 
 	private static Node node;
 
@@ -30,9 +34,24 @@ public class ElasticSearch {
 				.data(true).local(true).node();
 	}
 
+	private static void createIndex() {
+		CreateIndexRequest request = Requests.createIndexRequest(FileIndexer.ES_INDEX_NAME);
+		CreateIndexResponse response;
+		try (Client clt = client()) {
+			response = clt.admin().indices().create(request).actionGet();
+		}
+	}
+
+	/**
+	 * Prepare elasticsearch for this source.
+	 *
+	 * @param source Source to prepare it for.
+	 * @deprecated We will use only one indice for now.
+	 */
+	@Deprecated
 	public static void prepare(DBDescSource source) {
 		try {
-			CreateIndexRequest request = Requests.createIndexRequest(source.getEsIndexName());
+			CreateIndexRequest request = Requests.createIndexRequest(FileIndexer.ES_INDEX_NAME);
 			CreateIndexResponse response;
 			try (Client clt = client()) {
 				response = clt.admin().indices().create(request).actionGet();

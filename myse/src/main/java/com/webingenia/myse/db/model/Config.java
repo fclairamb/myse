@@ -47,7 +47,18 @@ public class Config implements Serializable {
 
 	public static String get(String name, String defaultValue) {
 		Config c = getConfig(name);
-		return c != null ? c.getValue() : null;
+		if (c == null) {
+			set(name, defaultValue);
+		}
+		return defaultValue;
+	}
+
+	public static int get(String name, int defaultValue) {
+		return Integer.parseInt(get(name, Integer.toString(defaultValue)));
+	}
+
+	public static boolean get(String name, boolean defaultValue) {
+		return Boolean.parseBoolean(get(name, Boolean.toString(defaultValue)));
 	}
 
 	private static Config getConfig(String name) {

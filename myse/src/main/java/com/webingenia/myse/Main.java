@@ -1,8 +1,6 @@
 package com.webingenia.myse;
 
-import com.webingenia.myse.access.File;
 import com.webingenia.myse.access.Source;
-import static com.webingenia.myse.common.LOG.LOG;
 import com.webingenia.myse.db.DBMgmt;
 import com.webingenia.myse.db.model.DBDescSource;
 import com.webingenia.myse.embeddedes.ElasticSearch;
@@ -50,14 +48,13 @@ public class Main {
 			em.getTransaction().commit();
 			allSources = DBDescSource.all(em);
 		}
-
+		
 		for (DBDescSource dbSource : allSources) {
 			// We make sure ES has an index for it
-			ElasticSearch.prepare(dbSource);
 
 			// We start the indexing tasks
 			Source source = Source.get(dbSource);
-			Tasks.getService().scheduleWithFixedDelay(new DirExplorer(source), 5, 10, TimeUnit.SECONDS);
+			Tasks.getService().scheduleWithFixedDelay(new DirExplorer(source), 0, 3, TimeUnit.MINUTES);
 			Tasks.getService().scheduleWithFixedDelay(new FileIndexer(source), 5, 5, TimeUnit.SECONDS);
 		}
 	}

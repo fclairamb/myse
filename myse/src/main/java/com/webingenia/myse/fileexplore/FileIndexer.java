@@ -10,6 +10,7 @@ import com.webingenia.myse.embeddedes.ElasticSearch;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import javax.persistence.EntityManager;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.TikaCoreProperties;
@@ -17,7 +18,6 @@ import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.BodyContentHandler;
-import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.index.IndexResponse;
@@ -50,7 +50,8 @@ public class FileIndexer implements Runnable {
 
 	private final ParseContext context = new ParseContext();
 
-	private static final String ES_DOC_TYPE = "Document";
+	public static final String ES_DOC_TYPE = "Document";
+	public static final String ES_INDEX_NAME = "all";
 
 	private void analyseFile(DBDescFile desc, EntityManager em, Client esClient) {
 		LOG.info("Analysing " + desc);
@@ -73,22 +74,29 @@ public class FileIndexer implements Runnable {
 
 				DBDescSource ds = source.getDesc();
 
-				String id = ds.getId() + "_" + desc.getId();
+				String docId = desc.getDocId();
 
 				Map<String, Object> data = new HashMap<>();
 				String title = metadata.get(TikaCoreProperties.TITLE);
 				if (title == null || title.trim().isEmpty()) {
 					title = desc.getPath();
-					title = title.substring(title.lastIndexOf("/")+1);
+					title = title.substring(title.lastIndexOf("/") + 1);
 				}
 				data.put("title", title);
+				data.put("name", desc.getName());
+				data.put("extension", desc.getExtension());
+				data.put("size", file.getSize());
 				data.put("path", file.getPath());
 				data.put("source", ds.getId());
 				data.put("date_mod", desc.getDateMod());
-				data.put("content", contenthandler.toString());
-				IndexRequest req = new IndexRequestBuilder(esClient).setIndex(ds.getEsIndexName()).setType(ES_DOC_TYPE).setId(id).setSource(data).request();
-				IndexResponse response = esClient.index(req).actionGet();
-				LOG.info("Index response: " + response);
+				{
+					String content = contenthandler.toString();
+					content = content.replace("\n", " ").replace("\r", " ").replace("\t", " ");
+					data.put("content", content);
+				}
+				IndexRequest req = new IndexRequestBuilder(esClient).setIndex(ES_INDEX_NAME).setType(ES_DOC_TYPE).setId(docId).setSource(data).request();
+				boolean created = esClient.index(req).actionGet().isCreated();
+				LOG.info("Document {} {} !", docId, created ? "created" : "updated");
 			} finally {
 				// Whatever happens, we save
 				em.getTransaction().commit();
