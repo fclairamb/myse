@@ -7,10 +7,27 @@
 		{{ 'Hello ' + 'you !'}} I am {{ 4 + 6}} at {{ 1427843288000 | date:'dd/MM/yyyy' }}.
 
 		<div ng-controller="MyappController as mac">
-			<div ng-repeat="product in mac.products | orderBy:'-price'">
+			<div ng-repeat="product in mac.products| orderBy:'-price'">
 				<div ng-hide="product.hide">
-					<h1>{{product.name}} ({{product.price | currency }})</h1>
+					<h1>{{product.name}} ({{product.price| currency }})</h1>
 					<div ng-show="product.ok">OK !</div>
+				</div>
+			</div>
+			<div ng-init="value = 'abc'">
+				<a href class="btn btn-default" ng-class="{'btn-info': value == 'abc'}" ng-click="value = 'abc'">ABC</a>
+				<a href class="btn btn-default" ng-class="{'btn-info': value == 'def'}" ng-click="value = 'def'">DEF</a>
+				<a href class="btn btn-default" ng-class="{'btn-info': value == 'ghi'}" ng-click="value = 'ghi'">GHI</a>
+				<div class="panel" ng-show="value == 'abc'">
+					<h4>ABC</h4>
+					<p>Stuff 1</p>
+				</div>
+				<div class="panel" ng-show="value == 'def'">
+					<h4>DEF</h4>
+					<p>Stuff 2</p>
+				</div>
+				<div class="panel" ng-show="value == 'ghi'">
+					<h4>GHI</h4>
+					<p>Stuff 3</p>
 				</div>
 			</div>
 		</div>
