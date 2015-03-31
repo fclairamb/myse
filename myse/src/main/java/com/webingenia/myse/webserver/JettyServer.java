@@ -1,6 +1,7 @@
 package com.webingenia.myse.webserver;
 
-import com.webingenia.myse.webserver.servlets.Index;
+import com.webingenia.myse.webserver.servlets.PageIndex;
+import com.webingenia.myse.webserver.servlets.PageStatic;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
 
@@ -24,7 +25,8 @@ public class JettyServer {
 
 	private static void loadHandler() {
 		handler = new ServletHandler();
-		handler.addServletWithMapping(Index.class, "/");
+		handler.addServletWithMapping(PageIndex.class, "/");
+		handler.addServletWithMapping(PageStatic.class, "/static/*");
 		server.setHandler(handler);
 	}
 }
