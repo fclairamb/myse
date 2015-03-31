@@ -13,19 +13,19 @@
 					<div ng-show="product.ok">OK !</div>
 				</div>
 			</div>
-			<div ng-init="value = 'abc'">
-				<a href class="btn btn-default" ng-class="{'btn-info': value == 'abc'}" ng-click="value = 'abc'">ABC</a>
-				<a href class="btn btn-default" ng-class="{'btn-info': value == 'def'}" ng-click="value = 'def'">DEF</a>
-				<a href class="btn btn-default" ng-class="{'btn-info': value == 'ghi'}" ng-click="value = 'ghi'">GHI</a>
-				<div class="panel" ng-show="value == 'abc'">
+			<div ng-controller="PanelController as pan">
+				<a href class="btn btn-default" ng-class="{'btn-info': pan.isSelected(1) }" ng-click="pan.selectTab(1)">ABC</a>
+				<a href class="btn btn-default" ng-class="{'btn-info': pan.isSelected(2) }" ng-click="pan.selectTab(2)">DEF</a>
+				<a href class="btn btn-default" ng-class="{'btn-info': pan.isSelected(3) }" ng-click="pan.selectTab(3)">GHI</a>
+				<div class="panel" ng-show="pan.isSelected(1)">
 					<h4>ABC</h4>
 					<p>Stuff 1</p>
 				</div>
-				<div class="panel" ng-show="value == 'def'">
+				<div class="panel" ng-show="pan.isSelected(2)">
 					<h4>DEF</h4>
 					<p>Stuff 2</p>
 				</div>
-				<div class="panel" ng-show="value == 'ghi'">
+				<div class="panel" ng-show="pan.isSelected(3)">
 					<h4>GHI</h4>
 					<p>Stuff 3</p>
 				</div>

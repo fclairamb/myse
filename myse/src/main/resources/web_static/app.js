@@ -25,4 +25,15 @@
 			hide: true
 		}
 	];
+
+	app.controller('PanelController', function () {
+		this.tab = 1;
+		this.selectTab = function (tab) {
+			this.tab = tab;
+		};
+		this.isSelected = function (checkTab) {
+			//console.log('isSelected( ' + this.tab + ' / ' + checkTab + ' )');
+			return this.tab === checkTab;
+		};
+	});
 })();
