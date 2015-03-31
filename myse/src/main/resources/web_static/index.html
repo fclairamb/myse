@@ -3,7 +3,17 @@
 		<title>MYSE</title>
 		<link rel="stylesheet" type="text/css" href="/static/boostrap-3.3.4/css/bootstrap.min.css" />
 	</head>
-	<body>
+	<body ng-app="myapp">
+		{{ 'Hello ' + 'you !'}} I am {{ 4 + 6}}.
+
+		<div ng-controller="MyappController as mac">
+			<div ng-repeat="product in mac.products">
+				<div ng-hide="product.hide">
+					<h1>{{product.name}} ({{product.price}})</h1>
+					<div ng-show="product.ok">OK !</div>
+				</div>
+			</div>
+		</div>
 		<script type="text/javascript" src="/static/jquery-1.11.2/jquery.min.js"></script>
 		<script type="text/javascript" src="/static/boostrap-3.3.4/js/bootstrap.min.js"></script>
 		<script type="text/javascript" src="/static/angular-1.4.0b6/angular.min.js"></script>
