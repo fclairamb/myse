@@ -9,12 +9,14 @@
 			name: 'Louis',
 			price: 1.30,
 			ok: false,
-			hide: false
+			hide: false,
+			hints: ['good cat!', 'gentle cat']
 		},
 		{
 			name: 'Charles',
 			price: 40,
-			ok: true
+			ok: true,
+			hints: ['bad cat!', 'evil cat!']
 		},
 		{
 			name: 'Alice',
