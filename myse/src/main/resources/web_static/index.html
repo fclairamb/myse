@@ -11,6 +11,17 @@
 				<div ng-hide="product.hide">
 					<h1>{{product.name}} ({{product.price| currency }})</h1>
 					<div ng-show="product.ok">OK !</div>
+					<ul>
+						<li ng-repeat="hint in product.hints">
+							{{ hint }}
+						</li>
+						<li ng-show="product.nextHint">
+							{{ product.nextHint }}
+						</li>
+					</ul>
+					<form ng-submit="mac.addHint(product, nextHint)">
+						<input type="text" ng-model="product.nextHint" />
+					</form>
 				</div>
 			</div>
 			<div ng-controller="PanelController as pan">

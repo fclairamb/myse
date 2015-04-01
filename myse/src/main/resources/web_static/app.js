@@ -3,6 +3,11 @@
 
 	app.controller('MyappController', function () {
 		this.products = gems;
+		
+		this.addHint = function(product) {
+			product.hints.push( product.nextHint );
+			product.nextHint = '';
+		}
 	});
 
 	var gems = [{
