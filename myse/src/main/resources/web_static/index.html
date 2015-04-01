@@ -2,6 +2,7 @@
 	<head>
 		<title>MYSE</title>
 		<link rel="stylesheet" type="text/css" href="/static/boostrap-3.3.4/css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="/static/styles.css" />
 	</head>
 	<body ng-app="myapp">
 		{{ 'Hello ' + 'you !'}} I am {{ 4 + 6}} at {{ 1427843288000 | date:'dd/MM/yyyy' }}.
@@ -19,10 +20,11 @@
 							{{ product.nextHint }}
 						</li>
 					</ul>
-					<form ng-submit="mac.addHint(product, nextHint)">
-						<input type="text" ng-model="product.nextHint" />
+					<form name="hintForm" ng-submit="hintForm.$valid && mac.addHint(product, nextHint)" novalidate>
+						<input type="text" ng-model="product.nextHint" required />
+						<input type="submit" class="btn btn-default" ng-show="hintForm.$valid" />
 					</form>
-				</div>
+				</div>	
 			</div>
 			<div ng-controller="PanelController as pan">
 				<a href class="btn btn-default" ng-class="{'btn-info': pan.isSelected(1) }" ng-click="pan.selectTab(1)">ABC</a>
