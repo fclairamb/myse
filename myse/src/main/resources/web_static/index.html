@@ -10,13 +10,13 @@
 		<div ng-controller="MyappController as mac">
 			<div ng-repeat="product in mac.products| orderBy:'-price'">
 				<div ng-hide="product.hide">
-					<div ng-include="'product-top.html'"></div>
+					<product-top></product-top>
 					<ul>
 						<li ng-repeat="hint in product.hints">
-							{{ hint }}
+							{{ hint}}
 						</li>
 						<li ng-show="product.nextHint">
-							{{ product.nextHint }}
+							{{ product.nextHint}}
 						</li>
 					</ul>
 					<form name="hintForm" ng-submit="hintForm.$valid && mac.addHint(product, nextHint)" novalidate>

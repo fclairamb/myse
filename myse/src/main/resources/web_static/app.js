@@ -41,4 +41,11 @@
 			return this.tab === checkTab;
 		};
 	});
+	
+	app.directive('productTop', function() {
+		return {
+			retrict: 'E',
+			templateUrl: 'product-top.html'
+		};
+	});
 })();
