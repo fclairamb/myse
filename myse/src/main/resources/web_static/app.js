@@ -3,9 +3,9 @@
 
 	app.controller('MyappController', function () {
 		this.products = gems;
-		
-		this.addHint = function(product) {
-			product.hints.push( product.nextHint );
+
+		this.addHint = function (product) {
+			product.hints.push(product.nextHint);
 			product.nextHint = '';
 		}
 	});
@@ -31,21 +31,28 @@
 		}
 	];
 
-	app.controller('PanelController', function () {
-		this.tab = 1;
-		this.selectTab = function (tab) {
-			this.tab = tab;
-		};
-		this.isSelected = function (checkTab) {
-			//console.log('isSelected( ' + this.tab + ' / ' + checkTab + ' )');
-			return this.tab === checkTab;
+	app.directive('productTop', function () {
+		return {
+			restrict: 'E', // E for element, A for attribute
+			templateUrl: 'product-top.html'
 		};
 	});
-	
-	app.directive('productTop', function() {
+
+	app.directive('myPanels', function () {
 		return {
-			retrict: 'E',
-			templateUrl: 'product-top.html'
+			restrict: 'E',
+			templateUrl: 'panels.html',
+			controller: function () {
+				this.tab = 1;
+				this.selectTab = function (tab) {
+					this.tab = tab;
+				};
+				this.isSelected = function (checkTab) {
+					//console.log('isSelected( ' + this.tab + ' / ' + checkTab + ' )');
+					return this.tab === checkTab;
+				};
+			},
+			controllerAs: 'pan'
 		};
 	});
 })();
