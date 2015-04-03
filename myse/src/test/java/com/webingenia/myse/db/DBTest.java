@@ -16,6 +16,7 @@ public class DBTest {
 		DBMgmt.start();
 	}
 
+	/*
 	@Test
 	public void config() throws Exception {
 		Config.del("unknown");
@@ -26,4 +27,5 @@ public class DBTest {
 		Config.set("param1", "value2");
 		Assert.assertEquals("value2", Config.get("param1", "value3"));
 	}
+	*/
 }
