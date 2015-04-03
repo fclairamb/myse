@@ -1,7 +1,10 @@
 package com.webingenia.myse;
 
 import com.webingenia.myse.access.Source;
+import com.webingenia.myse.common.BuildInfo;
+import static com.webingenia.myse.common.LOG.LOG;
 import com.webingenia.myse.db.DBMgmt;
+import com.webingenia.myse.db.model.Config;
 import com.webingenia.myse.db.model.DBDescSource;
 import com.webingenia.myse.embeddedes.ElasticSearch;
 import com.webingenia.myse.direxplore.DirExplorer;
@@ -47,6 +50,17 @@ public class Main {
 			em.persist(smb);
 			em.getTransaction().commit();
 			allSources = DBDescSource.all(em);
+		}
+
+		{ // We check the version
+			String currentVersion = BuildInfo.getBuildInfo();
+			String version = Config.get("version", currentVersion);
+			if (!currentVersion.equals(version)) {
+				LOG.info("VERSION Change: {} --> {}", version, currentVersion);
+				Config.set("version", currentVersion);
+			} else {
+				LOG.info("Version: " + currentVersion);
+			}
 		}
 
 		for (DBDescSource dbSource : allSources) {

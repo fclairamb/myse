@@ -5,6 +5,7 @@ import com.webingenia.myse.webserver.servlets.PageIndex;
 import com.webingenia.myse.webserver.servlets.PageStatic;
 import com.webingenia.myse.webserver.servlets.RestSearch;
 import com.webingenia.myse.webserver.servlets.RestSetupSource;
+import com.webingenia.myse.webserver.servlets.RestVersion;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
 
@@ -32,6 +33,7 @@ public class JettyServer {
 		handler.addServletWithMapping(PageStatic.class, "/static/*");
 		handler.addServletWithMapping(RestSearch.class, "/rest/search");
 		handler.addServletWithMapping(RestSetupSource.class, "/rest/setup/source");
+		handler.addServletWithMapping(RestVersion.class, "/rest/version");
 		server.setHandler(handler);
 	}
 }

@@ -68,11 +68,7 @@ public class DBMgmt {
 	}
 
 	public static void start() throws SQLException {
-		try {
-			startH2Server();
-		} catch (Exception ex) {
-			LOG.error("DBMgmt.start", ex);
-		}
+		startH2Server();
 	}
 
 	public static void stop() {
