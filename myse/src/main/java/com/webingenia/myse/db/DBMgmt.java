@@ -22,22 +22,14 @@ public class DBMgmt {
 		}
 	}
 
-	private static File getH2DB() {
-		File f = new File("data/h2/main.db");
-		if (!f.exists()) {
-			f = new File("data/h2/main.mv.db");
-		}
-		return f;
-	}
-
 	private static String getJdbcUrl() {
-		return "jdbc:h2:tcp://localhost/./data/h2/main";
+		return "jdbc:h2:tcp://localhost/./data/h2/myse";
 	}
 
 	private static Server h2Server;
 
 	public synchronized static void startH2Server() throws SQLException {
-		String path = getH2DB().getAbsolutePath();
+		//String path = getH2DB().getAbsolutePath();
 		LOG.debug("Starting H2 server... (" + getJdbcUrl() + ")");
 		if (h2Server == null) {
 			h2Server = Server.createTcpServer(new String[]{"-tcp"});

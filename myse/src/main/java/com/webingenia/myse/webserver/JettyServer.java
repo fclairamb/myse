@@ -1,5 +1,6 @@
 package com.webingenia.myse.webserver;
 
+import com.webingenia.myse.db.model.Config;
 import com.webingenia.myse.webserver.servlets.PageIndex;
 import com.webingenia.myse.webserver.servlets.PageStatic;
 import com.webingenia.myse.webserver.servlets.RestSearch;
@@ -13,7 +14,7 @@ public class JettyServer {
 	private static ServletHandler handler;
 
 	public static void start() throws Exception {
-		server = new Server(8080);
+		server = new Server(Config.get("jetty_port", 8080));
 
 		loadHandler();
 

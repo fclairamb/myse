@@ -67,4 +67,8 @@ public class Config implements Serializable {
 		}
 		return null;
 	}
+
+	public static void del(String name) {
+		DBMgmt.getDefaultEntityManager().createQuery("DELETE FROM Config c WHERE c.name = :name").setParameter("name", name).executeUpdate();
+	}
 }

@@ -18,6 +18,8 @@ public class DBTest {
 
 	@Test
 	public void config() throws Exception {
+		Config.del("unknown");
+		Config.del("param1");
 		Assert.assertEquals(null, Config.get("unknown", null));
 		Config.set("param1", "value1");
 		Assert.assertEquals("value1", Config.get("param1", "value3"));
