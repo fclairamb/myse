@@ -1,6 +1,7 @@
 package com.webingenia.myse;
 
 import com.webingenia.myse.access.Source;
+import com.webingenia.myse.access.disk.SourceDisk;
 import com.webingenia.myse.common.BuildInfo;
 import static com.webingenia.myse.common.LOG.LOG;
 import com.webingenia.myse.db.DBMgmt;
@@ -11,6 +12,7 @@ import com.webingenia.myse.direxplore.DirExplorer;
 import com.webingenia.myse.fileexplore.FileIndexer;
 import com.webingenia.myse.tasks.Tasks;
 import com.webingenia.myse.webserver.JettyServer;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.List;
@@ -30,24 +32,38 @@ public class Main {
 
 		List<DBDescSource> allSources = DBDescSource.all(em);
 		if (allSources.isEmpty()) {
+			LOG.warn("NO SOURCE! Creating one !");
 			em.getTransaction().begin();
 
 			// We will create a new source
-			DBDescSource smb = new DBDescSource();
-			Map<String, String> props = smb.getProperties();
+			if (new File("private/nas.properties").exists()) {
+				DBDescSource smb = new DBDescSource();
+				Map<String, String> props = smb.getProperties();
 
-			// All this source's data will come from the private directory
-			try (InputStream is = new FileInputStream("private/nas.properties")) {
-				Properties fileprops = new Properties();
-				fileprops.load(is);
-				smb.setName(fileprops.getProperty("_name"));
-				smb.setType(fileprops.getProperty("_type"));
-				for (Map.Entry<Object, Object> me : fileprops.entrySet()) {
-					props.put((String) me.getKey(), (String) me.getValue());
+				// All this source's data will come from the private directory
+				try (InputStream is = new FileInputStream("private/nas.properties")) {
+					Properties fileprops = new Properties();
+					fileprops.load(is);
+					smb.setName(fileprops.getProperty("_name"));
+					smb.setType(fileprops.getProperty("_type"));
+					for (Map.Entry<Object, Object> me : fileprops.entrySet()) {
+						props.put((String) me.getKey(), (String) me.getValue());
+					}
+				}
+				em.persist(smb);
+			}
+			{
+				String home = System.getenv("user.home");
+				File file = new File(new File(home), "Documents");
+				if (file.exists()) {
+					LOG.warn("Adding your documents dir !");
+					DBDescSource docs = new DBDescSource();
+					docs.setName("Local documents");
+					docs.setType(SourceDisk.TYPE);
+					docs.getProperties().put("path", file.getAbsolutePath());
+					em.persist(docs);
 				}
 			}
-
-			em.persist(smb);
 			em.getTransaction().commit();
 			allSources = DBDescSource.all(em);
 		}

@@ -32,7 +32,7 @@ public class JettyServer {
 		handler.addServletWithMapping(PageIndex.class, "/");
 		handler.addServletWithMapping(PageStatic.class, "/static/*");
 		handler.addServletWithMapping(RestSearch.class, "/rest/search");
-		handler.addServletWithMapping(RestSetupSource.class, "/rest/setup/source");
+		handler.addServletWithMapping(RestSetupSource.class, "/rest/setup/source/*");
 		handler.addServletWithMapping(RestVersion.class, "/rest/version");
 		server.setHandler(handler);
 	}

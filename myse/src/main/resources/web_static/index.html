@@ -7,6 +7,9 @@
 	</head>
 	<body ng-app="myse">
 		<div class="container-fluid" style="display: none" id="core" ng-controller="NavigationController as nav">
+			<div ng-controller="Version as v">
+				{{ v.props.general }}
+			</div>
 			<div class="row">
 				<div class="col-md-2 sidebar">
 					<ul class="nav nav-sidebar">

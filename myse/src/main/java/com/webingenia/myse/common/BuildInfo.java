@@ -45,7 +45,12 @@ public class BuildInfo {
 		BUILD_ID = buildId;
 		BUILD_TIMESTAMP = buildTimestamp;
 		BUILD_RELEASE = buildRelease;
-		BUILD_SIMPLIFIED_INFO = BUILD_RELEASE + " v" + BUILD_SVNREV + " (" + BUILD_TIMESTAMP + ")";
+		String info = BUILD_RELEASE;
+		if (BUILD_ID != null) {
+			info += " b" + BUILD_ID;
+		}
+		info += "(" + BUILD_TIMESTAMP + ")";
+		BUILD_SIMPLIFIED_INFO = info;
 	}
 
 	public static String getBuildInfo() {

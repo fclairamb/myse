@@ -17,6 +17,14 @@
 		};
 	});
 
+	app.controller('Version', ['$http', function ($http) {
+			this.props = {};
+			var ctrl = this;
+			$http.get('/rest/version').success(function (data) {
+				ctrl.props = data;
+			});
+		}]);
+
 	app.directive('myseSearch', function () {
 		return {
 			restrict: 'E',
@@ -46,7 +54,7 @@
 		return {
 			restrict: 'E',
 			templateUrl: '/static/setup.html'
-		}
+		};
 	});
 
 })();

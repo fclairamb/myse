@@ -30,7 +30,7 @@ public class RestVersion extends HttpServlet {
 			resp.setContentType("application/json; charset=utf8");
 			try (PrintWriter out = resp.getWriter()) {
 				out.write(gson.toJson(info));
-			} 
+			}
 		}
 	}
 
