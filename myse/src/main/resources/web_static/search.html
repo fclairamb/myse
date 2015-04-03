@@ -5,12 +5,17 @@
 		<input type="text" name="q" ng-model="search.query" ng-change="search.queryChanged()" class="form-control" placeholder="Search query" />
 	</div>
 </form>
-<div class="well">Search: {{ search.query }}</div>
 
-<div ng-repeat="result in search.response.results">
-	<h3>{{ result.title}}</h3>
-	<em>{{ result.path}}</em>
-	<p>{{ result.description}}</p>
+<div ng-show="search.response.results.length">
+	<div>
+		{{ search.response.results.length}} results in {{ search.response.time}} ms
+	</div>
+	<div ng-repeat="result in search.response.results" class="myse-result">
+		<div class="pull-right date">{{ result.dateMod | date }}</div>
+		<h3>{{ result.title}}</h3>
+		<span class="path">{{ result.path}}</span>
+		<p>{{ result.description}}</p>
+	</div>
 </div>
 
 <div class="alert alert-danger" role="alert" ng-show="search.response.error">

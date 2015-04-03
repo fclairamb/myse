@@ -35,7 +35,6 @@
 									ctrl.response = data;
 								}
 						);
-						$log.log(this.response);
 					};
 				}
 			],
