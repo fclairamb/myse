@@ -17,7 +17,7 @@
 		};
 	});
 
-	app.directive('searchList', function () {
+	app.directive('myseSearch', function () {
 		return {
 			restrict: 'E',
 			templateUrl: '/static/search.html',
@@ -40,6 +40,13 @@
 			],
 			controllerAs: 'search'
 		};
+	});
+
+	app.directive('myseSetup', function () {
+		return {
+			restrict: 'E',
+			templateUrl: '/static/setup.html'
+		}
 	});
 
 })();
