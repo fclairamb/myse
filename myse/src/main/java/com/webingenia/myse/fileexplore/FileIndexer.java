@@ -87,7 +87,8 @@ public class FileIndexer implements Runnable {
 				data.put("extension", desc.getExtension());
 				data.put("size", file.getSize());
 				data.put("path", file.getPath());
-				data.put("source", ds.getId());
+				data.put("source_id", ds.getId());
+				data.put("source_short", ds.getShortName());
 				data.put("date_mod", desc.getDateMod());
 				{
 					String content = contenthandler.toString();

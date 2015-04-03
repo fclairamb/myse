@@ -30,7 +30,7 @@ public class PageStatic extends HttpServlet {
 			String path = request.getPathInfo();
 
 			URL resource = null;
-			File file = null;
+			File file;
 			{ // DEV ONLY: We try to get the file directly
 				file = new File("src/main/resources/web_static/" + path);
 				if (file.exists()) {
@@ -90,8 +90,7 @@ public class PageStatic extends HttpServlet {
 					response.setHeader("Content-Range", "bytes " + rangeStart + "-" + rangeStop + "/" + size);
 				}
 
-				Headers.setCacheExpiration(response, System.currentTimeMillis() + EXPIRATION_STANDARD);
-
+				//Headers.setCacheExpiration(response, System.currentTimeMillis() + EXPIRATION_STANDARD);
 				try (OutputStream os = response.getOutputStream()) {
 					try (InputStream is = resource.openStream()) {
 						is.skip(rangeStart);

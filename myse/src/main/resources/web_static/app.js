@@ -1,25 +1,48 @@
 (function () {
-	var app = angular.module('myapp', ['tabs']);
+	var app = angular.module('myse', []);
 
-	app.controller('MyappController', ['$http', function ($http) {
-			this.products = [];
+	app.controller('NavigationController', function () {
+		this.current = 'search';
+		this.select = function (page) {
+			this.current = page;
+		};
+		this.isSelected = function (page) {
+			//console.log(this.current + ' / ' + page);
+			return this.current === page;
+		};
+		this.class = function (page) {
+			return {
+				active: this.isSelected(page)
+			};
+		};
+	});
 
-			this.addHint = function (product) {
-				product.hints.push(product.nextHint);
-				product.nextHint = '';
-			}
-
-			var store = this;
-			$http.get('/static/gems.json').success(function (data) {
-				store.products = data;
-			});
-		}]);
-
-	app.directive('productTop', function () {
+	app.directive('searchList', function () {
 		return {
-			restrict: 'E', // E for element, A for attribute
-			templateUrl: 'product-top.html'
+			restrict: 'E',
+			templateUrl: '/static/search.html',
+			controller: ['$http', function ($http) {
+					// CONTROLLER CODE
+					this.query = '';
+					this.response = {
+						results: [],
+						error: null
+					};
+					this.queryChanged = function () {
+						var ctrl = this;
+						$http.post('/rest/search', {'q': this.query}).success(
+								function (data) {
+									ctrl.response = data;
+								}
+						);
+						$log.log(this.response);
+					};
+				}
+			],
+			controllerAs: 'search'
 		};
 	});
 
 })();
+
+$('#core').show();

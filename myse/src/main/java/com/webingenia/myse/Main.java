@@ -48,7 +48,7 @@ public class Main {
 			em.getTransaction().commit();
 			allSources = DBDescSource.all(em);
 		}
-		
+
 		for (DBDescSource dbSource : allSources) {
 			// We make sure ES has an index for it
 

@@ -1,0 +1,18 @@
+
+<form>
+	<div class="form-group">
+		<label for="q">Search: </label>
+		<input type="text" name="q" ng-model="search.query" ng-change="search.queryChanged()" class="form-control" placeholder="Search query" />
+	</div>
+</form>
+<div class="well">Search: {{ search.query }}</div>
+
+<div ng-repeat="result in search.response.results">
+	<h3>{{ result.title}}</h3>
+	<em>{{ result.path}}</em>
+	<p>{{ result.description}}</p>
+</div>
+
+<div class="alert alert-danger" role="alert" ng-show="search.response.error">
+	<strong>Internal error !</strong><pre>{{ search.response.error}}</pre>
+</div>

@@ -3,34 +3,32 @@
 		<title>MYSE</title>
 		<link rel="stylesheet" type="text/css" href="/static/boostrap-3.3.4/css/bootstrap.min.css" />
 		<link rel="stylesheet" type="text/css" href="/static/styles.css" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 	</head>
-	<body ng-app="myapp">
-		{{ 'Hello ' + 'you !'}} I am {{ 4 + 6}} at {{ 1427843288000 | date:'dd/MM/yyyy' }}.
-
-		<div ng-controller="MyappController as mac">
-			<div ng-repeat="product in mac.products| orderBy:'-price'">
-				<div ng-hide="product.hide">
-					<product-top></product-top>
-					<ul>
-						<li ng-repeat="hint in product.hints">
-							{{ hint}}
-						</li>
-						<li ng-show="product.nextHint">
-							{{ product.nextHint}}
-						</li>
+	<body ng-app="myse">
+		<div class="container-fluid" style="display: none" id="core" ng-controller="NavigationController as nav">
+			<div class="row">
+				<div class="col-md-2 sidebar">
+					<ul class="nav nav-sidebar">
+						<li ng-class="nav.class('search')"><a href ng-click="nav.select('search')">Search</a></li>
+						<li ng-class="nav.class('setup')"><a href ng-click="nav.select('setup')">Setup</a></li>
 					</ul>
-					<form name="hintForm" ng-submit="hintForm.$valid && mac.addHint(product, nextHint)" novalidate>
-						<input type="text" ng-model="product.nextHint" required />
-						<input type="submit" class="btn btn-default" ng-show="hintForm.$valid" />
-					</form>
-				</div>	
+				</div>
+				<div class="col-md-10 main">
+					<div ng-show="nav.isSelected('search')">
+						<h1 class="page-header">Search</h1>
+						<search-list></search-list>
+					</div>
+					<div ng-show="nav.isSelected('setup')">
+						<h1 class="page-header">Setup</h1>
+					</div>
+				</div>
 			</div>
-			<my-panels></my-panels>
 		</div>
+
 		<script type="text/javascript" src="/static/jquery-1.11.2/jquery.min.js"></script>
 		<script type="text/javascript" src="/static/boostrap-3.3.4/js/bootstrap.min.js"></script>
 		<script type="text/javascript" src="/static/angular-1.4.0b6/angular.min.js"></script>
 		<script type="text/javascript" src="/static/app.js"></script>
-		<script type="text/javascript" src="/static/tabs.js"></script>
 	</body>
 </html>
