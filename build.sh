@@ -3,7 +3,7 @@ ROOT=$(pwd)
 
 cd $ROOT/myse
 mvn clean
-mvn package
+mvn assembly:assembly
 
 cd $ROOT
 mkdir -p dist/
