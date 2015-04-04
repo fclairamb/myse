@@ -5,10 +5,10 @@ import java.util.Properties;
 
 public class BuildInfo {
 
-	public static final String BUILD_NUMBER, BUILD_TIMESTAMP, BUILD_RELEASE, BUILD_SIMPLIFIED_INFO, BUILD_GIT_COMMIT, BUILD_GIT_NB;
+	public static final String BUILD_NUMBER, BUILD_DATE, BUILD_RELEASE, BUILD_SIMPLIFIED_INFO, BUILD_GIT_COMMIT, BUILD_GIT_NB;
 
 	static {
-		String buildGitCommit = null, buildGitNb = null, buildTimestamp = "_", buildRelease = "dev", buildNumber = "#";
+		String buildGitCommit = null, buildGitNb = null, buildDate = "XXXX-XX-XX_XX-XX-XX", buildRelease = "dev", buildNumber = "#";
 		try {
 			Properties properties = new Properties();
 			try (InputStream ras = BuildInfo.class.getResourceAsStream("/myse_build.properties")) {
@@ -18,7 +18,7 @@ public class BuildInfo {
 					buildGitCommit = (String) properties.getProperty("git_commit");
 					buildGitNb = (String) properties.getProperty("git_commit_count");
 
-					buildTimestamp = (String) properties.get("timestamp");
+					buildDate = (String) properties.get("date");
 					buildRelease = (String) properties.getProperty("release");
 				}
 			}
@@ -36,7 +36,7 @@ public class BuildInfo {
 		BUILD_NUMBER = buildNumber;
 		BUILD_GIT_COMMIT = buildGitCommit;
 		BUILD_GIT_NB = buildGitNb;
-		BUILD_TIMESTAMP = buildTimestamp;
+		BUILD_DATE = buildDate;
 		BUILD_RELEASE = buildRelease;
 		
 		String info = BUILD_RELEASE;
@@ -53,7 +53,7 @@ public class BuildInfo {
 			info += " h" + BUILD_GIT_COMMIT.substring(0, 5);
 		}
 
-		info += " (" + BUILD_TIMESTAMP + ")";
+		info += " (" + BUILD_DATE + ")";
 		BUILD_SIMPLIFIED_INFO = info;
 	}
 
