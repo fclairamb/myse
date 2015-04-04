@@ -1,9 +1,12 @@
 #!/bin/sh
+
+set -x
+
 ROOT=$(pwd)
 
-BUILD_DATE=$(date +%Y-%m-%d_%H-%M-%S)
-GIT_COMMIT=$(git rev-parse HEAD)
-GIT_COMMIT_COUNT=$(git rev-list HEAD --count)
+export BUILD_DATE=$(date +%Y-%m-%d_%H-%M-%S)
+export GIT_COMMIT=$(git rev-parse HEAD)
+export GIT_COMMIT_COUNT=$(git rev-list HEAD --count)
 
 cd $ROOT/myse
 mvn clean

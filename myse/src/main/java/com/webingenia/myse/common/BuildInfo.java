@@ -50,7 +50,7 @@ public class BuildInfo {
 		}
 
 		if (BUILD_GIT_COMMIT != null) {
-			info += " h" + BUILD_GIT_COMMIT.substring(0, 10);
+			info += " h" + BUILD_GIT_COMMIT.substring(0, 5);
 		}
 
 		info += " (" + BUILD_TIMESTAMP + ")";
