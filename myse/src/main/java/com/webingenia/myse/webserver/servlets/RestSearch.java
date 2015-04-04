@@ -86,6 +86,19 @@ public class RestSearch extends HttpServlet {
 						.execute()
 						.actionGet();
 
+				if (esResponse.getHits().totalHits() == 0) {
+					esRequest = client.prepareSearch(FileIndexer.ES_INDEX_NAME).setTypes(FileIndexer.ES_DOC_TYPE)
+							.setSearchType(SearchType.DFS_QUERY_AND_FETCH)
+							//.setQuery(QueryBuilders.termQuery("multi", q)) // Query
+							.setQuery(QueryBuilders.wildcardQuery("title", "*"+q+"*"))
+							.setFrom(0)
+							.setSize(size);
+
+					esResponse = esRequest
+							.execute()
+							.actionGet();
+				}
+
 				int count = 0;
 				for (SearchHit hit : esResponse.getHits().getHits()) {
 					if (count++ > size) {
@@ -102,7 +115,7 @@ public class RestSearch extends HttpServlet {
 						if (r.description != null && r.description.length() > 400) {
 							r.description = r.description.substring(0, 400) + "...";
 						}
-						
+
 						{
 							String sDate = (String) source.get("date_mod");
 							Date dateMod = sdf.parse(sDate);

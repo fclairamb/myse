@@ -22,15 +22,29 @@ public class DBMgmt {
 		}
 	}
 
-	private static String getJdbcUrl() {
+	private static String getJdbcServerUrl() {
 		return "jdbc:h2:tcp://localhost/./data/h2/myse";
+	}
+
+	private static String getJdbcLocalUrl() {
+		return "jdbc:h2:data/h2/myse";
+	}
+
+	private static String getJdbcUrl() {
+		return serverMode ? getJdbcServerUrl() : getJdbcLocalUrl();
+	}
+
+	private static boolean serverMode;
+
+	public void setServerMode(boolean mode) {
+		serverMode = mode;
 	}
 
 	private static Server h2Server;
 
 	public synchronized static void startH2Server() throws SQLException {
 		//String path = getH2DB().getAbsolutePath();
-		LOG.debug("Starting H2 server... (" + getJdbcUrl() + ")");
+		LOG.debug("Starting H2 server...");
 		if (h2Server == null) {
 			h2Server = Server.createTcpServer(new String[]{"-tcp"});
 			h2Server.start();
@@ -52,7 +66,7 @@ public class DBMgmt {
 
 	private static JdbcConnectionPool getPool() {
 		if (pool == null) {
-			pool = JdbcConnectionPool.create(getJdbcUrl(), "sa", "");
+			pool = JdbcConnectionPool.create(getJdbcServerUrl(), "sa", "");
 		}
 		return pool;
 	}
@@ -83,7 +97,7 @@ public class DBMgmt {
 			properties.put("eclipselink.jdbc.driver", "org.h2.Driver");
 			properties.put("eclipselink.jdbc.user", "sa");
 			properties.put("eclipselink.jdbc.password", "");
-			properties.put("eclipselink.jdbc.url", getJdbcUrl());
+			properties.put("eclipselink.jdbc.url", serverMode ? getJdbcServerUrl() : getJdbcLocalUrl());
 			emf = Persistence.createEntityManagerFactory("h2");
 		}
 		return emf;

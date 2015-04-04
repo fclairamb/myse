@@ -5,29 +5,21 @@ import java.util.Properties;
 
 public class BuildInfo {
 
-	public static final String BUILD_SVNREV, BUILD_ID, BUILD_TIMESTAMP, BUILD_RELEASE, BUILD_SIMPLIFIED_INFO;
+	public static final String BUILD_NUMBER, BUILD_TIMESTAMP, BUILD_RELEASE, BUILD_SIMPLIFIED_INFO, BUILD_GIT_COMMIT, BUILD_GIT_NB;
 
 	static {
-		String buildSvnRev = "-1", buildTimestamp = "_", buildRelease = "dev", buildStable, buildId = "#";
+		String buildGitCommit = null, buildGitNb = null, buildTimestamp = "_", buildRelease = "dev", buildNumber = "#";
 		try {
 			Properties properties = new Properties();
-			try (InputStream ras = BuildInfo.class.getResourceAsStream("/version.properties")) {
+			try (InputStream ras = BuildInfo.class.getResourceAsStream("/myse_build.properties")) {
 				if (ras != null) {
 					properties.load(ras);
+					buildNumber = (String) properties.get("number");
+					buildGitCommit = (String) properties.getProperty("git_commit");
+					buildGitNb = (String) properties.getProperty("git_commit_count");
 
-					buildSvnRev = (String) properties.get("build_svnrev");
-					buildId = (String) properties.get("build_id");
-					buildTimestamp = (String) properties.get("build_timestamp");
-					buildStable = (String) properties.getProperty("build_stable");
-					if (buildStable != null && !buildStable.startsWith("$")) {
-						if (buildStable.equals("true")) {
-							buildRelease = "prod";
-						} else {
-							buildRelease = "test";
-						}
-					} else {
-						buildRelease = (String) properties.getProperty("build_release");
-					}
+					buildTimestamp = (String) properties.get("timestamp");
+					buildRelease = (String) properties.getProperty("release");
 				}
 			}
 		} catch (Exception ex) {
@@ -37,19 +29,31 @@ public class BuildInfo {
 			buildRelease = "test";
 		}
 
-		if (buildRelease.startsWith("${")) {
+		if (buildRelease == null) {
 			buildRelease = "dev";
 		}
 
-		BUILD_SVNREV = buildSvnRev;
-		BUILD_ID = buildId;
+		BUILD_NUMBER = buildNumber;
+		BUILD_GIT_COMMIT = buildGitCommit;
+		BUILD_GIT_NB = buildGitNb;
 		BUILD_TIMESTAMP = buildTimestamp;
 		BUILD_RELEASE = buildRelease;
+		
 		String info = BUILD_RELEASE;
-		if (BUILD_ID != null) {
-			info += " b" + BUILD_ID;
+
+		if (BUILD_NUMBER != null) {
+			info += " b" + BUILD_NUMBER;
 		}
-		info += "(" + BUILD_TIMESTAMP + ")";
+
+		if (BUILD_GIT_NB != null) {
+			info += " c" + BUILD_GIT_COMMIT;
+		}
+
+		if (BUILD_GIT_COMMIT != null) {
+			info += " h" + BUILD_GIT_COMMIT.substring(0, 10);
+		}
+
+		info += " (" + BUILD_TIMESTAMP + ")";
 		BUILD_SIMPLIFIED_INFO = info;
 	}
 
