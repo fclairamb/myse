@@ -29,7 +29,7 @@ public class BuildInfo {
 			buildRelease = "test";
 		}
 
-		if (buildRelease == null) {
+		if (buildRelease == null || buildRelease.startsWith("$")) {
 			buildRelease = "dev";
 		}
 
@@ -38,22 +38,22 @@ public class BuildInfo {
 		BUILD_GIT_NB = buildGitNb;
 		BUILD_DATE = buildDate;
 		BUILD_RELEASE = buildRelease;
-		
+
 		String info = BUILD_RELEASE;
 
 		if (BUILD_NUMBER != null) {
-			info += " b" + BUILD_NUMBER;
+			info += ", b:" + BUILD_NUMBER;
 		}
 
 		if (BUILD_GIT_NB != null) {
-			info += " c" + BUILD_GIT_COMMIT;
+			info += ", c:" + BUILD_GIT_NB;
 		}
 
 		if (BUILD_GIT_COMMIT != null) {
-			info += " h" + BUILD_GIT_COMMIT.substring(0, 5);
+			info += ", h:" + BUILD_GIT_COMMIT.substring(0, 5);
 		}
 
-		info += " (" + BUILD_DATE + ")";
+		info += ", d:" + BUILD_DATE;
 		BUILD_SIMPLIFIED_INFO = info;
 	}
 
