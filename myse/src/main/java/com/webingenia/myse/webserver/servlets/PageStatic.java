@@ -30,7 +30,7 @@ public class PageStatic extends HttpServlet {
 			URL resource = null;
 			File file;
 			{ // DEV ONLY: We try to get the file directly
-				file = new File("src/main/resources/web_static/" + path);
+				file = new File("_src/main/resources/web_static/" + path);
 				if (file.exists()) {
 					resource = file.toURI().toURL();
 				}
@@ -48,9 +48,10 @@ public class PageStatic extends HttpServlet {
 			} else {
 				try (InputStream is = resource.openStream()) {
 					String contentType = tika.detect(is);
-					is.reset();
 					response.setHeader("Content-Type", contentType);
-					try (OutputStream os = response.getOutputStream()) {
+				}
+				try (OutputStream os = response.getOutputStream()) {
+					try (InputStream is = resource.openStream()) {
 						Streams.copy(is, os);
 					}
 				}
