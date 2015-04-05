@@ -23,11 +23,11 @@ public class DBMgmt {
 	}
 
 	private static String getJdbcServerUrl() {
-		return "jdbc:h2:tcp://localhost/./data/h2/myse";
+		return "jdbc:h2:tcp://localhost/./data/h2/main";
 	}
 
 	private static String getJdbcLocalUrl() {
-		return "jdbc:h2:data/h2/myse";
+		return "jdbc:h2:file:./data/h2/main";
 	}
 
 	private static String getJdbcUrl() {
@@ -66,7 +66,7 @@ public class DBMgmt {
 
 	private static JdbcConnectionPool getPool() {
 		if (pool == null) {
-			pool = JdbcConnectionPool.create(getJdbcServerUrl(), "sa", "");
+			pool = JdbcConnectionPool.create(getJdbcUrl(), "sa", "");
 		}
 		return pool;
 	}
@@ -82,11 +82,15 @@ public class DBMgmt {
 	}
 
 	public static void start() throws SQLException {
-		startH2Server();
+		if (serverMode) {
+			startH2Server();
+		}
 	}
 
 	public static void stop() {
-		stopH2Server();
+		if (serverMode) {
+			stopH2Server();
+		}
 	}
 
 	private static EntityManagerFactory emf;

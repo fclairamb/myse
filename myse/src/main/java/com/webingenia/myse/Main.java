@@ -54,19 +54,23 @@ public class Main {
 			}
 			{
 				String home = System.getenv("user.home");
-				File file = null;
-				String[] paths = {"Documents", "My Documents", "Mes Documents"};
-				for (String path : paths) {
-					file = new File(new File(home), path);
-					if (file.exists()) {
-						LOG.warn("Adding your documents dir !");
-						DBDescSource docs = new DBDescSource();
-						docs.setName("Local documents");
-						docs.setType(SourceDisk.TYPE);
-						docs.getProperties().put("path", file.getAbsolutePath());
-						em.persist(docs);
-						break;
+				if (home != null) {
+					File file = null;
+					String[] paths = {"Documents", "My Documents", "Mes Documents"};
+					for (String path : paths) {
+						file = new File(new File(home), path);
+						if (file.exists()) {
+							LOG.warn("Adding your documents dir !");
+							DBDescSource docs = new DBDescSource();
+							docs.setName("Local documents");
+							docs.setType(SourceDisk.TYPE);
+							docs.getProperties().put("path", file.getAbsolutePath());
+							em.persist(docs);
+							break;
+						}
 					}
+				} else {
+					LOG.warn("Could not find $HOME env var.");
 				}
 			}
 			em.getTransaction().commit();
