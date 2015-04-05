@@ -56,6 +56,15 @@
 			templateUrl: '/static/setup.html',
 			controller: ['$http', function ($http) {
 					var ctrl = this;
+					this.sources = [];
+					this.fetchSources = function () {
+						$http.get('/rest/setup/source/list').success(
+								function (data) {
+									ctrl.sources = data;
+								});
+					};
+					
+					this.fetchSources();
 				}],
 			controllerAs: 'setup'
 		};

@@ -1,1 +1,17 @@
 <h1 class="page-header">Setup</h1>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>ID</th>
+			<th>Name</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="source in setup.sources">
+			<td>{{ source._id }}</td>
+			<td>{{ source._name }}</td>
+			<td></td>
+		</tr>
+	</tbody>
+</table>

@@ -30,7 +30,7 @@ public class PageStatic extends HttpServlet {
 			URL resource = null;
 			File file;
 			{ // DEV ONLY: We try to get the file directly
-				file = new File("_src/main/resources/web_static/" + path);
+				file = new File("src/main/resources/web_static/" + path);
 				if (file.exists()) {
 					resource = file.toURI().toURL();
 				}
