@@ -54,14 +54,19 @@ public class Main {
 			}
 			{
 				String home = System.getenv("user.home");
-				File file = new File(new File(home), "Documents");
-				if (file.exists()) {
-					LOG.warn("Adding your documents dir !");
-					DBDescSource docs = new DBDescSource();
-					docs.setName("Local documents");
-					docs.setType(SourceDisk.TYPE);
-					docs.getProperties().put("path", file.getAbsolutePath());
-					em.persist(docs);
+				File file = null;
+				String[] paths = {"Documents", "My Documents", "Mes Documents"};
+				for (String path : paths) {
+					file = new File(new File(home), path);
+					if (file.exists()) {
+						LOG.warn("Adding your documents dir !");
+						DBDescSource docs = new DBDescSource();
+						docs.setName("Local documents");
+						docs.setType(SourceDisk.TYPE);
+						docs.getProperties().put("path", file.getAbsolutePath());
+						em.persist(docs);
+						break;
+					}
 				}
 			}
 			em.getTransaction().commit();

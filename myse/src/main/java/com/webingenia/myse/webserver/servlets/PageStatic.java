@@ -100,7 +100,11 @@ public class PageStatic extends HttpServlet {
 
 			} else {
 				if (file == null) {
-					response.sendError(HttpServletResponse.SC_NOT_FOUND, "File not found !");
+					response.sendError(HttpServletResponse.SC_NOT_FOUND, "File \"" + path + "\" not found !");
+					try (PrintWriter out = response.getWriter()) {
+						out.println("<h1>" + path + "NOT FOUND </h1>");
+						out.println("<p>" + path + " not found !</p>");
+					}
 				} else {
 					//response.sendError(HttpServletResponse.SC_FORBIDDEN, "Directory listing is not permitted !");
 					try (PrintWriter out = response.getWriter()) {
