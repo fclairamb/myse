@@ -2,13 +2,11 @@ package com.webingenia.myse.webserver.servlets;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import static com.webingenia.myse.common.LOG.LOG;
 import com.webingenia.myse.embeddedes.ElasticSearch;
 import com.webingenia.myse.fileexplore.FileIndexer;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,8 +45,7 @@ public class RestSearch extends HttpServlet {
 
 	private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	protected void doRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 		String q = null;
 
@@ -90,7 +87,7 @@ public class RestSearch extends HttpServlet {
 					esRequest = client.prepareSearch(FileIndexer.ES_INDEX_NAME).setTypes(FileIndexer.ES_DOC_TYPE)
 							.setSearchType(SearchType.DFS_QUERY_AND_FETCH)
 							//.setQuery(QueryBuilders.termQuery("multi", q)) // Query
-							.setQuery(QueryBuilders.wildcardQuery("title", "*"+q+"*"))
+							.setQuery(QueryBuilders.wildcardQuery("title", "*" + q + "*"))
 							.setFrom(0)
 							.setSize(size);
 
@@ -142,7 +139,12 @@ public class RestSearch extends HttpServlet {
 	}
 
 	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		doRequest(req, resp);
+	}
+
+	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		doGet(req, resp);
+		doRequest(req, resp);
 	}
 }

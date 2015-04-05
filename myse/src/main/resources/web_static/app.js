@@ -31,13 +31,13 @@
 			templateUrl: '/static/search.html',
 			controller: ['$http', function ($http) {
 					// CONTROLLER CODE
+					var ctrl = this;
 					this.query = '';
 					this.response = {
 						results: [],
 						error: null
 					};
 					this.queryChanged = function () {
-						var ctrl = this;
 						$http.post('/rest/search', {'q': this.query}).success(
 								function (data) {
 									ctrl.response = data;
@@ -53,7 +53,11 @@
 	app.directive('myseSetup', function () {
 		return {
 			restrict: 'E',
-			templateUrl: '/static/setup.html'
+			templateUrl: '/static/setup.html',
+			controller: ['$http', function ($http) {
+					var ctrl = this;
+				}],
+			controllerAs: 'setup'
 		};
 	});
 

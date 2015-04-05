@@ -19,7 +19,7 @@ public class PageStatic extends HttpServlet {
 //	private static final long EXPIRATION_DAYS_SHORT = 2L;
 //	private static final long EXPIRATION_DAYS_LONG = 30L;
 //	private static final long EXPIRATION_STANDARD = EXPIRATION_DAYS_LONG * 24 * 3600 * 1000; // A month
-	private Tika tika = new Tika();
+	private final Tika tika = new Tika();
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)

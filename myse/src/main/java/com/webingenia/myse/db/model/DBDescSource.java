@@ -117,6 +117,47 @@ public class DBDescSource implements Serializable {
 		return em.createQuery("SELECT s FROM DBDescSource s", DBDescSource.class).getResultList();
 	}
 
+	public static DBDescSource get(long id, EntityManager em) {
+		for (DBDescSource s : em.createQuery("SELECT s FROM DBDescSource s WHERE s.id = :id", DBDescSource.class).setParameter("id", id).getResultList()) {
+			return s;
+		}
+		return null;
+	}
+
+	public Map<String, String> asMap() {
+		Map<String, String> map = new HashMap<>();
+		for (Map.Entry<String, String> me : getProperties().entrySet()) {
+			map.put(me.getKey(), me.getValue());
+		}
+		map.put("_id", Long.toString(getId()));
+		map.put("_type", getType());
+		map.put("_name", getName());
+		map.put("_short", getShortName());
+		return map;
+	}
+
+	public void fromMap(Map<String, String> map) {
+		for (Map.Entry<String, String> me : map.entrySet()) {
+			String value = me.getValue();
+			switch (me.getKey()) {
+				case "_id":
+					id = Long.parseLong(value);
+					break;
+				case "_type":
+					type = value;
+					break;
+				case "_name":
+					name = value;
+					break;
+				case "_short":
+					shortName = value;
+					break;
+				default:
+					properties.put(name, value);
+			}
+		}
+	}
+
 //	public String getEsIndexName() {
 //		return "source_" + getId();
 //	}
