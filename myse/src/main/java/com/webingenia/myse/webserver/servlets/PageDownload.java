@@ -5,6 +5,7 @@ import com.webingenia.myse.access.File;
 import com.webingenia.myse.access.Source;
 import static com.webingenia.myse.common.LOG.LOG;
 import com.webingenia.myse.db.DBMgmt;
+import com.webingenia.myse.db.model.DBDescFile;
 import com.webingenia.myse.db.model.DBDescSource;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,21 +24,29 @@ public class PageDownload extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String sSource = req.getParameter("source");
-		String sPath = req.getParameter("path");
+		String path = req.getParameter("path");
+		String docId = req.getParameter("docId");
 
 		EntityManager em = DBMgmt.getEntityManager();
 		try {
-			DBDescSource dbSource = DBDescSource.get(sSource, em);
+			DBDescSource dbSource = null;
+			if (sSource != null) {
+				DBDescSource.get(sSource, em);
+			} else if (docId != null) {
+				DBDescFile dbFile = DBDescFile.get(docId, em);
+				dbSource = dbFile.getSource();
+				path = dbFile.getPath();
+			}
 			Source source = Source.get(dbSource);
-			File file = source.getFile(sPath);
+			File file = source.getFile(path);
 			resp.addHeader("Content-Disposition", "inline; filename=\"" + file.getName() + "\"");
 			try (InputStream is = file.getInputStream()) {
 				try (OutputStream os = resp.getOutputStream()) {
 					Streams.copy(is, os);
 				}
 			}
-		} catch (AccessException ex) {
-			LOG.error("Could not access " + sSource + ":" + sPath, ex);
+		} catch (Exception ex) {
+			LOG.error("Could not access " + sSource + ":" + path, ex);
 		} finally {
 			em.close();
 		}

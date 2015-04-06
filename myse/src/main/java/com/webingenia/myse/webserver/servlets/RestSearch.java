@@ -39,6 +39,7 @@ public class RestSearch extends HttpServlet {
 		public String source;
 		public String description;
 		public String image;
+		public String docId;
 		public String error;
 		public long dateMod;
 	}
@@ -103,6 +104,7 @@ public class RestSearch extends HttpServlet {
 					}
 					SearchResult r = new SearchResult();
 					try {
+						r.docId = hit.getId();
 						Map<String, Object> source = hit.getSource();
 						r.title = (String) source.get("title");
 						r.path = (String) source.get("path");

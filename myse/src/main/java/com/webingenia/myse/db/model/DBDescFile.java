@@ -25,7 +25,8 @@ import javax.persistence.TemporalType;
 		indexes = {
 			@Index(name = "path", columnList = "source_id,file_path", unique = true),
 			@Index(name = "next", columnList = "source_id,directory,to_analyse,date_mod", unique = false),
-			@Index(name = "date_mod", columnList = "date_mod", unique = false)
+			@Index(name = "date_mod", columnList = "date_mod", unique = false),
+			@Index(name = "docId", columnList = "docId", unique = true)
 		}
 )
 public class DBDescFile implements Serializable {
@@ -79,6 +80,9 @@ public class DBDescFile implements Serializable {
 
 	@Column(name = "nb_errors")
 	private int nbErrors;
+
+	@Column(name = "doc_id")
+	private String docId;
 
 	public long getId() {
 		return id;
@@ -211,6 +215,15 @@ public class DBDescFile implements Serializable {
 		return null;
 	}
 
+	public static DBDescFile get(String docId, EntityManager em) {
+		for (DBDescFile f : em.createQuery("SELECT f FROM DBDescFile f WHERE f.docId = :docId", DBDescFile.class)
+				.setParameter("docId", docId)
+				.getResultList()) {
+			return f;
+		}
+		return null;
+	}
+
 	public static List<DBDescFile> listFiles(DBDescSource s, boolean dir, int limit, EntityManager em) {
 		return em.createQuery("SELECT f FROM DBDescFile f WHERE f.source = :source AND f.directory = :dir ORDER BY f.toAnalyse DESC, f.nextAnalysis ASC", DBDescFile.class)
 				.setParameter("source", s)
@@ -227,6 +240,7 @@ public class DBDescFile implements Serializable {
 			df.setSource(file.getSource().getDesc());
 			df.setPath(file.getPath());
 			df.setDirectory(file.isDirectory());
+			df.setDocId(df.generateDocId());
 		}
 
 		return df;
@@ -243,8 +257,16 @@ public class DBDescFile implements Serializable {
 		lastAnalysis = new Date();
 	}
 
-	public String getDocId() {
+	public String generateDocId() {
 		String fullId = source.getShortName() + "-" + getPath();
 		return Hashing.toSHA1(fullId);
+	}
+
+	private void setDocId(String genDocId) {
+		docId = genDocId;
+	}
+
+	public String getDocId() {
+		return docId;
 	}
 }

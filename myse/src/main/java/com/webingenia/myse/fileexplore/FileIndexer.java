@@ -52,6 +52,8 @@ public class FileIndexer implements Runnable {
 
 	public static final String ES_DOC_TYPE = "Document";
 	public static final String ES_INDEX_NAME = "all";
+	
+	public static final int VERSION = 1;
 
 	private void analyseFile(DBDescFile desc, EntityManager em, Client esClient) {
 		LOG.info("Analysing " + desc);
@@ -90,6 +92,7 @@ public class FileIndexer implements Runnable {
 				data.put("source_id", ds.getId());
 				data.put("source_short", ds.getShortName());
 				data.put("date_mod", desc.getDateMod());
+				data.put("_version", VERSION);
 				{
 					String content = contenthandler.toString();
 					content = content.replace("\n", " ").replace("\r", " ").replace("\t", " ");

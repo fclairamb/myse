@@ -75,7 +75,7 @@ public class DirExplorer implements Runnable {
 		File file = source.getFile(desc.getPath());
 		boolean dir = file.isDirectory();
 		if (confLogDirsExploration) {
-			LOG.info("Analysing {} \"{}\" : {}", dir ? "dir" : "file", file.getPath(), file.getLastModified());
+			LOG.info("[{}] Analysing {} \"{}\" : {}", dir ? "dir" : "file", source, file.getPath(), file.getLastModified());
 		}
 
 		boolean again = false;

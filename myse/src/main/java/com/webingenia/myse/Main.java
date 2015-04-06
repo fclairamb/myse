@@ -54,9 +54,12 @@ public class Main {
 			}
 			{
 				String home = System.getenv("user.home");
+				if ( home == null ) { // Java 8
+					home = System.getProperty("user.home");
+				}
 				if (home != null) {
 					File file = null;
-					String[] paths = {"Documents", "My Documents", "Mes Documents"};
+					String[] paths = {"My Documents", "Documents", "Mes Documents"};
 					for (String path : paths) {
 						file = new File(new File(home), path);
 						if (file.exists()) {

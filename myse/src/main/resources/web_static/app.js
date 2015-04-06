@@ -21,6 +21,14 @@
 									controllerAs: 'setup'
 								}
 						)
+						.when(
+								"/setup/source/:sourceId/edit",
+								{
+									templateUrl: '/static/setup.html',
+									controller: 'SetupCtrl',
+									controllerAs: 'setup'
+								}
+						)
 						.otherwise(
 								{
 									redirectTo: '/search'
