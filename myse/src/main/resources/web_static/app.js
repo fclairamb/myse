@@ -9,7 +9,8 @@
 								{
 									templateUrl: '/static/search.html',
 									controller: 'SearchCtrl',
-									controllerAs: 'search'
+									controllerAs: 'search',
+									reloadOnSearch: false
 								}
 						)
 						.when(
@@ -49,10 +50,9 @@
 			});
 		}]);
 
-	app.controller('SearchCtrl', ['$http', function ($http) {
+	app.controller('SearchCtrl', ['$http', '$location', function ($http, $location) {
 			// CONTROLLER CODE
 			var ctrl = this;
-			this.query = '';
 			this.response = {
 				results: [],
 				error: null
@@ -63,7 +63,18 @@
 							ctrl.response = data;
 						}
 				);
+				if (this.query !== '' && this.query !== false) {
+					$location.search('q', this.query);
+					console.log('this.query(1) == ' + this.query);
+				} else {
+					console.log('this.query(2) == ' + this.query);
+					$location.search('q', null);
+				}
 			};
+			this.query = $location.search()['q'];
+			if (this.query !== undefined) {
+				this.queryChanged();
+			}
 		}
 	]
 			);
