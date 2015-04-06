@@ -1,6 +1,7 @@
 package com.webingenia.myse.webserver;
 
 import com.webingenia.myse.db.model.Config;
+import com.webingenia.myse.webserver.servlets.PageDownload;
 import com.webingenia.myse.webserver.servlets.PageIndex;
 import com.webingenia.myse.webserver.servlets.PageStatic;
 import com.webingenia.myse.webserver.servlets.RestSearch;
@@ -34,6 +35,7 @@ public class JettyServer {
 		handler.addServletWithMapping(RestSearch.class, "/rest/search");
 		handler.addServletWithMapping(RestSetupSource.class, "/rest/setup/source/*");
 		handler.addServletWithMapping(RestVersion.class, "/rest/version");
+		handler.addServletWithMapping(PageDownload.class, "/download");
 		server.setHandler(handler);
 	}
 }

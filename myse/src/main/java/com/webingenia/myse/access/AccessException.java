@@ -22,6 +22,7 @@ public class AccessException extends Exception {
 	public enum AccessState {
 
 		DENIED,
+		NOT_FOUND,
 		ERROR,
 		TEMPORARY_ISSUE,
 		UNKNOWN

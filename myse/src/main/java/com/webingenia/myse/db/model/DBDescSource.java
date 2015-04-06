@@ -124,6 +124,13 @@ public class DBDescSource implements Serializable {
 		return null;
 	}
 
+	public static DBDescSource get(String shortName, EntityManager em) {
+		for (DBDescSource s : em.createQuery("SELECT s FROM DBDescSource s WHERE s.shortName = :short", DBDescSource.class).setParameter("short", shortName).getResultList()) {
+			return s;
+		}
+		return null;
+	}
+
 	public Map<String, String> asMap() {
 		Map<String, String> map = new HashMap<>();
 		for (Map.Entry<String, String> me : getProperties().entrySet()) {

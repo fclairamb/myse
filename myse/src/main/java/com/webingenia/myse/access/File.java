@@ -36,8 +36,9 @@ public abstract class File {
 
 	/**
 	 * Get the file size.
+	 *
 	 * @return File's size
-	 * @throws AccessException 
+	 * @throws AccessException
 	 */
 	public abstract long getSize() throws AccessException;
 
@@ -67,5 +68,11 @@ public abstract class File {
 	@Override
 	public String toString() {
 		return "File{" + getPath() + "}";
+	}
+
+	public String getName() {
+		String path = getPath();
+		int p = path.lastIndexOf("/");
+		return path.substring(p+1);
 	}
 }

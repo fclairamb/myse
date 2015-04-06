@@ -28,16 +28,9 @@
 			}
 	);
 
-	app.controller('NavCtrl', ['$route', '$routeParams', '$location',
-		function ($route, $routeParams, $location) {
-			this.$route = $route;
-			this.$location = $location;
-			this.$routeParams = $routeParams;
-			this.current = 'search';
-			ctrl = this;
-			this.select = function (page) {
-				this.current = page;
-			};
+	app.controller('NavCtrl', [
+		'$location',
+		function ($location) {
 			this.isSelected = function (page) {
 				return $location.path().startsWith(page);
 			};
