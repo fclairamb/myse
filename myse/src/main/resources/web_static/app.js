@@ -65,9 +65,7 @@
 				);
 				if (this.query !== '' && this.query !== false) {
 					$location.search('q', this.query);
-					console.log('this.query(1) == ' + this.query);
 				} else {
-					console.log('this.query(2) == ' + this.query);
 					$location.search('q', null);
 				}
 			};
