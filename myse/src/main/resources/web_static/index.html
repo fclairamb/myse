@@ -6,24 +6,16 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 	</head>
 	<body ng-app="myse">
-		<div class="container-fluid" style="display: none" id="core" ng-controller="NavigationController as nav">
-			<div ng-controller="Version as v">
-				{{ v.props.general }}
-			</div>
+		<div class="container-fluid" style="display: none" id="core" ng-controller="NavCtrl as nav">
 			<div class="row">
 				<div class="col-md-2 sidebar">
 					<ul class="nav nav-sidebar">
-						<li ng-class="nav.class('search')"><a href ng-click="nav.select('search')">Search</a></li>
-						<li ng-class="nav.class('setup')"><a href ng-click="nav.select('setup')">Setup</a></li>
+						<li ng-class="nav.class('/search')"><a href="#/search">Search</a></li>
+						<li ng-class="nav.class('/setup')"><a href="#/setup">Setup</a></li>
 					</ul>
 				</div>
 				<div class="col-md-10 main">
-					<div ng-show="nav.isSelected('search')">
-						<myse-search></myse-search>
-					</div>
-					<div ng-show="nav.isSelected('setup')">
-						<myse-setup></myse-setup>
-					</div>
+					<div ng-view></div>
 				</div>
 			</div>
 		</div>
@@ -31,6 +23,10 @@
 		<script type="text/javascript" src="/static/jquery-1.11.2/jquery.min.js"></script>
 		<script type="text/javascript" src="/static/boostrap-3.3.4/js/bootstrap.min.js"></script>
 		<script type="text/javascript" src="/static/angular-1.4.0b6/angular.min.js"></script>
+		<script type="text/javascript" src="/static/angular-1.4.0b6/angular-route.min.js"></script>
 		<script type="text/javascript" src="/static/app.js"></script>
 	</body>
+	<div ng-controller="Version as v">
+		{{ v.props.general}}
+	</div>
 </html>
