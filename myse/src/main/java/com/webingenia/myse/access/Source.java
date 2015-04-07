@@ -52,6 +52,6 @@ public abstract class Source {
 	@Override
 	public String toString() {
 		DBDescSource d = getDesc();
-		return "Source{[" + d.getType().toUpperCase() + "] " + d.getName() + "}";
+		return "[" + d.getShortName() + "]";
 	}
 }

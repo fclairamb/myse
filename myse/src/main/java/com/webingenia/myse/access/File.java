@@ -67,12 +67,12 @@ public abstract class File {
 
 	@Override
 	public String toString() {
-		return "File{" + getPath() + "}";
+		return "File{" + getSource() + ":" + getPath() + "}";
 	}
 
 	public String getName() {
 		String path = getPath();
 		int p = path.lastIndexOf("/");
-		return path.substring(p+1);
+		return path.substring(p + 1);
 	}
 }

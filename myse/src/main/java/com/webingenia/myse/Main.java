@@ -97,7 +97,7 @@ public class Main {
 			// We start the indexing tasks
 			Source source = Source.get(dbSource);
 			Tasks.getService().scheduleWithFixedDelay(new DirExplorer(source), 0, 3, TimeUnit.MINUTES);
-			Tasks.getService().scheduleWithFixedDelay(new FileIndexer(source), 5, 5, TimeUnit.SECONDS);
+			Tasks.getService().scheduleWithFixedDelay(new FileIndexer(source), 5, 30, TimeUnit.SECONDS);
 		}
 	}
 }
