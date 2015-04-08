@@ -54,7 +54,7 @@ public class Main {
 			}
 			{
 				String home = System.getenv("user.home");
-				if ( home == null ) { // Java 8
+				if (home == null) { // Java 8
 					home = System.getProperty("user.home");
 				}
 				if (home != null) {
@@ -78,6 +78,17 @@ public class Main {
 			}
 			em.getTransaction().commit();
 			allSources = DBDescSource.all(em);
+		}
+
+		{
+			File sampleDocsDir = new File("sample_docs");
+			if (sampleDocsDir.exists() || DBDescSource.get("Sample_docs", em) == null) {
+				DBDescSource sampleDocs = new DBDescSource();
+				sampleDocs.setName("Sample docs");
+				sampleDocs.setType(SourceDisk.TYPE);
+				sampleDocs.getProperties().put("path", sampleDocsDir.getAbsolutePath());
+				em.persist(sampleDocs);
+			}
 		}
 
 		{ // We check the version

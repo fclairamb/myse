@@ -11,6 +11,25 @@ import javax.persistence.EntityManager;
 
 public abstract class Source {
 
+	public static class PropertyDescription {
+
+		public PropertyDescription(String name, Type type, String description) {
+			this.name = name;
+			this.type = type;
+			this.description = description;
+		}
+
+		public enum Type {
+
+			TEXT,
+			PASSWORD,
+			BOOLEAN
+		}
+		public final String name;
+		public final Type type;
+		public final String description;
+	}
+
 	protected final DBDescSource desc;
 
 	public Source(DBDescSource desc) {
@@ -37,6 +56,12 @@ public abstract class Source {
 		}
 	}
 
+	public static Source getTemporary(String type) {
+		DBDescSource temp = new DBDescSource();
+		temp.setType(type);
+		return get(temp);
+	}
+
 	public static List<Source> all(EntityManager em) {
 		List<Source> list = new ArrayList<>();
 		for (DBDescSource s : DBDescSource.all(em)) {
@@ -54,4 +79,6 @@ public abstract class Source {
 		DBDescSource d = getDesc();
 		return "[" + d.getShortName() + "]";
 	}
+
+	public abstract PropertyDescription[] getProperties();
 }

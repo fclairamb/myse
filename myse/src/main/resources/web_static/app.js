@@ -16,16 +16,16 @@
 						.when(
 								"/setup",
 								{
-									templateUrl: '/static/setup.html',
-									controller: 'SetupCtrl',
+									templateUrl: '/static/setup-list.html',
+									controller: 'SetupListCtrl',
 									controllerAs: 'setup'
 								}
 						)
 						.when(
 								"/setup/source/:sourceId/edit",
 								{
-									templateUrl: '/static/setup.html',
-									controller: 'SetupCtrl',
+									templateUrl: '/static/setup-edit.html',
+									controller: 'SetupEditCtrl',
 									controllerAs: 'setup'
 								}
 						)
@@ -85,19 +85,64 @@
 	]
 			);
 
-	app.controller('SetupCtrl', ['$http', function ($http) {
-			var ctrl = this;
-			this.sources = [];
-			this.fetchSources = function () {
-				$http.get('/rest/setup/source/list').success(
-						function (data) {
-							ctrl.sources = data;
-						});
-			};
+	app.controller(
+			'SetupListCtrl',
+			['$http',
+				function ($http) {
+					var ctrl = this;
+					this.sources = [];
+					this.fetchSources = function () {
+						$http.get('/rest/setup/source/list').success(
+								function (data) {
+									ctrl.sources = data;
+								});
+					};
 
-			this.fetchSources();
-		}]
-			);
+					this.fetchSources();
+				}
+			]);
+
+	app.controller(
+			'SetupEditCtrl',
+			['$http', '$routeParams',
+				function ($http, $routeParams) {
+					var ctrl = this;
+					this.sourceId = $routeParams.sourceId;
+					this.props = {};
+					this.descs = {};
+					this.types = [];
+
+					$http.get('/rest/setup/source/get?id=' + this.sourceId).success(
+							function (data) {
+								ctrl.props = data;
+								
+								ctrl.typeChanged();
+							}
+					);
+
+					$http.get('/rest/setup/source/types').success(
+							function (data) {
+								ctrl.types = data;
+							}
+					);
+
+					this.typeChanged = function () {
+						$http.get('/rest/setup/source/desc?type=' + this.props._type).success(
+								function (data) {
+									ctrl.descs = data;
+								}
+						);
+					};
+
+					this.save = function () {
+						$http.post('/rest/setup/source/edit', this.props).success(
+								function (data) {
+
+								}
+						);
+					};
+				}
+			]);
 
 })();
 

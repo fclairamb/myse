@@ -2,6 +2,10 @@ package com.webingenia.myse.access.ftps;
 
 import com.webingenia.myse.access.AccessException;
 import com.webingenia.myse.access.Source;
+import static com.webingenia.myse.access.vfs.SourceVFS.PROP_HOST;
+import static com.webingenia.myse.access.vfs.SourceVFS.PROP_PATH;
+import static com.webingenia.myse.access.vfs.SourceVFS.PROP_SCHEME;
+import static com.webingenia.myse.access.vfs.SourceVFS.PROP_USER;
 import static com.webingenia.myse.common.LOG.LOG;
 import com.webingenia.myse.db.model.DBDescSource;
 import java.io.IOException;
@@ -91,5 +95,15 @@ public class SourceFTPS extends Source {
 
 	AccessException convertException(Exception ex) {
 		return new AccessException(AccessException.AccessState.UNKNOWN, ex);
+	}
+
+	@Override
+	public PropertyDescription[] getProperties() {
+		return new PropertyDescription[]{
+			new PropertyDescription(PROP_HOST, PropertyDescription.Type.TEXT, "Host"),
+			new PropertyDescription(PROP_USER, PropertyDescription.Type.TEXT, "Username"),
+			new PropertyDescription(PROP_USER, PropertyDescription.Type.PASSWORD, "Password"),
+			new PropertyDescription(PROP_PATH, PropertyDescription.Type.TEXT, "Path of the directory to index")
+		};
 	}
 }

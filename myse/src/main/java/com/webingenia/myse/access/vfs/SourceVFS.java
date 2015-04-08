@@ -43,16 +43,19 @@ public class SourceVFS extends Source {
 			this.fsOpts = new FileSystemOptions();
 			try {
 				Map<String, String> props = getDesc().getProperties();
-				switch (props.get(PROP_SCHEME)) {
-					case "sftp":
-						SftpFileSystemConfigBuilder.getInstance().setTimeout(fsOpts, 10000);
-						SftpFileSystemConfigBuilder.getInstance().setStrictHostKeyChecking(fsOpts, "no");
-						break;
-					case "ftpes":
-						props.put(PROP_SCHEME, "ftps");
-						FtpsFileSystemConfigBuilder.getInstance().setFtpsType(fsOpts, "explicit");
-						FtpsFileSystemConfigBuilder.getInstance().setPassiveMode(fsOpts, true);
-						break;
+				String scheme = props.get(PROP_SCHEME);
+				if (scheme != null) {
+					switch (scheme) {
+						case "sftp":
+							SftpFileSystemConfigBuilder.getInstance().setTimeout(fsOpts, 10000);
+							SftpFileSystemConfigBuilder.getInstance().setStrictHostKeyChecking(fsOpts, "no");
+							break;
+						case "ftpes":
+							props.put(PROP_SCHEME, "ftps");
+							FtpsFileSystemConfigBuilder.getInstance().setFtpsType(fsOpts, "explicit");
+							FtpsFileSystemConfigBuilder.getInstance().setPassiveMode(fsOpts, true);
+							break;
+					}
 				}
 			} catch (FileSystemException ex) {
 				LOG.error("Error setting some FS options", ex);
@@ -106,6 +109,17 @@ public class SourceVFS extends Source {
 			}
 		}
 		return pathOffset;
+	}
+
+	@Override
+	public PropertyDescription[] getProperties() {
+		return new PropertyDescription[]{
+			new PropertyDescription(PROP_SCHEME, PropertyDescription.Type.TEXT, "VFS protocol scheme"),
+			new PropertyDescription(PROP_HOST, PropertyDescription.Type.TEXT, "Host"),
+			new PropertyDescription(PROP_USER, PropertyDescription.Type.TEXT, "Username"),
+			new PropertyDescription(PROP_USER, PropertyDescription.Type.PASSWORD, "Password"),
+			new PropertyDescription(PROP_PATH, PropertyDescription.Type.TEXT, "Path of the directory to index")
+		};
 	}
 
 }

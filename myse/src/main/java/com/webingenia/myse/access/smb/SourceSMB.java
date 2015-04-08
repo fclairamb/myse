@@ -3,6 +3,7 @@ package com.webingenia.myse.access.smb;
 import com.webingenia.myse.access.AccessException;
 import com.webingenia.myse.access.File;
 import com.webingenia.myse.access.Source;
+import static com.webingenia.myse.access.disk.SourceDisk.PROP_PATH;
 import static com.webingenia.myse.common.LOG.LOG;
 import com.webingenia.myse.db.model.DBDescSource;
 import java.net.MalformedURLException;
@@ -60,5 +61,15 @@ public class SourceSMB extends Source {
 		} catch (MalformedURLException ex) {
 			throw new AccessException(AccessException.AccessState.ERROR, ex);
 		}
+	}
+
+	@Override
+	public PropertyDescription[] getProperties() {
+		return new PropertyDescription[]{
+			new PropertyDescription(PROP_HOST, PropertyDescription.Type.TEXT, "Host"),
+			new PropertyDescription(PROP_USER, PropertyDescription.Type.TEXT, "Username"),
+			new PropertyDescription(PROP_PASS, PropertyDescription.Type.PASSWORD, "Password"),
+			new PropertyDescription(PROP_PATH, PropertyDescription.Type.TEXT, "Path of the directory to index")
+		};
 	}
 }

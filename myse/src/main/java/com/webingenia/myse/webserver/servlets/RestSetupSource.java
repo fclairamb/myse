@@ -2,6 +2,10 @@ package com.webingenia.myse.webserver.servlets;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.webingenia.myse.access.Source;
+import com.webingenia.myse.access.disk.SourceDisk;
+import com.webingenia.myse.access.smb.SourceSMB;
+import com.webingenia.myse.access.vfs.SourceVFS;
 import com.webingenia.myse.db.DBMgmt;
 import com.webingenia.myse.db.model.DBDescSource;
 import java.io.IOException;
@@ -9,7 +13,6 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.EntityManager;
@@ -40,13 +43,13 @@ public class RestSetupSource extends HttpServlet {
 
 	private Object doProcessGet(Context context) {
 		String sId = context.req.getParameter("id");
-		DBDescSource source = null;
+		DBDescSource dbSource = null;
 		if (sId != null) {
 			long id = Long.parseLong(sId);
-			source = DBDescSource.get(id, context.em);
+			dbSource = DBDescSource.get(id, context.em);
 		}
-		if (source != null) {
-			return source.asMap();
+		if (dbSource != null) {
+			return dbSource.asMap();
 		} else {
 			return null;
 		}
@@ -75,6 +78,36 @@ public class RestSetupSource extends HttpServlet {
 		}
 	}
 
+	private Object doProcessDesc(Context context) {
+		context.em.getTransaction().begin();
+		try {
+			DBDescSource dbSource = new DBDescSource();
+			dbSource.setType(context.req.getParameter("type"));
+			Source s = Source.get(dbSource);
+			return s.getProperties();
+		} finally {
+			context.em.getTransaction().commit();
+		}
+	}
+
+	static class SourceType {
+
+		public SourceType(String type, String name) {
+			this.type = type;
+			this.name = name;
+		}
+		public String type;
+		public String name;
+	}
+
+	private Object doProcessTypes(Context context) {
+		return new SourceType[]{
+			new SourceType(SourceSMB.TYPE, "Samba"),
+			new SourceType(SourceVFS.TYPE, "VFS"),
+			new SourceType(SourceDisk.TYPE, "Disk")
+		};
+	}
+
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String path = req.getPathInfo();
@@ -97,6 +130,12 @@ public class RestSetupSource extends HttpServlet {
 					break;
 				case "/get":
 					output = doProcessGet(context);
+					break;
+				case "/desc":
+					output = doProcessDesc(context);
+					break;
+				case "/types":
+					output = doProcessTypes(context);
 					break;
 				default:
 					output = "NOT HANDLED";

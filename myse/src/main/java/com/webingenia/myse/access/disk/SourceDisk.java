@@ -1,7 +1,6 @@
 package com.webingenia.myse.access.disk;
 
 import com.webingenia.myse.access.AccessException;
-import com.webingenia.myse.access.File;
 import com.webingenia.myse.access.Source;
 import com.webingenia.myse.db.model.DBDescSource;
 
@@ -36,5 +35,12 @@ public class SourceDisk extends Source {
 			pathOffset = getRootDir().file.getAbsolutePath().length();
 		}
 		return pathOffset;
+	}
+
+	@Override
+	public PropertyDescription[] getProperties() {
+		return new PropertyDescription[]{
+			new PropertyDescription(PROP_PATH, PropertyDescription.Type.TEXT, "Path of the directory to index")
+		};
 	}
 }

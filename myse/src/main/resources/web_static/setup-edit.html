@@ -1,0 +1,21 @@
+<div class="pull-right">ID {{ setup.sourceId}}</div>
+<h1 class="page-header">Source {{ setup.props._name}}</h1>
+<form>
+	<div class="form-group">
+		<label for="input_name">Name</label>
+		<input id="input_name" ng-model="setup.props._name" type="text" class="form-control" />
+	</div>
+	<div class="form-group">
+		<label for="input_name">Type</label>
+		<select id="input_type" ng-model="setup.props._type" class="form-control" ng-change="setup.typeChanged()">
+			<option ng-repeat="t in setup.types" value="{{t.type}}">{{t.name}}</option>
+		</select>
+	</div>
+	<div class="form-group" ng-repeat="desc in setup.descs">
+		<label for="input_{{desc.name}}">{{ desc.description}}</label>
+		<input id="input_{{desc.name}}" ng-model="setup.props[ desc.name ]" type="text" class="form-control" ng-if="desc.type === 'TEXT'" />
+		<input id="input_{{desc.name}}" ng-model="setup.props[ desc.name ]" type="password" class="form-control" ng-if="desc.type === 'PASSWORD'" />
+		<input id="input_{{desc.name}}" ng-model="setup.props[ desc.name ]" type="checkbox" class="form-control" ng-if="desc.type === 'BOOLEAN'" />
+	</div>
+	<button type="submit" class="btn btn-default" ng-click="setup.save()">Save</button>
+</form>
