@@ -8,18 +8,13 @@ import com.webingenia.myse.db.DBMgmt;
 import com.webingenia.myse.db.model.Config;
 import com.webingenia.myse.db.model.DBDescSource;
 import com.webingenia.myse.embeddedes.ElasticSearch;
-import com.webingenia.myse.direxplore.DirExplorer;
-import com.webingenia.myse.fileexplore.FileIndexer;
-import com.webingenia.myse.tasks.Tasks;
 import com.webingenia.myse.webserver.JettyServer;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 import javax.persistence.EntityManager;
 
 public class Main {
@@ -59,10 +54,9 @@ public class Main {
 					home = System.getProperty("user.home");
 				}
 				if (home != null) {
-					File file = null;
 					String[] paths = {"My Documents", "Documents", "Mes Documents"};
 					for (String path : paths) {
-						file = new File(new File(home), path);
+						File file = new File(new File(home), path);
 						if (file.exists()) {
 							LOG.warn("Adding your documents dir !");
 							DBDescSource docs = new DBDescSource();
@@ -104,11 +98,7 @@ public class Main {
 		}
 
 		for (DBDescSource dbSource : allSources) {
-			// We make sure ES has an index for it
-
-			// We start the indexing tasks
-			Source source = Source.get(dbSource);
-			Indexation.start(source);
+			Indexation.start(Source.get(dbSource));
 		}
 	}
 }
