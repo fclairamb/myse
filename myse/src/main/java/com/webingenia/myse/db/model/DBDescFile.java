@@ -6,6 +6,7 @@ import com.webingenia.myse.common.Hashing;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
@@ -37,7 +38,7 @@ public class DBDescFile implements Serializable {
 	private long id;
 
 	@JoinColumn(name = "source_id")
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.REMOVE)
 	private DBDescSource source;
 	/**
 	 * Path of the file

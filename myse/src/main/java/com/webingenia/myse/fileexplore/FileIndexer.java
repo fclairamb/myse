@@ -7,11 +7,10 @@ import com.webingenia.myse.db.DBMgmt;
 import com.webingenia.myse.db.model.DBDescFile;
 import com.webingenia.myse.db.model.DBDescSource;
 import com.webingenia.myse.embeddedes.ElasticSearch;
+import com.webingenia.myse.tasks.Tasks;
 import java.io.InputStream;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 import javax.persistence.EntityManager;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.TikaCoreProperties;
@@ -21,9 +20,7 @@ import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.BodyContentHandler;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexRequestBuilder;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.base.Objects;
 import org.xml.sax.ContentHandler;
 
 public class FileIndexer implements Runnable {
@@ -40,6 +37,9 @@ public class FileIndexer implements Runnable {
 		Client esClient = ElasticSearch.client();
 		try {
 			LOG.info("FileIndexer on " + source + " : STARTING !");
+			if (source.getDesc().deleted()) {
+				LOG.info("Deleted !");
+			}
 			for (DBDescFile desc : DBDescFile.listFiles(source.getDesc(), false, 300, em)) {
 				analyseFile(desc, em, esClient);
 			}

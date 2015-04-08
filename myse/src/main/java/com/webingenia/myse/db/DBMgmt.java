@@ -40,6 +40,12 @@ public class DBMgmt {
 		serverMode = mode;
 	}
 
+	private static boolean httpServer = true;
+
+	public void setHttpServer(boolean mode) {
+		httpServer = mode;
+	}
+
 	private static Server h2Server;
 
 	public synchronized static void startH2Server() throws SQLException {
@@ -82,13 +88,13 @@ public class DBMgmt {
 	}
 
 	public static void start() throws SQLException {
-		if (serverMode) {
+		if (serverMode || httpServer) {
 			startH2Server();
 		}
 	}
 
 	public static void stop() {
-		if (serverMode) {
+		if (serverMode || httpServer) {
 			stopH2Server();
 		}
 	}

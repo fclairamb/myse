@@ -104,7 +104,7 @@ public class SourceVFS extends Source {
 			try {
 				pathOffset = getRootDir().file.getURL().toString().length();
 			} catch (Exception ex) {
-				LOG.error("pathOffset = {}", pathOffset);
+				LOG.error("pathOffset", ex);
 				pathOffset = -1;
 			}
 		}
@@ -117,7 +117,7 @@ public class SourceVFS extends Source {
 			new PropertyDescription(PROP_SCHEME, PropertyDescription.Type.TEXT, "VFS protocol scheme"),
 			new PropertyDescription(PROP_HOST, PropertyDescription.Type.TEXT, "Host"),
 			new PropertyDescription(PROP_USER, PropertyDescription.Type.TEXT, "Username"),
-			new PropertyDescription(PROP_USER, PropertyDescription.Type.PASSWORD, "Password"),
+			new PropertyDescription(PROP_PASS, PropertyDescription.Type.PASSWORD, "Password"),
 			new PropertyDescription(PROP_PATH, PropertyDescription.Type.TEXT, "Path of the directory to index")
 		};
 	}

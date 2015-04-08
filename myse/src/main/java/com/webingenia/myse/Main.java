@@ -15,6 +15,7 @@ import com.webingenia.myse.webserver.JettyServer;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -107,8 +108,7 @@ public class Main {
 
 			// We start the indexing tasks
 			Source source = Source.get(dbSource);
-			Tasks.getService().scheduleWithFixedDelay(new DirExplorer(source), 0, 3, TimeUnit.MINUTES);
-			Tasks.getService().scheduleWithFixedDelay(new FileIndexer(source), 5, 30, TimeUnit.SECONDS);
+			Indexation.start(source);
 		}
 	}
 }

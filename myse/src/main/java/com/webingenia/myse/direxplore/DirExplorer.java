@@ -31,6 +31,9 @@ public class DirExplorer implements Runnable {
 	public void run() {
 		fetchSettings();
 		LOG.info("DirExplorer on " + source + " : STARTING !");
+		if (source.getDesc().deleted()) {
+			LOG.info("Deleted !");
+		}
 		EntityManager em = DBMgmt.getEntityManager();
 		DBDescSource sd = source.getDesc();
 		try {

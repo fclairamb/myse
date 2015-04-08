@@ -51,10 +51,13 @@ public class DBDescSource implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private AccessException.AccessState state;
 
+	@Column(name = "deleted")
+	private boolean deleted;
+
 	@ElementCollection
 	@CollectionTable(name = "source_property")
 	@JoinTable(name = "source_property", joinColumns = @JoinColumn(name = "source_id"))
-	@MapKeyColumn(name = "name")
+	@MapKeyColumn(name = "name", nullable = false)
 	@Column(name = "value")
 	private Map<String, String> properties = new HashMap<>();
 
@@ -72,6 +75,10 @@ public class DBDescSource implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+		createShortName();
+	}
+
+	private void createShortName() {
 		if (this.shortName == null) {
 			this.shortName = this.name.replaceAll("[\\s]", "_").replaceAll("[^\\w]", "");
 		}
@@ -114,7 +121,17 @@ public class DBDescSource implements Serializable {
 	}
 
 	public static List<DBDescSource> all(EntityManager em) {
-		return em.createQuery("SELECT s FROM DBDescSource s", DBDescSource.class).getResultList();
+		return em.createQuery("SELECT s FROM DBDescSource s WHERE s.deleted = false", DBDescSource.class).getResultList();
+	}
+
+	public boolean deleted() {
+		return this.deleted;
+	}
+
+	public static void delete(long id, EntityManager em) {
+		DBDescSource dbs = get(id, em);
+		dbs.deleted = true;
+		em.persist(dbs);
 	}
 
 	public static DBDescSource get(long id, EntityManager em) {
@@ -160,9 +177,11 @@ public class DBDescSource implements Serializable {
 					shortName = value;
 					break;
 				default:
-					properties.put(name, value);
+					properties.put(me.getKey(), value);
 			}
 		}
+		createShortName();
+
 	}
 
 //	public String getEsIndexName() {

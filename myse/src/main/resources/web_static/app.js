@@ -22,7 +22,15 @@
 								}
 						)
 						.when(
-								"/setup/source/:sourceId/edit",
+								"/setup/source/edit/:sourceId",
+								{
+									templateUrl: '/static/setup-edit.html',
+									controller: 'SetupEditCtrl',
+									controllerAs: 'setup'
+								}
+						)
+						.when(
+								"/setup/source/edit",
 								{
 									templateUrl: '/static/setup-edit.html',
 									controller: 'SetupEditCtrl',
@@ -98,27 +106,39 @@
 								});
 					};
 
+					this.delete = function (sourceId) {
+						$http.get('/rest/setup/source/delete?id=' + sourceId).success(
+								function (data) {
+									if (data) {
+										ctrl.fetchSources();
+									}
+								}
+						);
+					}
+
 					this.fetchSources();
 				}
 			]);
 
 	app.controller(
 			'SetupEditCtrl',
-			['$http', '$routeParams',
-				function ($http, $routeParams) {
+			['$http', '$routeParams', '$location',
+				function ($http, $routeParams, $location) {
 					var ctrl = this;
 					this.sourceId = $routeParams.sourceId;
 					this.props = {};
 					this.descs = {};
 					this.types = [];
 
-					$http.get('/rest/setup/source/get?id=' + this.sourceId).success(
-							function (data) {
-								ctrl.props = data;
-								
-								ctrl.typeChanged();
-							}
-					);
+					if (this.sourceId !== undefined) {
+						$http.get('/rest/setup/source/get?id=' + this.sourceId).success(
+								function (data) {
+									ctrl.props = data;
+
+									ctrl.typeChanged();
+								}
+						);
+					}
 
 					$http.get('/rest/setup/source/types').success(
 							function (data) {
@@ -137,7 +157,9 @@
 					this.save = function () {
 						$http.post('/rest/setup/source/edit', this.props).success(
 								function (data) {
-
+									if (data) {
+										$location.path('/setup');
+									}
 								}
 						);
 					};
