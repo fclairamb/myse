@@ -16,12 +16,6 @@ export GIT_COMMIT_COUNT=$(git rev-list HEAD --count)
 
 VERSION=${GIT_COMMIT_COUNT}-${GIT_COMMIT_SHORT}
 
-echo ${VERSION} >dist/version_last
-echo ${VERSION} >version_$release
-cp version_$release dist/version_$release
-
-
-
 cd $ROOT/myse
 mvn clean
 mvn assembly:assembly
@@ -29,6 +23,10 @@ mvn assembly:assembly
 cd $ROOT
 mkdir -p dist/
 rm dist/* -Rf
+
+echo ${VERSION} >dist/version_last
+echo ${VERSION} >version_$release
+cp version_$release dist/version_$release
 
 ln myse/target/*dependencies.jar dist/myse_${VERSION}.jar
 sha1sum dist/myse_${VERSION}.jar >dist/myse_${VERSION}.jar.sha1sum
