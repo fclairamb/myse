@@ -166,6 +166,63 @@
 				}
 			]);
 
+	app.directive(
+			'myseLogs',
+			function () {
+				return {
+					restrict: 'E',
+					templateUrl: '/static/logs.html',
+					controllerAs: 'logs',
+					controller: ['$scope', function ($scope) {
+							var ctrl = this;
+							ctrl.maxRows = 0;
+							ctrl.rows = [];
+							ctrl.initWs = function () {
+								if (ctrl.maxRows === 0) {
+									return;
+								}
+								ctrl.ws = new WebSocket("ws://localhost:8080/ws");
+
+								ctrl.ws.onmessage = function (evt) {
+									obj = JSON.parse(evt.data);
+									ctrl.rows.push(obj);
+									ctrl.cleanup();
+									$scope.$apply();
+								};
+
+								ctrl.cleanup = function () {
+									while (ctrl.rows.length > ctrl.maxRows) {
+										ctrl.rows.shift();
+									}
+								};
+
+								ctrl.ws.onopen = function () {
+									console.log("Opened!");
+									ctrl.ws.send(JSON.stringify({type: "start"}));
+								};
+
+								ctrl.ws.onerror = function (err) {
+									console.log("Error: " + err);
+								};
+
+								ctrl.ws.onclose = function () {
+									console.log("Closed!");
+								};
+							};
+							ctrl.initWs();
+
+							ctrl.maxRowsChanged = function () {
+								ctrl.rows = [];
+								if (ctrl.ws !== undefined) {
+									ctrl.ws.close();
+								}
+								ctrl.initWs();
+							};
+						}]
+				};
+			}
+	);
+
 })();
 
 $('#core').show();

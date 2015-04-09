@@ -1,0 +1,25 @@
+Logs rows:
+<select name="nb" ng-model="logs.maxRows" ng-change="logs.maxRowsChanged()">
+	<option>0</option>
+	<option>1</option>
+	<option>3</option>
+	<option>10</option>
+	<option>20</option>
+</select>
+<table class="table table-condensed table-striped" ng-show="logs.rows.length">
+	<thead>
+		<tr class="small">
+			<th>Date</th>
+			<th>Type</th>
+			<th>Path</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="row in logs.rows" class="small">
+			<td>{{ row.date | date:'HH:mm:ss' }}</td>
+			<td>{{ row.type}}</td>
+			<td>[{{ row.source}}] {{ row.path}}</td>
+		</tr>
+	</tbody>
+</table>
+

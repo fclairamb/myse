@@ -1,9 +1,12 @@
 package com.webingenia.myse.tasks;
 
 import static com.webingenia.myse.common.LOG.LOG;
+import com.webingenia.myse.common.RunnableCancellable;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 public class Tasks {
 
@@ -26,5 +29,13 @@ public class Tasks {
 
 	public static ScheduledExecutorService getService() {
 		return tasks;
+	}
+
+	public static void scheduleWithFixedDelay(RunnableCancellable cmd,
+			long initialDelay,
+			long delay,
+			TimeUnit unit) {
+		ScheduledFuture<?> future = getService().scheduleWithFixedDelay(cmd, initialDelay, delay, unit);
+		cmd.setFuture(future);
 	}
 }

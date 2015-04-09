@@ -1,7 +1,8 @@
 {
 	"elements": {
 		"search-list": {},
-		"myse-search": {}
+		"myse-search": {},
+		"myse-logs": {}
 	},
 	"attributes": {}
 }

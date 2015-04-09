@@ -23,22 +23,22 @@ public class WSAdapter extends WebSocketAdapter implements EventsNotifier.EventR
 		super.onWebSocketConnect(sess); //To change body of generated methods, choose Tools | Templates.
 		LOG.info("Session connected !");
 		EventsNotifier.addReceiver(this);
-		schedule = Tasks.getService().scheduleAtFixedRate(new Runnable() {
-
-			int nb;
-
-			@Override
-			public void run() {
-				if (nb >= 10) {
-					schedule.cancel(false);
-				}
-				try {
-					getRemote().sendString("Message " + (nb++));
-				} catch (IOException ex) {
-					LOG.error("Comm error", ex);
-				}
-			}
-		}, 0, 1, TimeUnit.SECONDS);
+//		schedule = Tasks.getService().scheduleAtFixedRate(new Runnable() {
+//
+//			int nb;
+//
+//			@Override
+//			public void run() {
+//				if (nb >= 10) {
+//					schedule.cancel(false);
+//				}
+//				try {
+//					getRemote().sendString("{\"type\":\"hello\"}");
+//				} catch (IOException ex) {
+//					LOG.error("Comm error", ex);
+//				}
+//			}
+//		}, 0, 1, TimeUnit.SECONDS);
 	}
 
 	@Override

@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 public class Indexation {
 
 	public static void start(Source source) {
-		Tasks.getService().scheduleWithFixedDelay(new DirExplorer(source), 0, 3, TimeUnit.MINUTES);
-		Tasks.getService().scheduleWithFixedDelay(new FileIndexer(source), 5, 30, TimeUnit.SECONDS);
+		Tasks.scheduleWithFixedDelay(new DirExplorer(source), 5, 30, TimeUnit.SECONDS);
+		Tasks.scheduleWithFixedDelay(new FileIndexer(source), 5, 30, TimeUnit.SECONDS);
 	}
 }

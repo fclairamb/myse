@@ -4,11 +4,11 @@ import com.webingenia.myse.access.File;
 import com.webingenia.myse.access.Source;
 import com.webingenia.myse.common.EventsNotifier;
 import static com.webingenia.myse.common.LOG.LOG;
+import com.webingenia.myse.common.RunnableCancellable;
 import com.webingenia.myse.db.DBMgmt;
 import com.webingenia.myse.db.model.DBDescFile;
 import com.webingenia.myse.db.model.DBDescSource;
 import com.webingenia.myse.embeddedes.ElasticSearch;
-import com.webingenia.myse.tasks.Tasks;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +24,7 @@ import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.client.Client;
 import org.xml.sax.ContentHandler;
 
-public class FileIndexer implements Runnable {
+public class FileIndexer extends RunnableCancellable {
 
 	private final Source source;
 

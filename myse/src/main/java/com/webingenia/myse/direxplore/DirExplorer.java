@@ -5,13 +5,14 @@ import com.webingenia.myse.access.File;
 import com.webingenia.myse.access.Source;
 import com.webingenia.myse.common.EventsNotifier;
 import static com.webingenia.myse.common.LOG.LOG;
+import com.webingenia.myse.common.RunnableCancellable;
 import com.webingenia.myse.db.DBMgmt;
 import com.webingenia.myse.db.model.Config;
 import com.webingenia.myse.db.model.DBDescFile;
 import com.webingenia.myse.db.model.DBDescSource;
 import javax.persistence.EntityManager;
 
-public class DirExplorer implements Runnable {
+public class DirExplorer extends RunnableCancellable {
 
 	private final Source source;
 
@@ -80,6 +81,13 @@ public class DirExplorer implements Runnable {
 		boolean dir = file.isDirectory();
 		if (confLogDirsExploration) {
 			LOG.info("[{}] Analysing {} \"{}\" : {}", dir ? "dir" : "file", source, file.getPath(), file.getLastModified());
+		}
+
+		String name = file.getName();
+
+		// We don't care about this
+		if (name.startsWith("~$")) {
+			return false;
 		}
 
 		boolean again = false;
