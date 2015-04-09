@@ -1,5 +1,6 @@
 package com.webingenia.myse.webserver;
 
+import com.webingenia.myse.common.LOG;
 import com.webingenia.myse.db.model.Config;
 import com.webingenia.myse.webserver.servlets.PageDownload;
 import com.webingenia.myse.webserver.servlets.PageIndex;
@@ -7,8 +8,12 @@ import com.webingenia.myse.webserver.servlets.PageStatic;
 import com.webingenia.myse.webserver.servlets.RestSearch;
 import com.webingenia.myse.webserver.servlets.RestSetupSource;
 import com.webingenia.myse.webserver.servlets.RestVersion;
+import com.webingenia.myse.webserver.servlets.WSAdapter;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.websocket.servlet.WebSocketServlet;
+import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 
 public class JettyServer {
 
@@ -36,6 +41,20 @@ public class JettyServer {
 		handler.addServletWithMapping(RestSetupSource.class, "/rest/setup/source/*");
 		handler.addServletWithMapping(RestVersion.class, "/rest/version");
 		handler.addServletWithMapping(PageDownload.class, "/download");
+
+		// Add a websocket to a specific path spec
+		ServletHolder holderEvents = new ServletHolder("ws-events", WSServlet.class);
+		handler.addServletWithMapping(holderEvents, "/ws");
+
 		server.setHandler(handler);
+	}
+
+	public static class WSServlet extends WebSocketServlet {
+
+		@Override
+		public void configure(WebSocketServletFactory factory) {
+			factory.register(WSAdapter.class);
+		}
+
 	}
 }

@@ -2,6 +2,7 @@ package com.webingenia.myse.fileexplore;
 
 import com.webingenia.myse.access.File;
 import com.webingenia.myse.access.Source;
+import com.webingenia.myse.common.EventsNotifier;
 import static com.webingenia.myse.common.LOG.LOG;
 import com.webingenia.myse.db.DBMgmt;
 import com.webingenia.myse.db.model.DBDescFile;
@@ -74,6 +75,8 @@ public class FileIndexer implements Runnable {
 						LOG.info("No analysis necessary !");
 						// return
 					}
+
+					EventsNotifier.indexingFile(file);
 
 					InputStream is = file.getInputStream();
 					ContentHandler contenthandler = new BodyContentHandler();

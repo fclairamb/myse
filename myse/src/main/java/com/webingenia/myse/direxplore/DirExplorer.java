@@ -3,6 +3,7 @@ package com.webingenia.myse.direxplore;
 import com.webingenia.myse.access.AccessException;
 import com.webingenia.myse.access.File;
 import com.webingenia.myse.access.Source;
+import com.webingenia.myse.common.EventsNotifier;
 import static com.webingenia.myse.common.LOG.LOG;
 import com.webingenia.myse.db.DBMgmt;
 import com.webingenia.myse.db.model.Config;
@@ -84,6 +85,7 @@ public class DirExplorer implements Runnable {
 		boolean again = false;
 
 		if (desc.getLastModified() == null) {
+			EventsNotifier.scanningNewDir(file);
 			again = true;
 		}
 
