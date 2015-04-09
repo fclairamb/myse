@@ -74,9 +74,9 @@ public class FileIndexer implements Runnable {
 					if (skip) {
 						LOG.info("No analysis necessary !");
 						// return
+					} else {
+						EventsNotifier.indexingFile(file);
 					}
-
-					EventsNotifier.indexingFile(file);
 
 					InputStream is = file.getInputStream();
 					ContentHandler contenthandler = new BodyContentHandler();
