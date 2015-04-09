@@ -1,5 +1,7 @@
 package com.webingenia.myse.webserver.servlets;
 
+import com.google.gson.Gson;
+import com.webingenia.myse.common.EventsNotifier;
 import static com.webingenia.myse.common.LOG.LOG;
 import com.webingenia.myse.tasks.Tasks;
 import java.io.IOException;
@@ -8,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 
-public class WSAdapter extends WebSocketAdapter {
+public class WSAdapter extends WebSocketAdapter implements EventsNotifier.EventReceiver {
 
 	public WSAdapter() {
 		LOG.info("Created new instance: " + hashCode());
@@ -20,6 +22,7 @@ public class WSAdapter extends WebSocketAdapter {
 	public void onWebSocketConnect(Session sess) {
 		super.onWebSocketConnect(sess); //To change body of generated methods, choose Tools | Templates.
 		LOG.info("Session connected !");
+		EventsNotifier.addReceiver(this);
 		schedule = Tasks.getService().scheduleAtFixedRate(new Runnable() {
 
 			int nb;
@@ -49,5 +52,17 @@ public class WSAdapter extends WebSocketAdapter {
 	public void onWebSocketClose(int statusCode, String reason) {
 		super.onWebSocketClose(statusCode, reason); //To change body of generated methods, choose Tools | Templates.
 		LOG.info("Session disconnected !");
+		EventsNotifier.removeReceiver(this);
+	}
+
+	private final Gson gson = new Gson();
+
+	@Override
+	public void handleEvent(EventsNotifier.Event event) {
+		try {
+			getRemote().sendString(gson.toJson(event));
+		} catch (Exception ex) {
+			LOG.error("handleEvent error", ex);
+		}
 	}
 }

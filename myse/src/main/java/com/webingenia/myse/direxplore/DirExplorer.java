@@ -85,7 +85,6 @@ public class DirExplorer implements Runnable {
 		boolean again = false;
 
 		if (desc.getLastModified() == null) {
-			EventsNotifier.scanningNewDir(file);
 			again = true;
 		}
 
@@ -98,6 +97,9 @@ public class DirExplorer implements Runnable {
 		desc.updateNextAnalysis();
 
 		if (dir) {
+			if (again) {
+				EventsNotifier.scanningNewDir(file);
+			}
 			if (sub) {
 				try {
 					desc.performingAnalysis();

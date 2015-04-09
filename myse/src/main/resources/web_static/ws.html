@@ -18,7 +18,7 @@
 
 			ws.onmessage = function (evt) {
 				console.log("Message: " + evt.data);
-				$('#messages').append('<li>' + evt.data + '</li>');
+				$('#messages').prepend('<li>' + evt.data + '</li>');
 			};
 
 			ws.onclose = function () {
