@@ -5,15 +5,16 @@ import java.util.Properties;
 
 public class BuildInfo {
 
-	public static final String BUILD_NUMBER, BUILD_DATE, BUILD_RELEASE, BUILD_SIMPLIFIED_INFO, BUILD_GIT_COMMIT, BUILD_GIT_NB;
+	public static final String BUILD_NUMBER, BUILD_DATE, BUILD_RELEASE, BUILD_SIMPLIFIED_INFO, BUILD_GIT_COMMIT, BUILD_GIT_NB, BUILD_VERSION;
 
 	static {
-		String buildGitCommit = null, buildGitNb = null, buildDate = "XXXX-XX-XX_XX-XX-XX", buildRelease = "dev", buildNumber = "#";
+		String buildGitCommit = null, buildGitNb = null, buildDate = "XXXX-XX-XX_XX-XX-XX", buildRelease = "dev", buildNumber = "#", buildVersion = "dev";
 		try {
 			Properties properties = new Properties();
 			try (InputStream ras = BuildInfo.class.getResourceAsStream("/myse_build.properties")) {
 				if (ras != null) {
 					properties.load(ras);
+					buildVersion = (String) properties.getProperty("version");
 					buildNumber = (String) properties.get("number");
 					buildGitCommit = (String) properties.getProperty("git_commit");
 					buildGitNb = (String) properties.getProperty("git_commit_count");
@@ -38,6 +39,7 @@ public class BuildInfo {
 		BUILD_GIT_NB = buildGitNb;
 		BUILD_DATE = buildDate;
 		BUILD_RELEASE = buildRelease;
+		BUILD_VERSION = buildVersion;
 
 		String info = BUILD_RELEASE;
 
@@ -55,10 +57,6 @@ public class BuildInfo {
 
 		info += ", d:" + BUILD_DATE;
 		BUILD_SIMPLIFIED_INFO = info;
-	}
-
-	public static String getBuildInfo() {
-		return BUILD_SIMPLIFIED_INFO;
 	}
 
 	public static String getBuildRelease() {

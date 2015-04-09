@@ -2,6 +2,9 @@
 
 set -x
 
+VERSION_MAJOR=1
+VERSION_MINIR=0
+
 if [ "$release" = "" ]; then
 	echo "No release !"
 	exit 1
@@ -14,7 +17,7 @@ export GIT_COMMIT=$(git rev-parse HEAD)
 export GIT_COMMIT_SHORT=$(git rev-parse HEAD|head -c5)
 export GIT_COMMIT_COUNT=$(git rev-list HEAD --count)
 
-VERSION=${GIT_COMMIT_COUNT}-${GIT_COMMIT_SHORT}
+VERSION=${VERSION_MAJOR}.${VERSION_MINOR}.${GIT_COMMIT_COUNT}
 
 cd $ROOT/myse
 mvn clean

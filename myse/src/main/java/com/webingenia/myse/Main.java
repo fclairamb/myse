@@ -87,7 +87,7 @@ public class Main {
 		}
 
 		{ // We check the version
-			String currentVersion = BuildInfo.getBuildInfo();
+			String currentVersion = BuildInfo.BUILD_VERSION;
 			String version = Config.get("version", currentVersion);
 			if (!currentVersion.equals(version)) {
 				LOG.info("VERSION Change: {} --> {}", version, currentVersion);
