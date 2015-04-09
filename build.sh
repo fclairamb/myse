@@ -3,7 +3,7 @@
 set -x
 
 VERSION_MAJOR=1
-VERSION_MINIR=0
+VERSION_MINOR=0
 
 if [ "$release" = "" ]; then
 	echo "No release !"
@@ -16,8 +16,7 @@ export BUILD_DATE=$(date +%Y-%m-%d_%H-%M-%S)
 export GIT_COMMIT=$(git rev-parse HEAD)
 export GIT_COMMIT_SHORT=$(git rev-parse HEAD|head -c5)
 export GIT_COMMIT_COUNT=$(git rev-list HEAD --count)
-
-VERSION=${VERSION_MAJOR}.${VERSION_MINOR}.${GIT_COMMIT_COUNT}
+export VERSION=${VERSION_MAJOR}.${VERSION_MINOR}.${GIT_COMMIT_COUNT}
 
 cd $ROOT/myse
 mvn clean
