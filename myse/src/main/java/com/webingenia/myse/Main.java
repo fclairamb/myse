@@ -28,11 +28,14 @@ import javax.persistence.EntityManager;
 public class Main {
 
 	public static void main(String[] args) throws Exception {
-		JettyServer.start();
-		startBrowser();
-		Upgrader.main(args);
-		DBMgmt.start();
-		ElasticSearch.start();
+
+		JettyServer.start(); // Web server
+
+		startBrowser(); // Browser 
+
+		Upgrader.main(args); // Upgrading code
+		DBMgmt.start(); // RDB code
+		ElasticSearch.start();  // DDB code
 
 		versionCheck();
 		EntityManager em = DBMgmt.getEntityManager();

@@ -4,7 +4,7 @@ import java.util.Comparator;
 
 public class VersionComparator implements Comparator<String> {
 
-	private static final String SIMULATED_DEV_VERSION = "1.0.0-r20000";
+	private static final String SIMULATED_DEV_VERSION = "1.1";
 
 	private int[] stringToInts(String str) {
 		str = str.split("-")[0];
