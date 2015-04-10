@@ -4,6 +4,7 @@ import com.webingenia.myse.common.LOG;
 import com.webingenia.myse.db.model.Config;
 import com.webingenia.myse.webserver.servlets.PageDownload;
 import com.webingenia.myse.webserver.servlets.PageIndex;
+import com.webingenia.myse.webserver.servlets.RestConfig;
 import com.webingenia.myse.webserver.servlets.PageStatic;
 import com.webingenia.myse.webserver.servlets.RestQuit;
 import com.webingenia.myse.webserver.servlets.RestSearch;
@@ -42,6 +43,7 @@ public class JettyServer {
 		handler.addServletWithMapping(RestSetupSource.class, "/rest/setup/source/*");
 		handler.addServletWithMapping(RestVersion.class, "/rest/version");
 		handler.addServletWithMapping(RestQuit.class, "/rest/quit");
+		handler.addServletWithMapping(RestConfig.class, "/rest/config");
 		handler.addServletWithMapping(PageDownload.class, "/download");
 
 		// Add a websocket to a specific path spec

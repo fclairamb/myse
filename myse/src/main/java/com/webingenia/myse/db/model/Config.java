@@ -49,7 +49,7 @@ public class Config implements Serializable {
 
 	public static String get(String name, String defaultValue) {
 		Config c = getConfig(name);
-		if (c == null) {
+		if (c == null && defaultValue != null) {
 			set(name, defaultValue);
 		}
 		return defaultValue;
