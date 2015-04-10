@@ -52,7 +52,7 @@ public class Upgrader implements Runnable {
 		}
 
 		{
-			File f = new File("release.txt");
+			File f = new File(Paths.getAppDir(), "release.txt");
 			if (f.exists()) {
 				try (BufferedReader reader = new BufferedReader(new FileReader(f))) {
 					String release = reader.readLine().trim();
