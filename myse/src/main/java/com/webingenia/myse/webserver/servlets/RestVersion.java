@@ -23,8 +23,8 @@ public class RestVersion extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		Info info = new Info();
-		info.general = BuildInfo.BUILD_VERSION;
-		info.buildId = BuildInfo.BUILD_NUMBER;
+		info.general = BuildInfo.VERSION;
+		info.buildId = BuildInfo.NUMBER;
 
 		{ // The response
 			resp.setContentType("application/json; charset=utf8");

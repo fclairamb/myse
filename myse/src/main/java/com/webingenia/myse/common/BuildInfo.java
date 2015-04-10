@@ -5,7 +5,7 @@ import java.util.Properties;
 
 public class BuildInfo {
 
-	public static final String BUILD_NUMBER, BUILD_DATE, BUILD_RELEASE, BUILD_SIMPLIFIED_INFO, BUILD_GIT_COMMIT, BUILD_GIT_NB, BUILD_VERSION;
+	public static final String NUMBER, DATE, RELEASE, SIMPLIFIED_INFO, GIT_COMMIT, GIT_NB, VERSION;
 
 	static {
 		String buildGitCommit = null, buildGitNb = null, buildDate = "XXXX-XX-XX_XX-XX-XX", buildRelease = "dev", buildNumber = "#", buildVersion = "dev";
@@ -34,32 +34,32 @@ public class BuildInfo {
 			buildRelease = "dev";
 		}
 
-		BUILD_NUMBER = buildNumber;
-		BUILD_GIT_COMMIT = buildGitCommit;
-		BUILD_GIT_NB = buildGitNb;
-		BUILD_DATE = buildDate;
-		BUILD_RELEASE = buildRelease;
-		BUILD_VERSION = buildVersion;
+		NUMBER = buildNumber;
+		GIT_COMMIT = buildGitCommit;
+		GIT_NB = buildGitNb;
+		DATE = buildDate;
+		RELEASE = buildRelease;
+		VERSION = buildVersion;
 
-		String info = BUILD_RELEASE;
+		String info = RELEASE;
 
-		if (BUILD_NUMBER != null) {
-			info += ", b:" + BUILD_NUMBER;
+		if (NUMBER != null) {
+			info += ", b:" + NUMBER;
 		}
 
-		if (BUILD_GIT_NB != null) {
-			info += ", c:" + BUILD_GIT_NB;
+		if (GIT_NB != null) {
+			info += ", c:" + GIT_NB;
 		}
 
-		if (BUILD_GIT_COMMIT != null) {
-			info += ", h:" + BUILD_GIT_COMMIT.substring(0, 5);
+		if (GIT_COMMIT != null) {
+			info += ", h:" + GIT_COMMIT.substring(0, 5);
 		}
 
-		info += ", d:" + BUILD_DATE;
-		BUILD_SIMPLIFIED_INFO = info;
+		info += ", d:" + DATE;
+		SIMPLIFIED_INFO = info;
 	}
 
 	public static String getBuildRelease() {
-		return BUILD_RELEASE;
+		return RELEASE;
 	}
 }

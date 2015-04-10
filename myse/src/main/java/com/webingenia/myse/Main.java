@@ -8,6 +8,9 @@ import com.webingenia.myse.db.DBMgmt;
 import com.webingenia.myse.db.model.Config;
 import com.webingenia.myse.db.model.DBDescSource;
 import com.webingenia.myse.embeddedes.ElasticSearch;
+import com.webingenia.myse.tasks.Tasks;
+import com.webingenia.myse.updater.Updater;
+import com.webingenia.myse.updater.Upgrader;
 import com.webingenia.myse.webserver.JettyServer;
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,11 +18,13 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import javax.persistence.EntityManager;
 
 public class Main {
 
 	public static void main(String[] args) throws Exception {
+		Upgrader.main(args);
 		DBMgmt.start();
 		ElasticSearch.start();
 		JettyServer.start();
@@ -86,8 +91,10 @@ public class Main {
 			}
 		}
 
+		Tasks.getService().scheduleWithFixedDelay(new Updater(), 0, 15, TimeUnit.MINUTES);
+
 		{ // We check the version
-			String currentVersion = BuildInfo.BUILD_VERSION;
+			String currentVersion = BuildInfo.VERSION;
 			String version = Config.get("version", currentVersion);
 			if (!currentVersion.equals(version)) {
 				LOG.info("VERSION Change: {} --> {}", version, currentVersion);

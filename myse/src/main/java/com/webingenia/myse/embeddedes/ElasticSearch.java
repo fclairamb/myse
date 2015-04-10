@@ -32,13 +32,17 @@ public class ElasticSearch {
 				.settings(settings)
 				.clusterName("localCluster")
 				.data(true).local(true).node();
+		createIndex();
 	}
 
 	private static void createIndex() {
-		CreateIndexRequest request = Requests.createIndexRequest(FileIndexer.ES_INDEX_NAME);
-		CreateIndexResponse response;
-		try (Client clt = client()) {
-			response = clt.admin().indices().create(request).actionGet();
+		try {
+			CreateIndexRequest request = Requests.createIndexRequest(FileIndexer.ES_INDEX_NAME);
+			try (Client clt = client()) {
+				clt.admin().indices().create(request).actionGet();
+			}
+		} catch (Exception ex) {
+			LOG.LOG.error("createIndex", ex);
 		}
 	}
 
