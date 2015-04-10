@@ -23,11 +23,11 @@ public class DBMgmt {
 	}
 
 	private static String getJdbcServerUrl() {
-		return "jdbc:h2:tcp://localhost/./data/h2/main";
+		return "jdbc:h2:tcp://localhost/~/.myse/h2/main";
 	}
 
 	private static String getJdbcLocalUrl() {
-		return "jdbc:h2:file:./data/h2/main";
+		return "jdbc:h2:file:~/.myse/h2/main";
 	}
 
 	private static String getJdbcUrl() {

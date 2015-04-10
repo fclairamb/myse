@@ -8,12 +8,12 @@
 	</appender>
 	
 	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>data/logs/myse.log</file>
+		<file>${user.home:-}/.myse/logs/myse.log</file>
 		<layout class="ch.qos.logback.classic.PatternLayout">
 			<Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %class{20}:%line{5} - %msg%n</Pattern>
 		</layout>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>data/logs/myse_%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+			<fileNamePattern>${user.home:-}/.myse/logs/myse_%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
 			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
 				<maxFileSize>100MB</maxFileSize>
 			</timeBasedFileNamingAndTriggeringPolicy>

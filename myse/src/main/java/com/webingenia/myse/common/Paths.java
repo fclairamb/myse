@@ -22,11 +22,10 @@ public class Paths {
 	}
 
 	public static File getAppDir() {
-//		File homeDir = new File(System.getProperty("user.home"));
-//		File appDir = new File(homeDir, ".myse");
+		File homeDir = new File(System.getProperty("user.home"));
+		File appDir = new File(homeDir, ".myse");
 
-		File appDir = new File("data");
-
+		//File appDir = new File("data");
 		if (!appDir.exists()) {
 			appDir.mkdir();
 		}
@@ -44,6 +43,14 @@ public class Paths {
 
 	public static File getLogsDir() {
 		File file = new File(getAppDir(), "logs");
+		if (!file.exists()) {
+			file.mkdir();
+		}
+		return file;
+	}
+
+	public static File getESDir() {
+		File file = new File(getAppDir(), "es");
 		if (!file.exists()) {
 			file.mkdir();
 		}

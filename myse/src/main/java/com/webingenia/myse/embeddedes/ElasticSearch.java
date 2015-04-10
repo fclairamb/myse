@@ -1,6 +1,8 @@
 package com.webingenia.myse.embeddedes;
 
+import com.webingenia.myse.access.File;
 import com.webingenia.myse.common.LOG;
+import com.webingenia.myse.common.Paths;
 import com.webingenia.myse.db.model.DBDescSource;
 import com.webingenia.myse.fileexplore.FileIndexer;
 import java.io.IOException;
@@ -25,7 +27,7 @@ public class ElasticSearch {
 		ImmutableSettings.Builder settings = ImmutableSettings.settingsBuilder();
 
 		settings.put("node.name", "localCluster");
-		settings.put("path.data", "data/es");
+		settings.put("path.data", Paths.getESDir().getAbsolutePath());
 		settings.put("http.enabled", true);
 
 		node = NodeBuilder.nodeBuilder()
