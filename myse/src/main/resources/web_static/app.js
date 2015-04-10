@@ -173,7 +173,7 @@
 					restrict: 'E',
 					templateUrl: '/static/logs.html',
 					controllerAs: 'logs',
-					controller: ['$scope', function ($scope) {
+					controller: ['$scope', '$http', '$window', function ($scope, $http, $window) {
 							var ctrl = this;
 							ctrl.maxRows = 0;
 							ctrl.rows = [];
@@ -217,6 +217,12 @@
 									ctrl.ws.close();
 								}
 								ctrl.initWs();
+							};
+
+							ctrl.quit = function () {
+								$http.get('/rest/quit').success(function () {
+									$('body').html('');
+								});
 							};
 						}]
 				};
