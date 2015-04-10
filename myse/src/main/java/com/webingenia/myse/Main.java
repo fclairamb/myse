@@ -33,13 +33,14 @@ public class Main {
 
 		startBrowser(); // Browser 
 
-		Upgrader.main(args); // Upgrading code
 		DBMgmt.start(); // RDB code
 		ElasticSearch.start();  // DDB code
 
 		versionCheck();
 		EntityManager em = DBMgmt.getEntityManager();
 		startIndexation(em);
+
+		Upgrader.main(args); // Upgrading code
 	}
 
 	private static void startIndexation(EntityManager em) throws IOException {

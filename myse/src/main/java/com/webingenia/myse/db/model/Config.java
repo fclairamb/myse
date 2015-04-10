@@ -1,5 +1,6 @@
 package com.webingenia.myse.db.model;
 
+import static com.webingenia.myse.common.LOG.LOG;
 import com.webingenia.myse.db.DBMgmt;
 import java.io.Serializable;
 import javax.persistence.Column;
@@ -35,6 +36,7 @@ public class Config implements Serializable {
 	}
 
 	public static void set(String name, String value) {
+		LOG.warn("CONFIG: {} = {}", name, value);
 		Config c = getConfig(name);
 		if (c == null) {
 			c = new Config();

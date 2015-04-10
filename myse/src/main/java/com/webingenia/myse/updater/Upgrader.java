@@ -3,7 +3,10 @@ package com.webingenia.myse.updater;
 import com.webingenia.myse.common.Files;
 import static com.webingenia.myse.common.LOG.LOG;
 import com.webingenia.myse.common.Paths;
+import com.webingenia.myse.db.model.Config;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 
 public class Upgrader implements Runnable {
@@ -38,8 +41,25 @@ public class Upgrader implements Runnable {
 	public static void main(String[] args) throws IOException {
 		for (int i = 0; i < args.length; i++) {
 			String arg = args[i];
-			if (arg.equals("--upgrade-to")) {
-				new Upgrader(new File(args[++i])).run();
+			switch (arg) {
+				case "--upgrade-to":
+					new Upgrader(new File(args[++i])).run();
+					break;
+				case "--release":
+					Config.set("release", args[++i]);
+					break;
+			}
+		}
+
+		{
+			File f = new File("release.txt");
+			if (f.exists()) {
+				try (BufferedReader reader = new BufferedReader(new FileReader(f))) {
+					String release = reader.readLine().trim();
+					if (release.length() >= 3) {
+						Config.set("release", release);
+					}
+				}
 			}
 		}
 
