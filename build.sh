@@ -41,4 +41,4 @@ if [ "$release" = "stable" ]; then
 	ln dist/myse_${VERSION}.jar dist/myse.jar
 fi
 
-rsync -av dist/ /home/myse.io/update/
+rsync -av dist/ myse.io@localhost:update/
