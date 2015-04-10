@@ -12,9 +12,13 @@ import com.webingenia.myse.tasks.Tasks;
 import com.webingenia.myse.updater.Updater;
 import com.webingenia.myse.updater.Upgrader;
 import com.webingenia.myse.webserver.JettyServer;
+import java.awt.Desktop;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -24,13 +28,18 @@ import javax.persistence.EntityManager;
 public class Main {
 
 	public static void main(String[] args) throws Exception {
+		JettyServer.start();
+		startBrowser();
 		Upgrader.main(args);
 		DBMgmt.start();
 		ElasticSearch.start();
-		JettyServer.start();
 
+		versionCheck();
 		EntityManager em = DBMgmt.getEntityManager();
+		startIndexation(em);
+	}
 
+	private static void startIndexation(EntityManager em) throws IOException {
 		List<DBDescSource> allSources = DBDescSource.all(em);
 		if (allSources.isEmpty()) {
 			LOG.warn("NO SOURCE! Creating one !");
@@ -91,6 +100,12 @@ public class Main {
 			}
 		}
 
+		for (DBDescSource dbSource : allSources) {
+			Indexation.start(Source.get(dbSource));
+		}
+	}
+
+	private static void versionCheck() {
 		Tasks.getService().scheduleWithFixedDelay(new Updater(), 0, 15, TimeUnit.MINUTES);
 
 		{ // We check the version
@@ -103,9 +118,11 @@ public class Main {
 				LOG.info("Version: " + currentVersion);
 			}
 		}
+	}
 
-		for (DBDescSource dbSource : allSources) {
-			Indexation.start(Source.get(dbSource));
+	private static void startBrowser() throws IOException, URISyntaxException {
+		if (Desktop.isDesktopSupported()) {
+			Desktop.getDesktop().browse(new URI("http://localhost:8080/"));
 		}
 	}
 }
