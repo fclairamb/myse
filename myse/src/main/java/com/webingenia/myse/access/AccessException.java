@@ -27,4 +27,8 @@ public class AccessException extends Exception {
 		TEMPORARY_ISSUE,
 		UNKNOWN
 	}
+
+	public AccessState state() {
+		return state;
+	}
 }

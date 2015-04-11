@@ -123,6 +123,9 @@ public class DirExplorer extends RunnableCancellable {
 					}
 				} catch (AccessException ex) {
 					LOG.warn("analyse.listing: " + ex);
+					if ( ex.state() == AccessException.AccessState.UNKNOWN ) {
+						
+					}
 				}
 			}
 		}
