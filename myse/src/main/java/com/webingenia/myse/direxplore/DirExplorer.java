@@ -25,8 +25,8 @@ public class DirExplorer extends RunnableCancellable {
 
 	private void fetchSettings() {
 		final String PRE = "direxplorer.";
-		confLogDirsExploration = Config.get(PRE + "log_dirs", false);
-		confNbFilesToFetch = Config.get(PRE + "nb_files_to_feth", 100);
+		confLogDirsExploration = Config.get(PRE + "log_dirs", false, true);
+		confNbFilesToFetch = Config.get(PRE + "nb_files_to_feth", 100, true);
 	}
 
 	@Override
@@ -123,8 +123,8 @@ public class DirExplorer extends RunnableCancellable {
 					}
 				} catch (AccessException ex) {
 					LOG.warn("analyse.listing: " + ex);
-					if ( ex.state() == AccessException.AccessState.UNKNOWN ) {
-						
+					if (ex.state() == AccessException.AccessState.UNKNOWN) {
+
 					}
 				}
 			}

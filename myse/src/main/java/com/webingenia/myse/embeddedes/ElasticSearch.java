@@ -9,6 +9,7 @@ import java.io.IOException;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.common.io.stream.BytesStreamOutput;
 import org.elasticsearch.common.settings.ImmutableSettings;
@@ -39,9 +40,12 @@ public class ElasticSearch {
 
 	private static void createIndex() {
 		try {
-			CreateIndexRequest request = Requests.createIndexRequest(FileIndexer.ES_INDEX_NAME);
 			try (Client clt = client()) {
-				clt.admin().indices().create(request).actionGet();
+				IndicesAdminClient indices = clt.admin().indices();
+				boolean exists = indices.prepareExists(FileIndexer.ES_INDEX_NAME).execute().actionGet().isExists();
+				if (!exists) {
+					indices.create(Requests.createIndexRequest(FileIndexer.ES_INDEX_NAME)).actionGet();
+				}
 			}
 		} catch (Exception ex) {
 			LOG.LOG.error("createIndex", ex);

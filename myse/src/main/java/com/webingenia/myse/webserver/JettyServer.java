@@ -23,7 +23,7 @@ public class JettyServer {
 	private static ServletHandler handler;
 
 	public static void start() throws Exception {
-		server = new Server(Config.get("jetty_port", 8080));
+		server = new Server(Config.get("jetty_port", 8080, true));
 
 		loadHandler();
 

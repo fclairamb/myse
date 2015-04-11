@@ -25,7 +25,7 @@ public class RestConfig extends HttpServlet {
 		{ // The response
 			resp.setContentType("application/json; charset=utf8");
 			try (PrintWriter out = resp.getWriter()) {
-				out.write(gson.toJson(Config.get(name, (String) null)));
+				out.write(gson.toJson(Config.get(name, (String) null, false)));
 			}
 		}
 

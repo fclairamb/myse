@@ -28,19 +28,23 @@ import javax.persistence.EntityManager;
 public class Main {
 
 	public static void main(String[] args) throws Exception {
+		try {
+			DBMgmt.start(); // RDB code
 
-		JettyServer.start(); // Web server
+			JettyServer.start(); // Web server
 
-		startBrowser(); // Browser 
+			ElasticSearch.start();  // DDB code
 
-		DBMgmt.start(); // RDB code
-		ElasticSearch.start();  // DDB code
+			versionCheck();
+			EntityManager em = DBMgmt.getEntityManager();
+			startIndexation(em);
 
-		versionCheck();
-		EntityManager em = DBMgmt.getEntityManager();
-		startIndexation(em);
-
-		Upgrader.main(args); // Upgrading code
+			Upgrader.main(args); // Upgrading code
+		} catch (Exception ex) {
+			LOG.error("Problem starting !", ex);
+		} finally {
+			startBrowser(); // Browser 
+		}
 	}
 
 	private static void startIndexation(EntityManager em) throws IOException {
@@ -114,7 +118,7 @@ public class Main {
 
 		{ // We check the version
 			String currentVersion = BuildInfo.VERSION;
-			String version = Config.get("version", currentVersion);
+			String version = Config.get("version", "0.0", false);
 			if (!currentVersion.equals(version)) {
 				LOG.info("VERSION Change: {} --> {}", version, currentVersion);
 				Config.set("version", currentVersion);

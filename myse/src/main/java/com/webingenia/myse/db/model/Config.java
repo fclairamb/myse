@@ -5,6 +5,8 @@ import com.webingenia.myse.db.DBMgmt;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -19,58 +21,62 @@ public class Config implements Serializable {
 	@Column(name = "VALUE")
 	private String value;
 
-	public String getName() {
-		return name;
+	public static String get(String name, String defaultValue, boolean save) {
+
+		EntityManager em = DBMgmt.getEntityManager();
+		try {
+			Config c = getConfig(name, em);
+			if (c == null && defaultValue != null) {
+				set(name, defaultValue);
+			}
+			return defaultValue;
+		} finally {
+			em.close();
+		}
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public static int get(String name, int defaultValue, boolean save) {
+		return Integer.parseInt(get(name, Integer.toString(defaultValue), save));
 	}
 
-	public String getValue() {
-		return value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
+	public static boolean get(String name, boolean defaultValue, boolean save) {
+		return Boolean.parseBoolean(get(name, Boolean.toString(defaultValue), save));
 	}
 
 	public static void set(String name, String value) {
 		LOG.warn("CONFIG: {} = {}", name, value);
-		Config c = getConfig(name);
-		if (c == null) {
-			c = new Config();
-			c.setName(name);
+
+		EntityManager em = DBMgmt.getEntityManager();
+		try {
+			Config c = getConfig(name, em);
+			if (c == null) {
+				c = new Config();
+				c.name = name;
+			}
+
+			c.value = value;
+			EntityTransaction tr = em.getTransaction();
+			tr.begin();
+			em.persist(c);
+			tr.commit();
+		} finally {
+			em.close();
 		}
-
-		c.setValue(value);
-		DBMgmt.getDefaultEntityManager().persist(c);
 	}
 
-	public static String get(String name, String defaultValue) {
-		Config c = getConfig(name);
-		if (c == null && defaultValue != null) {
-			set(name, defaultValue);
-		}
-		return defaultValue;
-	}
-
-	public static int get(String name, int defaultValue) {
-		return Integer.parseInt(get(name, Integer.toString(defaultValue)));
-	}
-
-	public static boolean get(String name, boolean defaultValue) {
-		return Boolean.parseBoolean(get(name, Boolean.toString(defaultValue)));
-	}
-
-	private static Config getConfig(String name) {
-		for (Config c : DBMgmt.getDefaultEntityManager().createQuery("SELECT c FROM Config c WHERE c.name = :name", Config.class).setParameter("name", name).getResultList()) {
+	private static Config getConfig(String name, EntityManager em) {
+		for (Config c : em.createQuery("SELECT c FROM Config c WHERE c.name = :name", Config.class).setParameter("name", name).getResultList()) {
 			return c;
 		}
 		return null;
 	}
 
 	public static void del(String name) {
-		DBMgmt.getDefaultEntityManager().createQuery("DELETE FROM Config c WHERE c.name = :name").setParameter("name", name).executeUpdate();
+		EntityManager em = DBMgmt.getEntityManager();
+		try {
+			em.createQuery("DELETE FROM Config c WHERE c.name = :name").setParameter("name", name).executeUpdate();
+		} finally {
+			em.close();
+		}
 	}
 }

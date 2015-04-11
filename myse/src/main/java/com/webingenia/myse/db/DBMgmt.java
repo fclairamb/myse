@@ -118,12 +118,12 @@ public class DBMgmt {
 	}
 
 	private static EntityManager defaultEm;
-
-	public static EntityManager getDefaultEntityManager() {
-		if (defaultEm == null) {
-			defaultEm = getEntityManager();
-			defaultEm.setFlushMode(FlushModeType.AUTO);
-		}
-		return defaultEm;
-	}
+//
+//	public static EntityManager getDefaultEntityManager() {
+//		if (defaultEm == null) {
+//			defaultEm = getEntityManager();
+//			defaultEm.setFlushMode(FlushModeType.AUTO);
+//		}
+//		return defaultEm;
+//	}
 }

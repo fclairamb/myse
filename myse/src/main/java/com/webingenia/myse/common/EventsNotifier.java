@@ -50,7 +50,7 @@ public class EventsNotifier {
 	private static void addEvent(Event event) {
 		try {
 			events.add(event);
-			while (events.size() > 10) {
+			while (events.size() > 20) {
 				events.remove(0);
 			}
 
