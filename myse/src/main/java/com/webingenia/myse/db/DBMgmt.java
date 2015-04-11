@@ -1,18 +1,18 @@
 package com.webingenia.myse.db;
 
 import static com.webingenia.myse.common.LOG.LOG;
-import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.FlushModeType;
 import javax.persistence.Persistence;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.h2.tools.Server;
 
 public class DBMgmt {
+
+	private static boolean stopped;
 
 	static {
 		try {
@@ -72,6 +72,9 @@ public class DBMgmt {
 
 	private static JdbcConnectionPool getPool() {
 		if (pool == null) {
+			if (stopped) {
+				throw new RuntimeException("DB is stopped !");
+			}
 			pool = JdbcConnectionPool.create(getJdbcUrl(), "sa", "");
 		}
 		return pool;
@@ -88,14 +91,20 @@ public class DBMgmt {
 	}
 
 	public static void start() throws SQLException {
+		stopped = false;
 		if (serverMode || httpServer) {
 			startH2Server();
 		}
 	}
 
 	public static void stop() {
+		stopped = true;
 		if (serverMode || httpServer) {
 			stopH2Server();
+		}
+		if (pool != null) {
+			pool.dispose();
+			pool = null;
 		}
 	}
 
@@ -116,14 +125,4 @@ public class DBMgmt {
 	public static EntityManager getEntityManager() {
 		return getEntityManagerFactory().createEntityManager();
 	}
-
-	private static EntityManager defaultEm;
-//
-//	public static EntityManager getDefaultEntityManager() {
-//		if (defaultEm == null) {
-//			defaultEm = getEntityManager();
-//			defaultEm.setFlushMode(FlushModeType.AUTO);
-//		}
-//		return defaultEm;
-//	}
 }

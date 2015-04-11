@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -29,22 +30,54 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 		try {
-			DBMgmt.start(); // RDB code
-
-			JettyServer.start(); // Web server
-
-			ElasticSearch.start();  // DDB code
-
-			versionCheck();
-			EntityManager em = DBMgmt.getEntityManager();
-			startIndexation(em);
-
-			Upgrader.main(args); // Upgrading code
+			start(args);
 		} catch (Exception ex) {
 			LOG.error("Problem starting !", ex);
 		} finally {
 			startBrowser(); // Browser 
 		}
+	}
+
+	public static void start(String[] args) throws SQLException, IOException, Exception {
+		DBMgmt.start(); // RDB code
+
+		JettyServer.start(); // Web server
+
+		ElasticSearch.start();  // DDB code
+
+		versionCheck();
+		EntityManager em = DBMgmt.getEntityManager();
+		startIndexation(em);
+
+		Upgrader.main(args); // Upgrading code
+	}
+
+	private static boolean stopped = false;
+
+	public static void stop() {
+//
+//		new Thread(new Runnable() {
+//			@Override
+//			public void run() {
+				try {
+					stopped = true;
+					LOG.info("Stopping tasks...");
+					Tasks.stop();
+					LOG.info("Stopping H2...");
+					DBMgmt.stop();
+					LOG.info("Stopping ES...");
+					ElasticSearch.stop();
+					LOG.info("Stopping Jetty...");
+					JettyServer.stop();
+				} catch (Exception ex) {
+					LOG.error("Main.stop", ex);
+				}
+//			}
+//		}, "Quitting").start();
+	}
+
+	public static boolean running() {
+		return !stopped;
 	}
 
 	private static void startIndexation(EntityManager em) throws IOException {

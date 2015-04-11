@@ -95,8 +95,8 @@
 
 	app.controller(
 			'SetupListCtrl',
-			['$http',
-				function ($http) {
+			['$http', '$window',
+				function ($http, $window) {
 					var ctrl = this;
 					this.sources = [];
 					this.fetchSources = function () {
@@ -114,7 +114,13 @@
 									}
 								}
 						);
-					}
+					};
+
+					this.deleteAfterConfirm = function (sourceId) {
+						if ($window.confirm('Do you really want to delete this source ?')) {
+							ctrl.delete(sourceId);
+						}
+					};
 
 					this.fetchSources();
 				}

@@ -1,5 +1,6 @@
 package com.webingenia.myse.updater;
 
+import com.webingenia.myse.Main;
 import com.webingenia.myse.common.Files;
 import static com.webingenia.myse.common.LOG.LOG;
 import com.webingenia.myse.common.Paths;
@@ -27,6 +28,8 @@ public class Upgrader implements Runnable {
 			LOG.info("Done! Starting the app !");
 
 			File javaExe = Paths.getJavaExe();
+
+			Main.stop();
 
 			ProcessBuilder pb = new ProcessBuilder(javaExe.getAbsolutePath(), "-jar", target.getAbsolutePath(), "--upgraded");
 			pb.directory(Paths.getUpgradeDir());
@@ -57,7 +60,7 @@ public class Upgrader implements Runnable {
 				try (BufferedReader reader = new BufferedReader(new FileReader(f))) {
 					String release = reader.readLine().trim();
 					if (release.length() >= 3) {
-						Config.set("release", release);
+						Config.set(Config.PAR_UPDATE_CHANNEL, release);
 					}
 				}
 			}

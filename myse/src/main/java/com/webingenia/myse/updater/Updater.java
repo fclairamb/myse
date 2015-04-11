@@ -28,7 +28,7 @@ public class Updater implements Runnable {
 	}
 
 	private String getLastVersionFileUrl() {
-		return URL_BASE + "version_" + Config.get("release", "stable", true) + "?version=" + BuildInfo.VERSION;
+		return URL_BASE + "version_" + Config.get(Config.PAR_UPDATE_CHANNEL, "stable", true) + "?version=" + BuildInfo.VERSION;
 	}
 
 	private String getHashUrl(String version) {

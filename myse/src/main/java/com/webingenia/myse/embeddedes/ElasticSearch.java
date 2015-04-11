@@ -1,11 +1,9 @@
 package com.webingenia.myse.embeddedes;
 
-import com.webingenia.myse.access.File;
 import com.webingenia.myse.common.LOG;
 import com.webingenia.myse.common.Paths;
 import com.webingenia.myse.db.model.DBDescSource;
 import com.webingenia.myse.fileexplore.FileIndexer;
-import java.io.IOException;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.client.Client;
@@ -77,7 +75,10 @@ public class ElasticSearch {
 	}
 
 	public static void stop() {
-		node.stop();
+		if (node != null) {
+			node.stop();
+			node = null;
+		}
 	}
 
 	public static Client client() {

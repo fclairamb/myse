@@ -1,5 +1,6 @@
 package com.webingenia.myse.webserver.servlets;
 
+import com.webingenia.myse.Main;
 import com.webingenia.myse.tasks.Tasks;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -16,7 +17,9 @@ public class RestQuit extends HttpServlet {
 
 			@Override
 			public void run() {
-				System.exit(0);
+				Main.stop();
+
+				//System.exit(0);
 			}
 		}, 2, TimeUnit.SECONDS);
 	}

@@ -1,5 +1,6 @@
 package com.webingenia.myse.fileexplore;
 
+import com.webingenia.myse.Main;
 import com.webingenia.myse.access.File;
 import com.webingenia.myse.access.Source;
 import com.webingenia.myse.common.EventsNotifier;
@@ -42,6 +43,10 @@ public class FileIndexer extends RunnableCancellable {
 				LOG.info("Deleted !");
 			}
 			for (DBDescFile desc : DBDescFile.listFiles(source.getDesc(), false, 300, em)) {
+				if (!Main.running()) {
+					LOG.warn("Bye bye !");
+					return;
+				}
 				analyseFile(desc, em, esClient);
 			}
 		} catch (Exception ex) {

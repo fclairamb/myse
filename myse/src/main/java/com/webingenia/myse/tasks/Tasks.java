@@ -38,4 +38,8 @@ public class Tasks {
 		ScheduledFuture<?> future = getService().scheduleWithFixedDelay(cmd, initialDelay, delay, unit);
 		cmd.setFuture(future);
 	}
+
+	public static void stop() throws InterruptedException {
+		tasks.shutdown();
+	}
 }

@@ -1,5 +1,6 @@
 package com.webingenia.myse.direxplore;
 
+import com.webingenia.myse.Main;
 import com.webingenia.myse.access.AccessException;
 import com.webingenia.myse.access.File;
 import com.webingenia.myse.access.Source;
@@ -24,10 +25,16 @@ public class DirExplorer extends RunnableCancellable {
 	private int confNbFilesToFetch;
 
 	private void fetchSettings() {
-		final String PRE = "direxplorer.";
-		confLogDirsExploration = Config.get(PRE + "log_dirs", false, true);
-		confNbFilesToFetch = Config.get(PRE + "nb_files_to_feth", 100, true);
+
+		confLogDirsExploration = Config.get(CONF_LOG_NEW_DIRS, false, true);
+		confNbFilesToFetch = Config.get(CONF_NB_FILES_TO_FETCH, 100, true);
 	}
+
+	private static final String PRE = "direxplorer.";
+
+	public static final String CONF_LOG_NEW_DIRS = PRE + "log_new_dirs";
+
+	public static final String CONF_NB_FILES_TO_FETCH = PRE + "nb_files_to_fetch";
 
 	@Override
 	public void run() {
@@ -58,6 +65,10 @@ public class DirExplorer extends RunnableCancellable {
 				em.getTransaction().begin();
 				try {
 					for (DBDescFile desc : DBDescFile.listFiles(sd, true, confNbFilesToFetch, em)) {
+						if (!Main.running()) {
+							LOG.warn("Bye bye !");
+							return;
+						}
 						if (analyseFile(desc, em, true)) {
 							again = true;
 						}
@@ -77,6 +88,10 @@ public class DirExplorer extends RunnableCancellable {
 	}
 
 	private boolean analyseFile(DBDescFile desc, EntityManager em, boolean sub) throws Exception {
+		if (!Main.running()) {
+			LOG.warn("Bye bye !");
+			return false;
+		}
 		File file = source.getFile(desc.getPath());
 		boolean dir = file.isDirectory();
 		if (confLogDirsExploration) {
@@ -112,6 +127,10 @@ public class DirExplorer extends RunnableCancellable {
 				try {
 					desc.performingAnalysis();
 					for (File f : file.listFiles()) {
+						if (!Main.running()) {
+							LOG.warn("Bye bye !");
+							return false;
+						}
 						try {
 							DBDescFile df = DBDescFile.getOrCreate(f, em);
 							if (analyseFile(df, em, false)) {

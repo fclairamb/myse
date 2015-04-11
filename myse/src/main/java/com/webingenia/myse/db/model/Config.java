@@ -21,6 +21,8 @@ public class Config implements Serializable {
 	@Column(name = "VALUE")
 	private String value;
 
+	public static final String PAR_UPDATE_CHANNEL = "update.channel";
+
 	public static String get(String name, String defaultValue, boolean save) {
 
 		EntityManager em = DBMgmt.getEntityManager();

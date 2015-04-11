@@ -13,8 +13,8 @@
 			<td>{{ source._id}}</td>
 			<td>{{ source._name}}</td>
 			<td>
-				<a href="#/setup/source/edit/{{ source._id}}">Edit</a>
-				<a href ng-click="setup.delete(source._id)">Delete</a>
+				<a href="#/setup/source/edit/{{ source._id}}" class="btn btn-info">Edit</a>
+				<a href ng-click="setup.deleteAfterConfirm(source._id)" class="btn btn-info">Delete</a>
 			</td>
 		</tr>
 	</tbody>
