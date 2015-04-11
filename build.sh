@@ -39,6 +39,20 @@ if [ "$release" = "stable" ]; then
 		rm dist/myse.jar; 
 	fi
 	ln dist/myse_${VERSION}.jar dist/myse.jar
+
+	echo "
+<html>
+  <head>
+    <title>MYSE ${VERSION}
+    <meta http-equiv=\"refresh\" content=\"0; url=http://update.myse.io/myse.jar\">
+  </head>
+  <body>
+    You are about to <a href=\"http://update.myse.io/myse.jar\">Run MYSE ${VERSION}</a>
+  </body>
+</html>" >dist/index.html
+  
+
+
 fi
 
 rsync -av dist/ myse.io@localhost:update/
