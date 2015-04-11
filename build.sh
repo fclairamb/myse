@@ -43,11 +43,11 @@ if [ "$release" = "stable" ]; then
 	echo "
 <html>
   <head>
-    <title>MYSE ${VERSION}
-    <meta http-equiv=\"refresh\" content=\"0; url=http://update.myse.io/myse.jar\">
+    <title>MYSE ${VERSION}</title>
+    <meta http-equiv=\"refresh\" content=\"0; url=http://update.myse.io/myse.jar\" />
   </head>
   <body>
-    You are about to <a href=\"http://update.myse.io/myse.jar\">Run MYSE ${VERSION}</a>
+    You are about to <a href=\"http://update.myse.io/myse.jar\">Run MYSE ${VERSION}</a>.
   </body>
 </html>" >dist/index.html
   
