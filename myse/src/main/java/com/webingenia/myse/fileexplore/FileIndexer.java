@@ -98,6 +98,7 @@ public class FileIndexer extends RunnableCancellable {
 					if (title == null || title.trim().isEmpty()) {
 						title = desc.getPath();
 						title = title.substring(title.lastIndexOf("/") + 1);
+						title = title.substring(title.lastIndexOf("\"") + 1);
 					}
 					data.put("title", title);
 					data.put("name", desc.getName());

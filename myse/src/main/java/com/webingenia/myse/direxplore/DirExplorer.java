@@ -86,7 +86,7 @@ public class DirExplorer extends RunnableCancellable {
 		String name = file.getName();
 
 		// We don't care about this
-		if (name.startsWith("~$")) {
+		if (name.startsWith("~$") || name.startsWith(".")) {
 			return false;
 		}
 
