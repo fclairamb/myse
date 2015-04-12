@@ -111,6 +111,7 @@ public class RestSearch extends HttpServlet {
 						r.source = (String) source.get("source_short");
 						r.description = (String) source.get("content");
 
+						// TODO: Description: Show the matching words in bold
 						if (r.description != null && r.description.length() > 400) {
 							r.description = r.description.substring(0, 400) + "...";
 						}
