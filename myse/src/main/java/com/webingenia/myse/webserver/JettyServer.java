@@ -22,8 +22,12 @@ public class JettyServer {
 	private static Server server;
 	private static ServletHandler handler;
 
+	private static final String PRE = "web_server.";
+
+	public static final String PROP_PORT = PRE + "port";
+
 	public static void start() throws Exception {
-		server = new Server(Config.get("jetty_port", 8080, true));
+		server = new Server(Config.get(PROP_PORT, 10080, true));
 
 		loadHandler();
 
@@ -43,7 +47,7 @@ public class JettyServer {
 		handler.addServletWithMapping(RestSetupSource.class, "/rest/setup/source/*");
 		handler.addServletWithMapping(RestVersion.class, "/rest/version");
 		handler.addServletWithMapping(RestQuit.class, "/rest/quit");
-		handler.addServletWithMapping(RestConfig.class, "/rest/config");
+		handler.addServletWithMapping(RestConfig.class, "/rest/config/*");
 		handler.addServletWithMapping(PageDownload.class, "/download");
 
 		// Add a websocket to a specific path spec
