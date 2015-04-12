@@ -156,6 +156,17 @@
 						$http.get('/rest/setup/source/desc?type=' + this.props._type).success(
 								function (data) {
 									ctrl.descs = data;
+
+									// If this is a new source,
+									// we should set some default values
+									if (ctrl.sourceId === undefined) {
+										for (i = 0; i < ctrl.descs.length; ++i) {
+											var d = ctrl.descs[i];
+											if ( d.defaultValue !== undefined ) {
+												ctrl.props[ d.name ] = d.defaultValue;
+											}
+										}
+									}
 								}
 						);
 					};
