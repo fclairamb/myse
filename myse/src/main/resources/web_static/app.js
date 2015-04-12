@@ -14,26 +14,26 @@
 								}
 						)
 						.when(
-								"/setup",
+								"/setup/source/list",
 								{
-									templateUrl: '/static/setup-list.html',
-									controller: 'SetupListCtrl',
+									templateUrl: '/static/setup-source-list.html',
+									controller: 'SetupSourceListCtrl',
 									controllerAs: 'setup'
 								}
 						)
 						.when(
 								"/setup/source/edit/:sourceId",
 								{
-									templateUrl: '/static/setup-edit.html',
-									controller: 'SetupEditCtrl',
+									templateUrl: '/static/setup-source-edit.html',
+									controller: 'SetupSourceEditCtrl',
 									controllerAs: 'setup'
 								}
 						)
 						.when(
 								"/setup/source/edit",
 								{
-									templateUrl: '/static/setup-edit.html',
-									controller: 'SetupEditCtrl',
+									templateUrl: '/static/setup-source-edit.html',
+									controller: 'SetupSourceEditCtrl',
 									controllerAs: 'setup'
 								}
 						)
@@ -94,7 +94,7 @@
 			);
 
 	app.controller(
-			'SetupListCtrl',
+			'SetupSourceListCtrl',
 			['$http', '$window',
 				function ($http, $window) {
 					var ctrl = this;
@@ -127,7 +127,7 @@
 			]);
 
 	app.controller(
-			'SetupEditCtrl',
+			'SetupSourceEditCtrl',
 			['$http', '$routeParams', '$location',
 				function ($http, $routeParams, $location) {
 					var ctrl = this;
@@ -175,7 +175,7 @@
 						$http.post('/rest/setup/source/edit', this.props).success(
 								function (data) {
 									if (data) {
-										$location.path('/setup');
+										$location.path('/setup/source/list');
 									}
 								}
 						);
