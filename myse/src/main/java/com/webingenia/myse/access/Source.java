@@ -89,7 +89,7 @@ public abstract class Source {
 
 	protected List<PropertyDescription> getSharedProperties() {
 		return Arrays.asList(
-				new PropertyDescription(PROP_FILENAME_INCLUDE, PropertyDescription.Type.TEXT, "Files to include", "*.doc,*.docx,*.xls,*.xlsx,*.pdf,*.odt"),
+				new PropertyDescription(PROP_FILENAME_INCLUDE, PropertyDescription.Type.TEXT, "Files to include", "*.doc,*.docx,*.xls,*.xlsx,*.ppt,*.pptx,*.pdf,*.odt,*.ods,*.odp"),
 				new PropertyDescription(PROP_FILENAME_EXCLUDE, PropertyDescription.Type.TEXT, "Files to exclude", "*")
 		);
 	}
