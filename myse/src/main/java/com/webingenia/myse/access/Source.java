@@ -71,7 +71,7 @@ public abstract class Source {
 
 	public static List<Source> all(EntityManager em) {
 		List<Source> list = new ArrayList<>();
-		for (DBDescSource s : DBDescSource.all(em)) {
+		for (DBDescSource s : DBDescSource.allExisting(em)) {
 			list.add(get(s));
 		}
 		return list;

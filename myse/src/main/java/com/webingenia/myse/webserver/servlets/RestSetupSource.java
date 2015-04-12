@@ -35,7 +35,7 @@ public class RestSetupSource extends HttpServlet {
 	}
 
 	private Object doProcessList(Context context) {
-		List<DBDescSource> dbList = DBDescSource.all(context.em);
+		List<DBDescSource> dbList = DBDescSource.allExisting(context.em);
 		List<Map<String, String>> list = new ArrayList<>(dbList.size());
 		for (DBDescSource s : dbList) {
 			list.add(s.asMap());

@@ -120,8 +120,16 @@ public class DBDescSource implements Serializable {
 		this.state = state;
 	}
 
-	public static List<DBDescSource> all(EntityManager em) {
-		return em.createQuery("SELECT s FROM DBDescSource s WHERE s.deleted = false", DBDescSource.class).getResultList();
+	private static List<DBDescSource> all(boolean deleted, EntityManager em) {
+		return em.createQuery("SELECT s FROM DBDescSource s WHERE s.deleted = :deleted", DBDescSource.class).setParameter("deleted", deleted).getResultList();
+	}
+
+	public static List<DBDescSource> allExisting(EntityManager em) {
+		return all(false, em);
+	}
+
+	public static List<DBDescSource> allDeleted(EntityManager em) {
+		return all(true, em);
 	}
 
 	public boolean deleted() {

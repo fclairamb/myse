@@ -100,7 +100,7 @@ public class Main {
 	}
 
 	private static void startIndexation(EntityManager em) throws IOException {
-		List<DBDescSource> allSources = DBDescSource.all(em);
+		List<DBDescSource> allSources = DBDescSource.allExisting(em);
 		if (allSources.isEmpty()) {
 			LOG.warn("NO SOURCE! Creating one !");
 			em.getTransaction().begin();
@@ -146,7 +146,7 @@ public class Main {
 				}
 			}
 			em.getTransaction().commit();
-			allSources = DBDescSource.all(em);
+			allSources = DBDescSource.allExisting(em);
 		}
 
 		{
@@ -163,6 +163,8 @@ public class Main {
 		for (DBDescSource dbSource : allSources) {
 			Indexation.start(Source.get(dbSource));
 		}
+		
+		//TODO: Delete all the non-existing sources and their respective documents
 	}
 
 	private static void versionCheck() {
@@ -182,7 +184,7 @@ public class Main {
 
 	private static void startBrowser() throws IOException, URISyntaxException {
 		if (Desktop.isDesktopSupported()) {
-			Desktop.getDesktop().browse(new URI("http://localhost:8080/"));
+			Desktop.getDesktop().browse(new URI("http://localhost:" + Config.get(JettyServer.PROP_PORT, 10080, false) + "/"));
 		}
 	}
 }
