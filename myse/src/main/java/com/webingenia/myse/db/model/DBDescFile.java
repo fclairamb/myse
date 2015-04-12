@@ -150,15 +150,21 @@ public class DBDescFile implements Serializable {
 	}
 
 	private static int extensionToPriority(String extension) {
+		//TODO: Find a more generic/elegant way to do this
 		switch (extension) {
 			case "doc":
 			case "docx":
 			case "pdf":
 			case "odt":
 				return 0;
+			case "ppt":
+			case "pptx":
+			case "odp":
+				return 10;
 			case "xls":
 			case "xlsx":
-				return 10;
+			case "ods":
+				return 20;
 			case "html":
 			case "txt":
 				return 30;
