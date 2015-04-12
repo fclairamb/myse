@@ -3,6 +3,9 @@ package com.webingenia.myse.access.disk;
 import com.webingenia.myse.access.AccessException;
 import com.webingenia.myse.access.Source;
 import com.webingenia.myse.db.model.DBDescSource;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class SourceDisk extends Source {
 
@@ -14,6 +17,7 @@ public class SourceDisk extends Source {
 		super(desc);
 	}
 
+	//TODO: Make sure the root path is finishing with a "/"
 	private String getRootPath() {
 		return desc.getProperties().get(PROP_PATH);
 	}
@@ -38,9 +42,12 @@ public class SourceDisk extends Source {
 	}
 
 	@Override
-	public PropertyDescription[] getProperties() {
-		return new PropertyDescription[]{
-			new PropertyDescription(PROP_PATH, PropertyDescription.Type.TEXT, "Path of the directory to index")
-		};
+	public List<PropertyDescription> getProperties() {
+		ArrayList<PropertyDescription> list = new ArrayList<>();
+		list.addAll(Arrays.asList(
+				new PropertyDescription(PROP_PATH, PropertyDescription.Type.TEXT, "Path of the directory to index")
+		));
+		list.addAll(getSharedProperties());
+		return list;
 	}
 }

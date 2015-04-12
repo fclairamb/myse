@@ -11,7 +11,10 @@ import com.webingenia.myse.db.DBMgmt;
 import com.webingenia.myse.db.model.Config;
 import com.webingenia.myse.db.model.DBDescFile;
 import com.webingenia.myse.db.model.DBDescSource;
+import java.util.Map;
+import java.util.regex.Pattern;
 import javax.persistence.EntityManager;
+import org.elasticsearch.common.base.Strings;
 
 public class DirExplorer extends RunnableCancellable {
 
@@ -36,8 +39,34 @@ public class DirExplorer extends RunnableCancellable {
 
 	public static final String CONF_NB_FILES_TO_FETCH = PRE + "nb_files_to_fetch";
 
+	public static Pattern compileWildcardRule(String wildCard) {
+		StringBuilder sb = new StringBuilder();
+
+		int count = 0;
+		for (String s : wildCard.split(",")) {
+			s = s.trim(); // We remove space
+			if (count++ > 0) {
+				sb.append("|");
+			}
+			sb.append(s.replace(".", "\\.").replace("*", ".*"));
+		}
+
+		return Pattern.compile(sb.toString(), Pattern.CASE_INSENSITIVE);
+	}
+
+	Pattern patternInclude, patternExclude;
+
 	@Override
 	public void run() {
+
+		{ // We compile the patterns at each run (because they might be run again)
+			Map<String, String> properties = source.getDesc().getProperties();
+			String strPatternInclude = properties.get(Source.PROP_FILENAME_INCLUDE);
+			String strPatternExclude = properties.get(Source.PROP_FILENAME_EXCLUDE);
+			patternInclude = Strings.isNullOrEmpty(strPatternInclude) ? null : compileWildcardRule(strPatternInclude);
+			patternExclude = Strings.isNullOrEmpty(strPatternExclude) ? null : compileWildcardRule(strPatternExclude);
+		}
+
 		fetchSettings();
 		LOG.info("DirExplorer on " + source + " : STARTING !");
 		if (source.getDesc().deleted()) {
@@ -98,11 +127,27 @@ public class DirExplorer extends RunnableCancellable {
 			LOG.info("[{}] Analysing {} \"{}\" : {}", dir ? "dir" : "file", source, file.getPath(), file.getLastModified());
 		}
 
-		String name = file.getName();
+		// File name checking doesn't apply to directories
+		if (!dir) {
+			String name = file.getName();
+			boolean index = true;
+			// We don't care about hidden files and lock files by default
+			if (name.startsWith("~$") || name.startsWith(".")) {
+				index = false;
+			}
 
-		// We don't care about this
-		if (name.startsWith("~$") || name.startsWith(".")) {
-			return false;
+			if (index && patternExclude != null) {
+				index = !patternExclude.matcher(name).matches();
+			}
+
+			if (!index && patternInclude != null) {
+				index = patternInclude.matcher(name).matches();
+			}
+
+			if (!index) {
+				//LOG.info("This filename was excluded: " + name);
+				return false;
+			}
 		}
 
 		boolean again = false;

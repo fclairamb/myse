@@ -2,8 +2,15 @@ package com.webingenia.myse.access.vfs;
 
 import com.webingenia.myse.access.AccessException;
 import com.webingenia.myse.access.Source;
+import static com.webingenia.myse.access.smb.SourceSMB.PROP_HOST;
+import static com.webingenia.myse.access.smb.SourceSMB.PROP_PASS;
+import static com.webingenia.myse.access.smb.SourceSMB.PROP_PATH;
+import static com.webingenia.myse.access.smb.SourceSMB.PROP_USER;
 import static com.webingenia.myse.common.LOG.LOG;
 import com.webingenia.myse.db.model.DBDescSource;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -112,14 +119,17 @@ public class SourceVFS extends Source {
 	}
 
 	@Override
-	public PropertyDescription[] getProperties() {
-		return new PropertyDescription[]{
-			new PropertyDescription(PROP_SCHEME, PropertyDescription.Type.TEXT, "VFS protocol scheme"),
-			new PropertyDescription(PROP_HOST, PropertyDescription.Type.TEXT, "Host"),
-			new PropertyDescription(PROP_USER, PropertyDescription.Type.TEXT, "Username"),
-			new PropertyDescription(PROP_PASS, PropertyDescription.Type.PASSWORD, "Password"),
-			new PropertyDescription(PROP_PATH, PropertyDescription.Type.TEXT, "Path of the directory to index")
-		};
+	public List<PropertyDescription> getProperties() {
+		ArrayList<PropertyDescription> list = new ArrayList<>();
+		list.addAll(Arrays.asList(
+				new PropertyDescription(PROP_SCHEME, PropertyDescription.Type.TEXT, "VFS protocol scheme"),
+				new PropertyDescription(PROP_HOST, PropertyDescription.Type.TEXT, "Host"),
+				new PropertyDescription(PROP_USER, PropertyDescription.Type.TEXT, "Username"),
+				new PropertyDescription(PROP_PASS, PropertyDescription.Type.PASSWORD, "Password"),
+				new PropertyDescription(PROP_PATH, PropertyDescription.Type.TEXT, "Path of the directory to index")
+		));
+		list.addAll(getSharedProperties());
+		return list;
 	}
 
 }

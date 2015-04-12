@@ -2,14 +2,13 @@ package com.webingenia.myse.access.ftps;
 
 import com.webingenia.myse.access.AccessException;
 import com.webingenia.myse.access.Source;
-import static com.webingenia.myse.access.vfs.SourceVFS.PROP_HOST;
-import static com.webingenia.myse.access.vfs.SourceVFS.PROP_PATH;
-import static com.webingenia.myse.access.vfs.SourceVFS.PROP_SCHEME;
-import static com.webingenia.myse.access.vfs.SourceVFS.PROP_USER;
 import static com.webingenia.myse.common.LOG.LOG;
 import com.webingenia.myse.db.model.DBDescSource;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.net.ftp.FTPClientConfig;
 import org.apache.commons.net.ftp.FTPReply;
@@ -27,6 +26,7 @@ public class SourceFTPS extends Source {
 
 	public static final String PROP_USER = "user",
 			PROP_PASS = "pass",
+			PROP_PATH = "path",
 			PROP_HOST = "host",
 			PROP_DIR = "dir";
 
@@ -46,7 +46,7 @@ public class SourceFTPS extends Source {
 
 	@Override
 	public FileFTPS getRootDir() throws AccessException {
-		return getFile("/");
+		return getFile(desc.getProperties().get(PROP_PATH));
 	}
 
 	public FTPSClient getClient() throws AccessException {
@@ -98,12 +98,15 @@ public class SourceFTPS extends Source {
 	}
 
 	@Override
-	public PropertyDescription[] getProperties() {
-		return new PropertyDescription[]{
-			new PropertyDescription(PROP_HOST, PropertyDescription.Type.TEXT, "Host"),
-			new PropertyDescription(PROP_USER, PropertyDescription.Type.TEXT, "Username"),
-			new PropertyDescription(PROP_USER, PropertyDescription.Type.PASSWORD, "Password"),
-			new PropertyDescription(PROP_PATH, PropertyDescription.Type.TEXT, "Path of the directory to index")
-		};
+	public List<PropertyDescription> getProperties() {
+		ArrayList<PropertyDescription> list = new ArrayList<>();
+		list.addAll(Arrays.asList(
+				new PropertyDescription(PROP_HOST, PropertyDescription.Type.TEXT, "Host"),
+				new PropertyDescription(PROP_USER, PropertyDescription.Type.TEXT, "Username"),
+				new PropertyDescription(PROP_USER, PropertyDescription.Type.PASSWORD, "Password"),
+				new PropertyDescription(PROP_PATH, PropertyDescription.Type.TEXT, "Path of the directory to index")
+		));
+		list.addAll(getSharedProperties());
+		return list;
 	}
 }

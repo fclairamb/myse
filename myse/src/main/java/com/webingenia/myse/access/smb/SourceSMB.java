@@ -3,10 +3,12 @@ package com.webingenia.myse.access.smb;
 import com.webingenia.myse.access.AccessException;
 import com.webingenia.myse.access.File;
 import com.webingenia.myse.access.Source;
-import static com.webingenia.myse.access.disk.SourceDisk.PROP_PATH;
 import static com.webingenia.myse.common.LOG.LOG;
 import com.webingenia.myse.db.model.DBDescSource;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import jcifs.smb.SmbFile;
 
@@ -64,12 +66,15 @@ public class SourceSMB extends Source {
 	}
 
 	@Override
-	public PropertyDescription[] getProperties() {
-		return new PropertyDescription[]{
-			new PropertyDescription(PROP_HOST, PropertyDescription.Type.TEXT, "Host"),
-			new PropertyDescription(PROP_USER, PropertyDescription.Type.TEXT, "Username"),
-			new PropertyDescription(PROP_PASS, PropertyDescription.Type.PASSWORD, "Password"),
-			new PropertyDescription(PROP_PATH, PropertyDescription.Type.TEXT, "Path of the directory to index")
-		};
+	public List<PropertyDescription> getProperties() {
+		ArrayList<PropertyDescription> list = new ArrayList<>();
+		list.addAll(Arrays.asList(
+				new PropertyDescription(PROP_HOST, PropertyDescription.Type.TEXT, "Host"),
+				new PropertyDescription(PROP_USER, PropertyDescription.Type.TEXT, "Username"),
+				new PropertyDescription(PROP_PASS, PropertyDescription.Type.PASSWORD, "Password"),
+				new PropertyDescription(PROP_PATH, PropertyDescription.Type.TEXT, "Path of the directory to index")
+		));
+		list.addAll(getSharedProperties());
+		return list;
 	}
 }

@@ -6,6 +6,7 @@ import com.webingenia.myse.access.smb.SourceSMB;
 import com.webingenia.myse.access.vfs.SourceVFS;
 import com.webingenia.myse.db.model.DBDescSource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.persistence.EntityManager;
 
@@ -14,9 +15,14 @@ public abstract class Source {
 	public static class PropertyDescription {
 
 		public PropertyDescription(String name, Type type, String description) {
+			this(name, type, description, null);
+		}
+
+		public PropertyDescription(String name, Type type, String description, String defaultValue) {
 			this.name = name;
 			this.type = type;
 			this.description = description;
+			this.defaultValue = defaultValue;
 		}
 
 		public enum Type {
@@ -28,6 +34,7 @@ public abstract class Source {
 		public final String name;
 		public final Type type;
 		public final String description;
+		public final String defaultValue;
 	}
 
 	protected final DBDescSource desc;
@@ -80,5 +87,15 @@ public abstract class Source {
 		return "[" + d.getShortName() + "]";
 	}
 
-	public abstract PropertyDescription[] getProperties();
+	protected List<PropertyDescription> getSharedProperties() {
+		return Arrays.asList(
+				new PropertyDescription(PROP_FILENAME_INCLUDE, PropertyDescription.Type.TEXT, "Files to include", "*.doc,*.docx,*.xls,*.xlsx,*.pdf,*.odt"),
+				new PropertyDescription(PROP_FILENAME_EXCLUDE, PropertyDescription.Type.TEXT, "Files to exclude", "*")
+		);
+	}
+
+	public static String PROP_FILENAME_INCLUDE = "filename_include",
+			PROP_FILENAME_EXCLUDE = "filename_exclude";
+
+	public abstract List<PropertyDescription> getProperties();
 }
