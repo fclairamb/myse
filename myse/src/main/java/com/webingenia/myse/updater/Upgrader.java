@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import org.elasticsearch.common.Strings;
 
 public class Upgrader implements Runnable {
 
@@ -33,7 +34,7 @@ public class Upgrader implements Runnable {
 
 			ProcessBuilder pb = new ProcessBuilder(javaExe.getAbsolutePath(), "-jar", target.getAbsolutePath(), "--upgraded");
 			pb.directory(Paths.getUpgradeDir());
-			LOG.info("Starting " + pb.command() + " ...");
+			LOG.info("Starting " + Strings.collectionToDelimitedString(pb.command(), " ", "\"", "\"") + " ...");
 			pb.start();
 			System.exit(0);
 		} catch (Exception ex) {
