@@ -162,7 +162,7 @@
 									if (ctrl.sourceId === undefined) {
 										for (i = 0; i < ctrl.descs.length; ++i) {
 											var d = ctrl.descs[i];
-											if ( d.defaultValue !== undefined ) {
+											if (d.defaultValue !== undefined) {
 												ctrl.props[ d.name ] = d.defaultValue;
 											}
 										}
@@ -179,6 +179,15 @@
 									}
 								}
 						);
+					};
+
+					this.setToDefault = function (name) {
+						for (i = 0; i < ctrl.descs.length; ++i) {
+							var d = ctrl.descs[i];
+							if (d.name === name) {
+								ctrl.props[ name ] = d.defaultValue;
+							}
+						}
 					};
 				}
 			]);
