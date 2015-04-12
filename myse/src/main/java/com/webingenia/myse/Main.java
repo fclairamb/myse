@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import javax.persistence.EntityManager;
+import sun.misc.Signal;
+import sun.misc.SignalHandler;
 
 public class Main {
 
@@ -35,6 +37,23 @@ public class Main {
 			LOG.error("Problem starting !", ex);
 		} finally {
 			startBrowser(); // Browser 
+		}
+	}
+
+	private void signalHandling() {
+		try {
+			Signal.handle(new Signal("TERM"),
+					new SignalHandler() {
+						@Override
+						public void handle(Signal signal) {
+							LOG.warn("Received a TERM signal !");
+							Main.stop();
+							System.exit(0);
+						}
+					});
+		} catch (Throwable ex) {
+			// Not a big deal
+			LOG.info("sun.* Proprietary call failure", ex);
 		}
 	}
 
@@ -59,19 +78,19 @@ public class Main {
 //		new Thread(new Runnable() {
 //			@Override
 //			public void run() {
-				try {
-					stopped = true;
-					LOG.info("Stopping tasks...");
-					Tasks.stop();
-					LOG.info("Stopping H2...");
-					DBMgmt.stop();
-					LOG.info("Stopping ES...");
-					ElasticSearch.stop();
-					LOG.info("Stopping Jetty...");
-					JettyServer.stop();
-				} catch (Exception ex) {
-					LOG.error("Main.stop", ex);
-				}
+		try {
+			stopped = true;
+			LOG.info("Stopping tasks...");
+			Tasks.stop();
+			LOG.info("Stopping H2...");
+			DBMgmt.stop();
+			LOG.info("Stopping ES...");
+			ElasticSearch.stop();
+			LOG.info("Stopping Jetty...");
+			JettyServer.stop();
+		} catch (Exception ex) {
+			LOG.error("Main.stop", ex);
+		}
 //			}
 //		}, "Quitting").start();
 	}
