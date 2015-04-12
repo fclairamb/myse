@@ -28,10 +28,13 @@ public class Config implements Serializable {
 		EntityManager em = DBMgmt.getEntityManager();
 		try {
 			Config c = getConfig(name, em);
-			if (c == null && defaultValue != null) {
-				set(name, defaultValue);
+			if (c == null) {
+				if (defaultValue != null && save) {
+					set(name, defaultValue);
+				}
+				return defaultValue;
 			}
-			return defaultValue;
+			return c.value;
 		} finally {
 			em.close();
 		}
@@ -75,10 +78,17 @@ public class Config implements Serializable {
 
 	public static void del(String name) {
 		EntityManager em = DBMgmt.getEntityManager();
+		em.getTransaction().begin();
 		try {
 			em.createQuery("DELETE FROM Config c WHERE c.name = :name").setParameter("name", name).executeUpdate();
 		} finally {
+			em.getTransaction().commit();
 			em.close();
 		}
+	}
+
+	@Override
+	public String toString() {
+		return name + "=" + value;
 	}
 }
