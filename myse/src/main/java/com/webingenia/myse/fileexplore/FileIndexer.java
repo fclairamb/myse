@@ -78,7 +78,7 @@ public class FileIndexer extends RunnableCancellable {
 
 					if (skip) {
 						LOG.info("No analysis necessary !");
-						// return
+						return;
 					} else {
 						EventsNotifier.indexingFile(file);
 					}
