@@ -19,7 +19,7 @@ public class RestQuit extends HttpServlet {
 			public void run() {
 				Main.stop();
 
-				//System.exit(0);
+				System.exit(0);
 			}
 		}, 2, TimeUnit.SECONDS);
 	}

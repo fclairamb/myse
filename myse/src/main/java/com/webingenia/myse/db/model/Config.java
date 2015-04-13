@@ -3,6 +3,7 @@ package com.webingenia.myse.db.model;
 import static com.webingenia.myse.common.LOG.LOG;
 import com.webingenia.myse.db.DBMgmt;
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
@@ -74,6 +75,10 @@ public class Config implements Serializable {
 			return c;
 		}
 		return null;
+	}
+
+	public static List<Config> all(EntityManager em) {
+		return em.createQuery("SELECT c FROM Config c", Config.class).getResultList();
 	}
 
 	public static void del(String name) {

@@ -2,7 +2,7 @@
 	var app = angular.module('myse', ['ngRoute']);
 
 	app.config(
-			function ($routeProvider, $locationProvider) {
+			function ($routeProvider) {
 				$routeProvider
 						.when(
 								"/search",
@@ -37,6 +37,14 @@
 									controllerAs: 'setup'
 								}
 						)
+						.when(
+								"/setup/config",
+								{
+									templateUrl: '/static/setup-config-list.html',
+									controller: 'SetupConfigListCtrl',
+									controllerAs: 'config'
+								}
+						)
 						.otherwise(
 								{
 									redirectTo: '/search'
@@ -46,8 +54,8 @@
 	);
 
 	app.controller('NavCtrl', [
-		'$location',
-		function ($location) {
+		'$location', '$http',
+		function ($location, $http) {
 			this.isSelected = function (page) {
 				return $location.path().startsWith(page);
 			};
@@ -55,6 +63,15 @@
 				return {
 					active: this.isSelected(page)
 				};
+			};
+
+			this.quit = function () {
+				if (confirm('Really quit the app ?')) {
+					$http.get('/rest/quit').success(function () {
+						$('body').html('');
+						window.close()
+					});
+				}
 			};
 		}
 	]);
@@ -192,6 +209,55 @@
 				}
 			]);
 
+	app.controller('SetupConfigListCtrl',
+			['$http', '$routeParams', '$location',
+				function ($http, $routeParams, $location) {
+					var ctrl = this;
+					this.editedParameters = {};
+					this.values = {};
+					this.parameters = [];
+
+					this.fetch = function () {
+						$http.get('/rest/setup/config/list').success(
+								function (data) {
+									ctrl.parameters = data;
+								});
+					};
+
+					this.getValue = function (name) {
+						for (i = 0; i < ctrl.parameters.length; ++i) {
+							var p = ctrl.parameters[i];
+							if (p.name === name) {
+								return p.value;
+							}
+						}
+					};
+
+					this.edit = function (name) {
+//						console.log("edit " + name);
+						this.values[ name ] = this.getValue(name);
+					};
+
+					this.editing = function (name) {
+//						console.log("editing " + name + " : " + this.values[ name ]);
+						return this.values[ name ] !== undefined;
+					};
+
+					this.save = function (name) {
+//						console.log("save " + name);
+						$http.get('/rest/setup/config?name=' + name + '&value=' + this.values[ name ]).success(
+								function (data) {
+									ctrl.values[ name ] = undefined;
+
+									ctrl.fetch();
+								}
+						);
+					};
+
+					this.fetch();
+				}
+			]);
+
 	app.directive(
 			'myseLogs',
 			function () {
@@ -207,7 +273,7 @@
 								if (ctrl.maxRows === 0) {
 									return;
 								}
-								ctrl.ws = new WebSocket("ws://localhost:8080/ws");
+								ctrl.ws = new WebSocket("ws://" + window.location.host + "/ws");
 
 								ctrl.ws.onmessage = function (evt) {
 									obj = JSON.parse(evt.data);
@@ -243,12 +309,6 @@
 									ctrl.ws.close();
 								}
 								ctrl.initWs();
-							};
-
-							ctrl.quit = function () {
-								$http.get('/rest/quit').success(function () {
-									$('body').html('');
-								});
 							};
 						}]
 				};

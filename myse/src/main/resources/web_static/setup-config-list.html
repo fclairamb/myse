@@ -1,0 +1,30 @@
+<h1 class="page-header">Setup</h1>
+<h3>Config</h3>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>Description</th>
+			<th>Name</th>
+			<th>Value</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="par in config.parameters track by $index">
+			<td>{{ par.description}}</td>
+			<td>{{ par.name}}</td>
+			<td>
+				<span ng-if="!config.editing(par.name)">
+					{{ par.value}}
+				</span>
+				<span ng-if="config.editing(par.name)" ng-click="config.edit(par.name)">
+					<input type="text" name="value_{{ par.name }}" ng-model="config.values[ par.name ]" class="form-control" />
+				</span>
+			</td>
+			<td>
+				<a href class="btn btn-info" ng-if="!config.editing(par.name)" ng-click="config.edit(par.name)">Edit</a>
+				<a href class="btn btn-warning" ng-if="config.editing(par.name)" ng-click="config.save(par.name)">Save</a>
+			</td>
+		</tr>
+	</tbody>
+</table>

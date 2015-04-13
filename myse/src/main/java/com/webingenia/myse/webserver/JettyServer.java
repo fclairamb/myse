@@ -44,11 +44,11 @@ public class JettyServer {
 		handler.addServletWithMapping(PageIndex.class, "/");
 		handler.addServletWithMapping(PageStatic.class, "/static/*");
 		handler.addServletWithMapping(RestSearch.class, "/rest/search");
+		handler.addServletWithMapping(PageDownload.class, "/download");
 		handler.addServletWithMapping(RestSetupSource.class, "/rest/setup/source/*");
+		handler.addServletWithMapping(RestConfig.class, "/rest/setup/config/*");
 		handler.addServletWithMapping(RestVersion.class, "/rest/version");
 		handler.addServletWithMapping(RestQuit.class, "/rest/quit");
-		handler.addServletWithMapping(RestConfig.class, "/rest/config/*");
-		handler.addServletWithMapping(PageDownload.class, "/download");
 
 		// Add a websocket to a specific path spec
 		ServletHolder holderEvents = new ServletHolder("ws-events", WSServlet.class);
