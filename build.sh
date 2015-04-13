@@ -47,7 +47,7 @@ if [ "$release" = "stable" ]; then
     <meta http-equiv=\"refresh\" content=\"0; url=http://update.myse.io/myse.jar\" />
   </head>
   <body>
-    You are about to <a href=\"http://update.myse.io/myse.jar\">Run MYSE ${VERSION}</a>.
+    You are about to <a href=\"http://update.myse.io/myse.jar\">Get MYSE ${VERSION}</a>.
   </body>
 </html>" >dist/index.html
   
