@@ -33,8 +33,8 @@ cp version_$release dist/version_$release
 ln myse/target/*dependencies.jar dist/myse_${VERSION}.jar
 sha1sum dist/myse_${VERSION}.jar >dist/myse_${VERSION}.jar.sha1sum
 
-# We add this for people who just want/need to download the jar directly
 if [ "$release" = "stable" ]; then
+	# We add this for people who just want/need to download the jar directly
 	if [ -f dist/myse.jar ]; then
 		rm dist/myse.jar; 
 	fi
@@ -51,7 +51,8 @@ if [ "$release" = "stable" ]; then
   </body>
 </html>" >dist/index.html
   
-
+	# As this is a version that will be distributed, we want to tag it
+	git tag ${VERSION}
 
 fi
 
