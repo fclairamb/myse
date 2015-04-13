@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.persistence.EntityManager;
+import org.elasticsearch.common.base.Strings;
 
 public abstract class Source {
 
@@ -98,4 +99,16 @@ public abstract class Source {
 			PROP_FILENAME_EXCLUDE = "filename_exclude";
 
 	public abstract List<PropertyDescription> getProperties();
+
+	private void preSaveChangePath() {
+		String path = desc.getProperties().get("path");
+		if (!Strings.isNullOrEmpty(path) && !path.endsWith("/")) {
+			path += "/";
+			desc.getProperties().put("path", path);
+		}
+	}
+
+	public void preSave() {
+		preSaveChangePath();
+	}
 }

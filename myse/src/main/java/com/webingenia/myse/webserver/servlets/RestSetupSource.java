@@ -84,6 +84,10 @@ public class RestSetupSource extends HttpServlet {
 				context.input.remove("_short");
 			}
 			dbSource.fromMap(mapStrObjToMapStrStr(context.input));
+			{ // We let the source apply it's pre-saving logic
+				Source source = Source.get(dbSource);
+				source.preSave();
+			}
 			context.em.persist(dbSource);
 			if (newSource) {
 				Indexation.start(Source.get(dbSource));

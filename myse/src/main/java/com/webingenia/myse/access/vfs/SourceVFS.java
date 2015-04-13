@@ -2,17 +2,12 @@ package com.webingenia.myse.access.vfs;
 
 import com.webingenia.myse.access.AccessException;
 import com.webingenia.myse.access.Source;
-import static com.webingenia.myse.access.smb.SourceSMB.PROP_HOST;
-import static com.webingenia.myse.access.smb.SourceSMB.PROP_PASS;
-import static com.webingenia.myse.access.smb.SourceSMB.PROP_PATH;
-import static com.webingenia.myse.access.smb.SourceSMB.PROP_USER;
 import static com.webingenia.myse.common.LOG.LOG;
 import com.webingenia.myse.db.model.DBDescSource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileSystemOptions;
 import org.apache.commons.vfs2.impl.StandardFileSystemManager;

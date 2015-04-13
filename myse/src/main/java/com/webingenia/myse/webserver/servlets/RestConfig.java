@@ -2,9 +2,8 @@ package com.webingenia.myse.webserver.servlets;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.webingenia.myse.access.Source;
 import com.webingenia.myse.db.model.Config;
-import com.webingenia.myse.direxplore.DirExplorer;
+import com.webingenia.myse.exploration.DirExplorer;
 import com.webingenia.myse.webserver.JettyServer;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -47,10 +46,10 @@ public class RestConfig extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String path = req.getPathInfo();
-		if ( path == null ) {
+		if (path == null) {
 			path = "";
 		}
-		Object output = null;
+		Object output;
 		switch (path) {
 			case "/list":
 				List<ConfigDescription> list = Arrays.asList(
