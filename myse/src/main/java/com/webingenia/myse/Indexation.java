@@ -1,8 +1,8 @@
 package com.webingenia.myse;
 
 import com.webingenia.myse.access.Source;
-import com.webingenia.myse.direxplore.DirExplorer;
-import com.webingenia.myse.fileexplore.FileIndexer;
+import com.webingenia.myse.exploration.DirExplorer;
+import com.webingenia.myse.exploration.FileIndexer;
 import com.webingenia.myse.tasks.Tasks;
 import java.util.concurrent.TimeUnit;
 
