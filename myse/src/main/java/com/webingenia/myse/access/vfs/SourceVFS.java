@@ -18,6 +18,7 @@ import org.apache.commons.vfs2.FileSystemOptions;
 import org.apache.commons.vfs2.impl.StandardFileSystemManager;
 import org.apache.commons.vfs2.provider.ftps.FtpsFileSystemConfigBuilder;
 import org.apache.commons.vfs2.provider.sftp.SftpFileSystemConfigBuilder;
+import org.elasticsearch.common.base.Strings;
 
 public class SourceVFS extends Source {
 
@@ -71,18 +72,29 @@ public class SourceVFS extends Source {
 
 		{ // We build the fsUrl
 			Map<String, String> props = desc.getProperties();
-			String url = props.get(PROP_SCHEME) + "://" + props.get(PROP_USER) + ":" + props.get(PROP_PASS) + "@" + props.get(PROP_HOST);
+			StringBuilder url = new StringBuilder();
+			url.append(props.get(PROP_SCHEME)).append("://");
+
+			{
+				String user = props.get(PROP_USER);
+				String pass = props.get(PROP_PASS);
+				if (!Strings.isNullOrEmpty(user)) {
+					url.append(":").append(pass).append("@");
+				}
+			}
+
+			url.append(props.get(PROP_HOST));
 
 			{
 				String port = props.get(PROP_PORT);
 				if (port != null) {
-					url += ":" + port;
+					url.append(":").append(port);
 				}
 			}
 
-			url += "/" + props.get(PROP_PATH);
+			url.append(props.get(PROP_PATH));
 
-			this.fsUrl = url;
+			this.fsUrl = url.toString();
 		}
 	}
 
