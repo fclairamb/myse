@@ -1,6 +1,6 @@
 package com.webingenia.myse.access;
 
-import com.webingenia.myse.direxplore.DirExplorer;
+import com.webingenia.myse.exploration.DirExplorer;
 import java.util.regex.Pattern;
 import org.junit.Assert;
 import org.junit.Test;
