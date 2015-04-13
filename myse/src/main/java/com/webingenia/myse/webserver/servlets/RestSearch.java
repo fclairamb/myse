@@ -3,7 +3,7 @@ package com.webingenia.myse.webserver.servlets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.webingenia.myse.embeddedes.ElasticSearch;
-import com.webingenia.myse.fileexplore.FileIndexer;
+import com.webingenia.myse.exploration.FileIndexer;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
@@ -76,7 +76,7 @@ public class RestSearch extends HttpServlet {
 				SearchRequestBuilder esRequest = client.prepareSearch(FileIndexer.ES_INDEX_NAME).setTypes(FileIndexer.ES_DOC_TYPE)
 						.setSearchType(SearchType.DFS_QUERY_AND_FETCH)
 						//.setQuery(QueryBuilders.termQuery("multi", q)) // Query
-						.setQuery(QueryBuilders.queryString(q))
+						.setQuery(QueryBuilders.queryStringQuery(q))
 						.setFrom(0)
 						.setSize(size);
 
