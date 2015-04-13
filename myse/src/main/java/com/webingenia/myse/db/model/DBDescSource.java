@@ -192,7 +192,7 @@ public class DBDescSource implements Serializable {
 
 	}
 
-//	public String getEsIndexName() {
-//		return "source_" + getId();
-//	}
+	public int deleteDocs(EntityManager em) {
+		return em.createQuery("DELETE FROM DBDescFile f WHERE f.source = :source").setParameter("source", this).executeUpdate();
+	}
 }

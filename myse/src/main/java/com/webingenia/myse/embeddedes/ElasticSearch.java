@@ -3,16 +3,23 @@ package com.webingenia.myse.embeddedes;
 import com.webingenia.myse.common.LOG;
 import com.webingenia.myse.common.Paths;
 import com.webingenia.myse.db.model.DBDescSource;
-import com.webingenia.myse.fileexplore.FileIndexer;
+import com.webingenia.myse.exploration.FileIndexer;
+import com.webingenia.myse.webserver.servlets.RestSearch;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
+import org.elasticsearch.action.delete.DeleteRequestBuilder;
+import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.common.io.stream.BytesStreamOutput;
 import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
+import org.elasticsearch.search.SearchHit;
 
 public class ElasticSearch {
 
@@ -48,6 +55,35 @@ public class ElasticSearch {
 		} catch (Exception ex) {
 			LOG.LOG.error("createIndex", ex);
 		}
+	}
+
+	public static int deleteDocsForSource(DBDescSource source) {
+		int count = 0;
+		try (Client clt = client()) {
+			SearchRequestBuilder esRequest = clt.prepareSearch(FileIndexer.ES_INDEX_NAME).setTypes(FileIndexer.ES_DOC_TYPE)
+					.setSearchType(SearchType.DFS_QUERY_AND_FETCH)
+					//.setQuery(QueryBuilders.termQuery("multi", q)) // Query
+					.setQuery(QueryBuilders.matchQuery("source_id", source.getId()))
+					.setFrom(0)
+					.setSize(100);
+
+			SearchResponse esResponse = esRequest
+					.execute()
+					.actionGet();
+
+			for (SearchHit hit : esResponse.getHits().getHits()) {
+				count++;
+				RestSearch.SearchResult r = new RestSearch.SearchResult();
+				try {
+					// TODO: Execute it
+					LOG.LOG.info("Deleting " + hit.getId());
+					new DeleteRequestBuilder(clt).setIndex(hit.getIndex()).setId(hit.getId()).execute();
+				} catch (Exception ex) {
+					r.error = ex.toString();
+				}
+			}
+		}
+		return count;
 	}
 
 	/**

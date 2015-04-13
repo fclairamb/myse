@@ -2,6 +2,7 @@ package com.webingenia.myse;
 
 import com.webingenia.myse.access.Source;
 import com.webingenia.myse.access.disk.SourceDisk;
+import com.webingenia.myse.access.vfs.SourceVFS;
 import com.webingenia.myse.common.BuildInfo;
 import static com.webingenia.myse.common.LOG.LOG;
 import com.webingenia.myse.db.DBMgmt;
@@ -58,6 +59,8 @@ public class Main {
 	}
 
 	public static void start(String[] args) throws SQLException, IOException, Exception {
+		Upgrader.main(args); // Upgrading code
+
 		DBMgmt.start(); // RDB code
 
 		JettyServer.start(); // Web server
@@ -67,8 +70,6 @@ public class Main {
 		versionCheck();
 		EntityManager em = DBMgmt.getEntityManager();
 		startIndexation(em);
-
-		Upgrader.main(args); // Upgrading code
 	}
 
 	private static boolean stopped = false;
@@ -105,7 +106,7 @@ public class Main {
 			LOG.warn("NO SOURCE! Creating one !");
 			em.getTransaction().begin();
 
-			// We will create a new source
+			// Private NAS source
 			if (new File("private/nas.properties").exists()) {
 				DBDescSource smb = new DBDescSource();
 				Map<String, String> props = smb.getProperties();
@@ -122,6 +123,8 @@ public class Main {
 				}
 				em.persist(smb);
 			}
+
+			// Private documents source
 			{
 				String home = System.getenv("user.home");
 				if (home == null) { // Java 8
@@ -145,6 +148,21 @@ public class Main {
 					LOG.warn("Could not find $HOME env var.");
 				}
 			}
+
+			// FTP Free source
+			{
+				DBDescSource docs = new DBDescSource();
+				docs.setName("assistance free");
+				docs.setType(SourceVFS.TYPE);
+				Map<String, String> props = docs.getProperties();
+				props.put(SourceVFS.PROP_SCHEME, "ftp");
+				props.put(SourceVFS.PROP_HOST, "ftp.free.fr");
+				props.put(SourceVFS.PROP_PATH, "/pub/assistance/");
+				props.put(Source.PROP_FILENAME_INCLUDE, "*.pdf");
+				props.put(Source.PROP_FILENAME_EXCLUDE, "*");
+				em.persist(docs);
+			}
+
 			em.getTransaction().commit();
 			allSources = DBDescSource.allExisting(em);
 		}
@@ -163,7 +181,20 @@ public class Main {
 		for (DBDescSource dbSource : allSources) {
 			Indexation.start(Source.get(dbSource));
 		}
-		
+
+		for (DBDescSource deleted : DBDescSource.allDeleted(em)) {
+			int nb = -1;
+			while (nb != 0) {
+				nb = deleted.deleteDocs(em);
+				LOG.info("Deleted {} DB files.", nb);
+			}
+			nb = -1;
+			while (nb != 0) {
+				nb = ElasticSearch.deleteDocsForSource(deleted);
+				LOG.info("Deleted {} doc files.", nb);
+			}
+		}
+
 		//TODO: Delete all the non-existing sources and their respective documents
 	}
 
