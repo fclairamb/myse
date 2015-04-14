@@ -196,6 +196,7 @@ public class Main {
 		}
 
 		//TODO: Delete all the non-existing sources and their respective documents
+		//TODO: Show tray icon if possible
 	}
 
 	private static void versionCheck() {

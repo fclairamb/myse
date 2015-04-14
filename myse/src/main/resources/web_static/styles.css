@@ -7,15 +7,21 @@
 }
 
 /* Search result */
-.myse-result h3 {
+.search-result h3 {
 	margin-bottom: 0px;
 }
 
-.myse-result .path {
+.search-result .path {
 	color: green;
 }
 
-.myse-result .date {
+.search-result .date {
 	color: #23527c;
+}
+
+.search-result .description em {
+	background-color: #ff0;
+	font-style: normal;
+	font-weight: 200;
 }
 

@@ -83,7 +83,7 @@
 			});
 		}]);
 
-	app.controller('SearchCtrl', ['$http', '$location', function ($http, $location) {
+	app.controller('SearchCtrl', ['$http', '$location', '$scope', '$sce', function ($http, $location, $scope, $sce) {
 			// CONTROLLER CODE
 			var ctrl = this;
 			this.response = {
@@ -106,6 +106,10 @@
 			if (this.query !== undefined) {
 				this.queryChanged();
 			}
+
+			$scope.trusted_html = function (html_code) {
+				return $sce.trustAsHtml(html_code);
+			};
 		}
 	]
 			);

@@ -2,6 +2,7 @@ package com.webingenia.myse.webserver.servlets;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import static com.webingenia.myse.common.LOG.LOG;
 import com.webingenia.myse.embeddedes.ElasticSearch;
 import com.webingenia.myse.exploration.FileIndexer;
 import java.io.IOException;
@@ -20,8 +21,11 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.text.Text;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.highlight.HighlightField;
 
 public class RestSearch extends HttpServlet {
 
@@ -73,10 +77,14 @@ public class RestSearch extends HttpServlet {
 		try {
 			try (Client client = ElasticSearch.client()) {
 				long before = System.currentTimeMillis();
+				QueryStringQueryBuilder query = QueryBuilders.queryStringQuery(q);
 				SearchRequestBuilder esRequest = client.prepareSearch(FileIndexer.ES_INDEX_NAME).setTypes(FileIndexer.ES_DOC_TYPE)
 						.setSearchType(SearchType.DFS_QUERY_AND_FETCH)
 						//.setQuery(QueryBuilders.termQuery("multi", q)) // Query
-						.setQuery(QueryBuilders.queryStringQuery(q))
+						.setQuery(query)
+						.addHighlightedField("content")
+						.setHighlighterFragmentSize(200)
+						.setHighlighterNumOfFragments(5)
 						.setFrom(0)
 						.setSize(size);
 
@@ -84,19 +92,18 @@ public class RestSearch extends HttpServlet {
 						.execute()
 						.actionGet();
 
-				if (esResponse.getHits().totalHits() == 0) {
-					esRequest = client.prepareSearch(FileIndexer.ES_INDEX_NAME).setTypes(FileIndexer.ES_DOC_TYPE)
-							.setSearchType(SearchType.DFS_QUERY_AND_FETCH)
-							//.setQuery(QueryBuilders.termQuery("multi", q)) // Query
-							.setQuery(QueryBuilders.wildcardQuery("title", "*" + q + "*"))
-							.setFrom(0)
-							.setSize(size);
-
-					esResponse = esRequest
-							.execute()
-							.actionGet();
-				}
-
+//				if (esResponse.getHits().totalHits() == 0) {
+//					esRequest = client.prepareSearch(FileIndexer.ES_INDEX_NAME).setTypes(FileIndexer.ES_DOC_TYPE)
+//							.setSearchType(SearchType.DFS_QUERY_AND_FETCH)
+//							//.setQuery(QueryBuilders.termQuery("multi", q)) // Query
+//							.setQuery(QueryBuilders.wildcardQuery("title", "*" + q + "*"))
+//							.setFrom(0)
+//							.setSize(size);
+//
+//					esResponse = esRequest
+//							.execute()
+//							.actionGet();
+//				}
 				int count = 0;
 				for (SearchHit hit : esResponse.getHits().getHits()) {
 					if (count++ > size) {
@@ -109,11 +116,27 @@ public class RestSearch extends HttpServlet {
 						r.title = (String) source.get("title");
 						r.path = (String) source.get("path");
 						r.source = (String) source.get("source_short");
-						r.description = (String) source.get("content");
 
-						// TODO: Description: Show the matching words in bold
-						if (r.description != null && r.description.length() > 400) {
-							r.description = r.description.substring(0, 400) + "...";
+						HighlightField highContent = hit.getHighlightFields().get("content");
+
+						if (highContent.fragments() != null) {
+							StringBuilder sb = new StringBuilder();
+							int c = 0;
+							for (Text fragment : highContent.fragments()) {
+								if (c++ > 0) {
+									sb.append(" ... ");
+								}
+								sb.append(fragment.string());
+
+								r.description = sb.toString();
+							}
+						} else {
+							r.description = (String) source.get("content");
+
+							// TODO: Description: Show the matching words in bold
+							if (r.description != null && r.description.length() > 400) {
+								r.description = r.description.substring(0, 400) + "...";
+							}
 						}
 
 						{
@@ -123,6 +146,7 @@ public class RestSearch extends HttpServlet {
 						}
 
 					} catch (Exception ex) {
+						LOG.error("Problem parsing result", ex);
 						r.error = ex.toString();
 					}
 					response.results.add(r);

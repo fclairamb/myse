@@ -10,11 +10,11 @@
 	<div>
 		{{ search.response.results.length}} results in {{ search.response.time}} ms
 	</div>
-	<div ng-repeat="result in search.response.results" class="myse-result">
+	<div ng-repeat="result in search.response.results" class="search-result">
 		<div class="pull-right date">{{ result.dateMod | date }}</div>
 		<h3>{{ result.title}}</h3>
 		<a href="/download?docId={{ result.docId }}" class="download" target="_blank">Download</a> ... <span class="path">[{{ result.source }}] {{ result.path}}</span>
-		<p>{{ result.description}}</p>
+		<p class="description" ng-bind-html="trusted_html(result.description)"></p>
 	</div>
 </div>
 
