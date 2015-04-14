@@ -45,6 +45,7 @@ public class RestSearch extends HttpServlet {
 		public String image;
 		public String docId;
 		public String error;
+		public Integer size;
 		public long dateMod;
 	}
 
@@ -82,6 +83,7 @@ public class RestSearch extends HttpServlet {
 						.setSearchType(SearchType.DFS_QUERY_AND_FETCH)
 						//.setQuery(QueryBuilders.termQuery("multi", q)) // Query
 						.setQuery(query)
+						.addHighlightedField("title")
 						.addHighlightedField("content")
 						.setHighlighterFragmentSize(200)
 						.setHighlighterNumOfFragments(5)
@@ -116,6 +118,8 @@ public class RestSearch extends HttpServlet {
 						r.title = (String) source.get("title");
 						r.path = (String) source.get("path");
 						r.source = (String) source.get("source_short");
+						r.size = (Integer) source.get("size");
+						
 
 						HighlightField highContent = hit.getHighlightFields().get("content");
 

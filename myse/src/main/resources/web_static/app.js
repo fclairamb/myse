@@ -1,5 +1,5 @@
 (function () {
-	var app = angular.module('myse', ['ngRoute']);
+	var app = angular.module('myse', ['ngRoute', 'filters']);
 
 	app.config(
 			function ($routeProvider) {
@@ -52,6 +52,37 @@
 						);
 			}
 	);
+
+	// Source: https://gist.github.com/yrezgui/5653591
+	angular.module('filters', [])
+			.filter('filesize', function () {
+				return function (size) {
+					if (isNaN(size))
+						size = 0;
+
+					if (size < 1024)
+						return size + ' Bytes';
+
+					size /= 1024;
+
+					if (size < 1024)
+						return size.toFixed(2) + ' Kb';
+
+					size /= 1024;
+
+					if (size < 1024)
+						return size.toFixed(2) + ' Mb';
+
+					size /= 1024;
+
+					if (size < 1024)
+						return size.toFixed(2) + ' Gb';
+
+					size /= 1024;
+
+					return size.toFixed(2) + ' Tb';
+				};
+			});
 
 	app.controller('NavCtrl', [
 		'$location', '$http',
