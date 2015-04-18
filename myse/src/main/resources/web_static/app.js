@@ -30,6 +30,14 @@
 								}
 						)
 						.when(
+								"/setup/source/edit/copyFrom/:copySourceId",
+								{
+									templateUrl: '/static/setup-source-edit.html',
+									controller: 'SetupSourceEditCtrl',
+									controllerAs: 'setup'
+								}
+						)
+						.when(
 								"/setup/source/edit",
 								{
 									templateUrl: '/static/setup-source-edit.html',
@@ -183,15 +191,25 @@
 			['$http', '$routeParams', '$location',
 				function ($http, $routeParams, $location) {
 					var ctrl = this;
-					this.sourceId = $routeParams.sourceId;
 					this.props = {};
 					this.descs = {};
 					this.types = [];
+
+					if ($routeParams.sourceId !== undefined) {
+						this.sourceId = $routeParams.sourceId;
+					} else if ($routeParams.copySourceId !== undefined) {
+						this.sourceId = $routeParams.copySourceId;
+						this.copy = true;
+					}
 
 					if (this.sourceId !== undefined) {
 						$http.get('/rest/setup/source/get?id=' + this.sourceId).success(
 								function (data) {
 									ctrl.props = data;
+
+									if (ctrl.copy) {
+										delete ctrl.props['_id'];
+									}
 
 									ctrl.typeChanged();
 								}

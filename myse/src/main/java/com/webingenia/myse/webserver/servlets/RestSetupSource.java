@@ -121,6 +121,22 @@ public class RestSetupSource extends HttpServlet {
 		}
 	}
 
+	private Object doProcessCopy(Context context) {
+		context.em.getTransaction().begin();
+		try {
+			int id = Integer.parseInt(context.req.getParameter("id"));
+			DBDescSource src = DBDescSource.get(id, context.em);
+			Map<String, String> map = src.asMap();
+			map.remove("_id");
+			map.put("_name", "Copy of " + map.get("name"));
+			DBDescSource dst = new DBDescSource();
+			dst.fromMap(map);
+			return dst;
+		} finally {
+			context.em.getTransaction().commit();
+		}
+	}
+
 	static class SourceType {
 
 		public SourceType(String type, String name) {
@@ -171,6 +187,9 @@ public class RestSetupSource extends HttpServlet {
 						break;
 					case "/delete":
 						output = doProcessDelete(context);
+						break;
+					case "/copy":
+						output = doProcessCopy(context);
 						break;
 					default:
 						output = "NOT HANDLED";

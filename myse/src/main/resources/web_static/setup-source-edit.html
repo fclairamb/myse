@@ -15,5 +15,5 @@
 		<input id="input_{{desc.name}}" ng-model="setup.props[ desc.name ]" type="password" class="form-control" ng-if="desc.type === 'PASSWORD'" />
 		<input id="input_{{desc.name}}" ng-model="setup.props[ desc.name ]" type="checkbox" class="form-control" ng-if="desc.type === 'BOOLEAN'" />
 	</div>
-	<button type="submit" class="btn btn-default" ng-click="setup.save()">Save</button>
+	<button type="submit" class="btn btn-info" ng-click="setup.save()">Save</button>
 </form>
