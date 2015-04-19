@@ -53,7 +53,7 @@ if [ "$release" = "stable" ]; then
   
 	# As this is a version that will be distributed, we want to tag it
 	git tag ${VERSION}
-
+	git push --tags
 fi
 
 rsync -av dist/ myse.io@localhost:update/
