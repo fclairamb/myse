@@ -69,26 +69,26 @@
 						size = 0;
 
 					if (size < 1024)
-						return size + ' Bytes';
+						return size + ' B';
 
 					size /= 1024;
 
 					if (size < 1024)
-						return size.toFixed(2) + ' Kb';
+						return size.toFixed(1) + ' KB';
 
 					size /= 1024;
 
 					if (size < 1024)
-						return size.toFixed(2) + ' Mb';
+						return size.toFixed(1) + ' MB';
 
 					size /= 1024;
 
 					if (size < 1024)
-						return size.toFixed(2) + ' Gb';
+						return size.toFixed(1) + ' GB';
 
 					size /= 1024;
 
-					return size.toFixed(2) + ' Tb';
+					return size.toFixed(1) + ' TB';
 				};
 			});
 
