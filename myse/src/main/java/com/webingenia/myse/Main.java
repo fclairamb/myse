@@ -209,7 +209,7 @@ public class Main {
 			Indexation.start(Source.get(dbSource));
 		}
 
-		//TODO: Delete all the non-existing sources and their respective documents
+		//DONE: Delete all the non-existing sources and their respective documents
 		//TODO: Show tray icon if possible
 	}
 
