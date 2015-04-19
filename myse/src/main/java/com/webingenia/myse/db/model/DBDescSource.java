@@ -73,14 +73,23 @@ public class DBDescSource implements Serializable {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(String name, EntityManager em) {
 		this.name = name;
-		createShortName();
+		createShortName(em);
 	}
 
-	private void createShortName() {
+	private void createShortName(EntityManager em) {
 		if (this.shortName == null) {
-			this.shortName = this.name.replaceAll("[\\s]", "_").replaceAll("[^\\w]", "").toLowerCase();
+			String osn = this.name.replaceAll("[\\s]", "_").replaceAll("[^\\w]", "").toLowerCase();
+
+			for (int i = 0; i < 100; i++) {
+				String sn = osn + (i == 0 ? "" : "_" + i);
+				List<DBDescSource> list = em.createQuery("select s FROM DBDescSource s WHERE s.deleted = false AND s.shortName = :shortName", DBDescSource.class).setParameter("shortName", sn).getResultList();
+				if (list.isEmpty() || (list.size() == 1 && list.get(0).id == id)) {
+					this.shortName = sn;
+					break;
+				}
+			}
 		}
 	}
 
@@ -88,9 +97,9 @@ public class DBDescSource implements Serializable {
 		return this.shortName;
 	}
 
-	public void resetShortName() {
+	public void resetShortName(EntityManager em) {
 		shortName = null;
-		createShortName();
+		createShortName(em);
 	}
 
 	public String getType() {
@@ -173,7 +182,7 @@ public class DBDescSource implements Serializable {
 		return map;
 	}
 
-	public void fromMap(Map<String, String> map) {
+	public void fromMap(Map<String, String> map, EntityManager em) {
 		for (Map.Entry<String, String> me : map.entrySet()) {
 			String value = me.getValue();
 			switch (me.getKey()) {
@@ -193,8 +202,7 @@ public class DBDescSource implements Serializable {
 					properties.put(me.getKey(), value);
 			}
 		}
-		createShortName();
-
+		createShortName(em);
 	}
 
 	public int deleteDocs(EntityManager em) {

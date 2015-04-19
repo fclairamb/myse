@@ -142,7 +142,7 @@ public class Main {
 				try (InputStream is = new FileInputStream("private/nas.properties")) {
 					Properties fileprops = new Properties();
 					fileprops.load(is);
-					smb.setName(fileprops.getProperty("_name"));
+					smb.setName(fileprops.getProperty("_name"), em);
 					smb.setType(fileprops.getProperty("_type"));
 					for (Map.Entry<Object, Object> me : fileprops.entrySet()) {
 						props.put((String) me.getKey(), (String) me.getValue());
@@ -164,7 +164,7 @@ public class Main {
 						if (file.exists()) {
 							LOG.warn("Adding your documents dir !");
 							DBDescSource docs = new DBDescSource();
-							docs.setName("Local documents");
+							docs.setName("Local documents", em);
 							docs.setType(SourceDisk.TYPE);
 							docs.getProperties().put("path", file.getAbsolutePath());
 							em.persist(docs);
@@ -179,7 +179,7 @@ public class Main {
 			// FTP Free source
 			{
 				DBDescSource docs = new DBDescSource();
-				docs.setName("assistance free");
+				docs.setName("assistance free", em);
 				docs.setType(SourceVFS.TYPE);
 				Map<String, String> props = docs.getProperties();
 				props.put(SourceVFS.PROP_SCHEME, "ftp");
@@ -198,7 +198,7 @@ public class Main {
 			File sampleDocsDir = new File("sample_docs");
 			if (sampleDocsDir.exists() || DBDescSource.get("Sample_docs", em) == null) {
 				DBDescSource sampleDocs = new DBDescSource();
-				sampleDocs.setName("Sample docs");
+				sampleDocs.setName("Sample docs", em);
 				sampleDocs.setType(SourceDisk.TYPE);
 				sampleDocs.getProperties().put("path", sampleDocsDir.getAbsolutePath());
 				em.persist(sampleDocs);
@@ -241,7 +241,7 @@ public class Main {
 
 				for (DBDescSource source : DBDescSource.allExisting(em)) {
 					String shortName = source.getShortName();
-					source.resetShortName();
+					source.resetShortName(em);
 
 					if (!source.getShortName().equals(shortName)) {
 						ElasticSearch.deleteIndex(shortName);

@@ -83,7 +83,7 @@ public class RestSetupSource extends HttpServlet {
 			if (context.input.containsKey("_short")) {
 				context.input.remove("_short");
 			}
-			dbSource.fromMap(mapStrObjToMapStrStr(context.input));
+			dbSource.fromMap(mapStrObjToMapStrStr(context.input), context.em);
 			{ // We let the source apply it's pre-saving logic
 				Source source = Source.get(dbSource);
 				source.preSave();
@@ -130,7 +130,7 @@ public class RestSetupSource extends HttpServlet {
 			map.remove("_id");
 			map.put("_name", "Copy of " + map.get("name"));
 			DBDescSource dst = new DBDescSource();
-			dst.fromMap(map);
+			dst.fromMap(map, context.em);
 			return dst;
 		} finally {
 			context.em.getTransaction().commit();
