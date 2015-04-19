@@ -27,16 +27,19 @@ public class JettyServer {
 	public static final String PROP_PORT = PRE + "port";
 
 	public static void start() throws Exception {
-		server = new Server(Config.get(PROP_PORT, 10080, true));
-
-		loadHandler();
-
-		server.start();
+		if (server == null) {
+			server = new Server(Config.get(PROP_PORT, 10080, true));
+			loadHandler();
+			server.start();
+		}
 	}
 
 	public static void stop() throws Exception {
-		server.stop();
-		server.join();
+		if (server != null) {
+			server.stop();
+			server.join();
+			server = null;
+		}
 	}
 
 	private static void loadHandler() {
