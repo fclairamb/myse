@@ -4,9 +4,9 @@ import java.util.Comparator;
 
 public class VersionComparator implements Comparator<String> {
 
-	private static final String SIMULATED_DEV_VERSION = "1.1";
+	private static final String SIMULATED_DEV_VERSION = "1.0.131";
 
-	private int[] stringToInts(String str) {
+	private static int[] stringToInts(String str) {
 		str = str.split("-")[0];
 		String[] spl = str.split("\\.");
 		int ints[] = new int[spl.length];
@@ -16,8 +16,7 @@ public class VersionComparator implements Comparator<String> {
 		return ints;
 	}
 
-	@Override
-	public int compare(String o1, String o2) {
+	public static int compareVersions(String o1, String o2) {
 
 		{ // For dev environment only
 			if (o2.startsWith("${")) {
@@ -53,6 +52,11 @@ public class VersionComparator implements Comparator<String> {
 		}
 
 		return 0;
+	}
+
+	@Override
+	public int compare(String o1, String o2) {
+		return compareVersions(o1, o2);
 	}
 
 }

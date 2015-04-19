@@ -59,7 +59,7 @@ public class FileIndexer extends RunnableCancellable {
 	private final ParseContext context = new ParseContext();
 
 	public static final String ES_DOC_TYPE = "Document";
-	public static final String ES_INDEX_NAME = "all";
+	//public static final String ES_INDEX_NAME = "all";
 
 	public static final int VERSION = 1;
 
@@ -119,7 +119,7 @@ public class FileIndexer extends RunnableCancellable {
 						content = content.replace("\n", " ").replace("\r", " ").replace("\t", " ");
 						data.put("content", content);
 					}
-					IndexRequest req = new IndexRequestBuilder(esClient).setIndex(ES_INDEX_NAME).setType(ES_DOC_TYPE).setId(docId).setSource(data).request();
+					IndexRequest req = new IndexRequestBuilder(esClient).setIndex(ds.getShortName()).setType(ES_DOC_TYPE).setId(docId).setSource(data).request();
 					boolean created = esClient.index(req).actionGet().isCreated();
 					LOG.info("Document {} {} !", docId, created ? "created" : "updated");
 				} catch (Exception ex) {

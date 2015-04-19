@@ -80,12 +80,17 @@ public class DBDescSource implements Serializable {
 
 	private void createShortName() {
 		if (this.shortName == null) {
-			this.shortName = this.name.replaceAll("[\\s]", "_").replaceAll("[^\\w]", "");
+			this.shortName = this.name.replaceAll("[\\s]", "_").replaceAll("[^\\w]", "").toLowerCase();
 		}
 	}
 
 	public String getShortName() {
 		return this.shortName;
+	}
+
+	public void resetShortName() {
+		shortName = null;
+		createShortName();
 	}
 
 	public String getType() {
@@ -193,6 +198,11 @@ public class DBDescSource implements Serializable {
 	}
 
 	public int deleteDocs(EntityManager em) {
+//		em.getTransaction().begin();
+//		try {
 		return em.createQuery("DELETE FROM DBDescFile f WHERE f.source = :source").setParameter("source", this).executeUpdate();
+//		} finally {
+//			em.getTransaction().commit();
+//		}
 	}
 }

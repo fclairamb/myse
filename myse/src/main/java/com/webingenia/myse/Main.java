@@ -12,6 +12,7 @@ import com.webingenia.myse.embeddedes.ElasticSearch;
 import com.webingenia.myse.tasks.Tasks;
 import com.webingenia.myse.updater.Updater;
 import com.webingenia.myse.updater.Upgrader;
+import com.webingenia.myse.updater.VersionComparator;
 import com.webingenia.myse.webserver.JettyServer;
 import java.awt.Desktop;
 import java.io.File;
@@ -26,6 +27,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import javax.persistence.EntityManager;
+import org.elasticsearch.client.Client;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
 
@@ -68,8 +70,11 @@ public class Main {
 		ElasticSearch.start();  // DDB code
 
 		versionCheck();
+
 		EntityManager em = DBMgmt.getEntityManager();
 		startIndexation(em);
+
+		deletePreviousSources(em);
 	}
 
 	private static boolean stopped = false;
@@ -98,6 +103,28 @@ public class Main {
 
 	public static boolean running() {
 		return !stopped;
+	}
+
+	private static void deletePreviousSources(EntityManager em) throws IOException {
+		for (DBDescSource deleted : DBDescSource.allDeleted(em)) {
+			em.getTransaction().begin();
+			try {
+				int nb = -1;
+				while (nb != 0) {
+					nb = deleted.deleteDocs(em);
+					LOG.info("Deleted {} DB files.", nb);
+				}
+				nb = -1;
+				while (nb != 0) {
+					if (ElasticSearch.deleteIndex(deleted.getShortName())) {
+						LOG.info("Deleted index \"{}\".", deleted.getShortName());
+					}
+				}
+				em.remove(deleted);
+			} finally {
+				em.getTransaction().commit();
+			}
+		}
 	}
 
 	private static void startIndexation(EntityManager em) throws IOException {
@@ -182,35 +209,55 @@ public class Main {
 			Indexation.start(Source.get(dbSource));
 		}
 
-		for (DBDescSource deleted : DBDescSource.allDeleted(em)) {
-			int nb = -1;
-			while (nb != 0) {
-				nb = deleted.deleteDocs(em);
-				LOG.info("Deleted {} DB files.", nb);
-			}
-			nb = -1;
-			while (nb != 0) {
-				nb = ElasticSearch.deleteDocsForSource(deleted);
-				LOG.info("Deleted {} doc files.", nb);
-			}
-		}
-
 		//TODO: Delete all the non-existing sources and their respective documents
 		//TODO: Show tray icon if possible
 	}
 
 	private static void versionCheck() {
-		Tasks.getService().scheduleWithFixedDelay(new Updater(), 0, 15, TimeUnit.MINUTES);
+		Tasks.getService().scheduleWithFixedDelay(new Updater(), 0, 3, TimeUnit.MINUTES);
 
 		{ // We check the version
 			String currentVersion = BuildInfo.VERSION;
-			String version = Config.get("version", "0.0", false);
-			if (!currentVersion.equals(version)) {
-				LOG.info("VERSION Change: {} --> {}", version, currentVersion);
-				Config.set("version", currentVersion);
+			String previousVersion = Config.get(VERSION, "0.0", false);
+			if (!currentVersion.equals(previousVersion)) {
+				LOG.info("VERSION Change: {} --> {}", previousVersion, currentVersion);
+				upgradeVersion(previousVersion);
+				Config.set(VERSION, currentVersion);
 			} else {
 				LOG.info("Version: " + currentVersion);
 			}
+		}
+	}
+
+	public static final String VERSION = "version";
+
+	private static void upgradeVersion(String previousVersion) {
+		EntityManager em = DBMgmt.getEntityManager();
+		em.getTransaction().begin();
+		try {
+//			try (Client esClt = ElasticSearch.client()) {
+			if (VersionComparator.compareVersions(previousVersion, "1.0.132") < 0) {
+				LOG.info("Upgrading from one index to multiple indexes");
+
+				for (DBDescSource source : DBDescSource.allExisting(em)) {
+					String shortName = source.getShortName();
+					source.resetShortName();
+
+					if (!source.getShortName().equals(shortName)) {
+						ElasticSearch.deleteIndex(shortName);
+
+						// It's easier to just reindex everything
+						source.deleteDocs(em);
+					}
+					em.persist(source);
+				}
+				ElasticSearch.deleteIndex("all");
+
+			}
+//			}
+		} finally {
+			em.getTransaction().commit();
+			em.close();
 		}
 	}
 

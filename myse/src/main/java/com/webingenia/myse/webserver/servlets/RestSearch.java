@@ -79,7 +79,7 @@ public class RestSearch extends HttpServlet {
 			try (Client client = ElasticSearch.client()) {
 				long before = System.currentTimeMillis();
 				QueryStringQueryBuilder query = QueryBuilders.queryStringQuery(q);
-				SearchRequestBuilder esRequest = client.prepareSearch(FileIndexer.ES_INDEX_NAME).setTypes(FileIndexer.ES_DOC_TYPE)
+				SearchRequestBuilder esRequest = client.prepareSearch("_all").setTypes(FileIndexer.ES_DOC_TYPE)
 						.setSearchType(SearchType.DFS_QUERY_AND_FETCH)
 						//.setQuery(QueryBuilders.termQuery("multi", q)) // Query
 						.setQuery(query)
