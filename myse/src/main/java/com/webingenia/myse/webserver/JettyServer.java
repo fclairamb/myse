@@ -10,6 +10,7 @@ import com.webingenia.myse.webserver.servlets.PageStatic;
 import com.webingenia.myse.webserver.servlets.RestQuit;
 import com.webingenia.myse.webserver.servlets.RestSearch;
 import com.webingenia.myse.webserver.servlets.RestSetupSource;
+import com.webingenia.myse.webserver.servlets.RestStats;
 import com.webingenia.myse.webserver.servlets.RestVersion;
 import com.webingenia.myse.webserver.servlets.WSAdapter;
 import org.eclipse.jetty.server.Server;
@@ -49,13 +50,14 @@ public class JettyServer {
 		handler.addServletWithMapping(PageStatic.class, "/static/*");
 		handler.addServletWithMapping(PageFavIcon.class, "/favicon.ico");
 		handler.addServletWithMapping(PageDownload.class, "/download");
-		
+
 		handler.addServletWithMapping(RestSearch.class, "/rest/search");
 		handler.addServletWithMapping(RestSetupSource.class, "/rest/setup/source/*");
 		handler.addServletWithMapping(RestConfig.class, "/rest/setup/config/*");
 		handler.addServletWithMapping(RestVersion.class, "/rest/version");
+		handler.addServletWithMapping(RestStats.class, "/rest/stats");
 		handler.addServletWithMapping(RestQuit.class, "/rest/quit");
-		
+
 		// Add a websocket to a specific path spec
 		ServletHolder holderEvents = new ServletHolder("ws-events", WSServlet.class);
 		handler.addServletWithMapping(holderEvents, "/ws");

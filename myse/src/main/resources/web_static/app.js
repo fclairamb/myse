@@ -53,6 +53,14 @@
 									controllerAs: 'config'
 								}
 						)
+						.when(
+								"/stats",
+								{
+									templateUrl: '/static/stats.html',
+									controller: 'StatsCtrl',
+									controllerAs: 'stats'
+								}
+						)
 						.otherwise(
 								{
 									redirectTo: '/search'
@@ -308,6 +316,29 @@
 					};
 
 					this.fetch();
+				}
+			]);
+
+	app.controller('StatsCtrl',
+			['$http',
+				function ($http) {
+					var ctrl = this;
+					this.fetchPeriod = 5000; // 5s
+					this.all = {};
+
+					this.fetch = function () {
+						$http.get('/rest/stats').success(
+								function (data) {
+									ctrl.all = data;
+								});
+					};
+
+					this.regularFetch = function () {
+						window.setTimeout(ctrl.regularFetch, ctrl.fetchPeriod);
+						ctrl.fetch();
+					};
+
+					this.regularFetch();
 				}
 			]);
 
