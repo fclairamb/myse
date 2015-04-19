@@ -46,12 +46,9 @@ public class PageStatic extends HttpServlet {
 					out.println("<p>" + path + " not found !</p>");
 				}
 			} else {
-				// TODO: Replace this by extension to mimetype
-				// Type detection is useless here
-				try (InputStream is = resource.openStream()) {
-					String contentType = tika.detect(is);
-					response.setHeader("Content-Type", contentType);
-				}
+				// DONE: Using file's name instead of content for type detection
+				String contentType = tika.detect(path);
+				response.setHeader("Content-Type", contentType);
 				try (OutputStream os = response.getOutputStream()) {
 					try (InputStream is = resource.openStream()) {
 						Streams.copy(is, os);
