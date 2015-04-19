@@ -4,6 +4,8 @@ import java.io.File;
 import java.net.URLDecoder;
 import java.nio.file.Files;
 
+import static com.webingenia.myse.common.LOG.LOG;
+
 public class Paths {
 
 	public static File getDesktopDir() {
@@ -93,7 +95,7 @@ public class Paths {
 			javaExe = new File(javaBin, "java");
 		}
 		if (!javaExe.exists()) {
-			LOG.LOG.warn("Could not find java executable !");
+			LOG.warn("Could not find java executable !");
 			return null;
 		}
 		return javaExe;
@@ -103,7 +105,7 @@ public class Paths {
 		try {
 			return new File(URLDecoder.decode(Paths.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "utf8"));
 		} catch (Exception ex) {
-			LOG.LOG.error("myJarFile", ex);
+			LOG.error("myJarFile", ex);
 			return null;
 		}
 	}

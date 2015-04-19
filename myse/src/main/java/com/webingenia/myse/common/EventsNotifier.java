@@ -1,6 +1,9 @@
 package com.webingenia.myse.common;
 
+import com.webingenia.myse.desktop.TrayIconMgmt;
+import static com.webingenia.myse.common.LOG.LOG;
 import com.webingenia.myse.access.File;
+import java.awt.TrayIcon;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -29,6 +32,17 @@ public class EventsNotifier {
 		String source;
 	}
 
+	public static class EventTextNotification extends Event {
+
+		public EventTextNotification(String title, String message) {
+			super("notification");
+			this.title = title;
+			this.message = message;
+		}
+
+		String title, message;
+	}
+
 	public static interface EventReceiver {
 
 		void handleEvent(Event event);
@@ -37,14 +51,20 @@ public class EventsNotifier {
 	private static final List<Event> events = Collections.synchronizedList(new LinkedList<Event>());
 	private static final List<EventReceiver> receivers = Collections.synchronizedList(new ArrayList<EventReceiver>());
 
-	public static void scanningNewDir(File dir) {
+	public static void eventScanningNewDir(File dir) {
 		EventFile event = new EventFile("newDir", dir);
 		addEvent(event);
 	}
 
-	public static void indexingFile(File file) {
+	public static void eventIndexingFile(File file) {
 		EventFile event = new EventFile("newFile", file);
 		addEvent(event);
+	}
+
+	public static void eventTextNotification(String title, String content) {
+		EventTextNotification notification = new EventTextNotification(title, content);
+		addEvent(notification);
+		TrayIconMgmt.displayMessage(title, content, TrayIcon.MessageType.INFO);
 	}
 
 	private static void addEvent(Event event) {
@@ -58,7 +78,7 @@ public class EventsNotifier {
 				r.handleEvent(event);
 			}
 		} catch (Throwable ex) {
-			LOG.LOG.error("addEvent", ex);
+			LOG.error("addEvent", ex);
 		}
 	}
 

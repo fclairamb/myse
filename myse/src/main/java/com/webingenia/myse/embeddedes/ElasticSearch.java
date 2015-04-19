@@ -1,17 +1,20 @@
 package com.webingenia.myse.embeddedes;
 
-import com.webingenia.myse.common.LOG;
 import com.webingenia.myse.common.Paths;
 import com.webingenia.myse.db.model.DBDescSource;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.client.Requests;
-import org.elasticsearch.common.io.stream.BytesStreamOutput;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
+
+import static com.webingenia.myse.common.LOG.LOG;
+import java.util.ArrayList;
+import java.util.List;
+import org.elasticsearch.cluster.metadata.IndexMetaData;
+import org.elasticsearch.common.collect.ImmutableOpenMap;
+import org.elasticsearch.common.hppc.cursors.ObjectCursor;
 
 public class ElasticSearch {
 
@@ -44,7 +47,7 @@ public class ElasticSearch {
 				}
 			}
 		} catch (Exception ex) {
-			LOG.LOG.error("createIndex", ex);
+			LOG.error("createIndex", ex);
 		}
 	}
 
@@ -60,6 +63,17 @@ public class ElasticSearch {
 		return exists;
 	}
 
+	public static List<String> listIndexes() {
+		List<String> list = new ArrayList<>();
+		try (Client esClt = ElasticSearch.client()) {
+			ImmutableOpenMap<String, IndexMetaData> indices = esClt.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().indices();
+			for (ObjectCursor<IndexMetaData> next : indices.values()) {
+				list.add(next.value.index());
+			}
+		}
+		return list;
+	}
+
 	/**
 	 * Prepare elasticsearch for this source.
 	 *
@@ -69,7 +83,7 @@ public class ElasticSearch {
 		try {
 			createIndex(source.getShortName());
 		} catch (Exception ex) {
-			LOG.LOG.error("Index preparation failed", ex);
+			LOG.error("Index preparation failed", ex);
 		}
 	}
 

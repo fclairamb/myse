@@ -80,7 +80,7 @@ public class FileIndexer extends RunnableCancellable {
 						LOG.info("No analysis necessary !");
 						return;
 					} else {
-						EventsNotifier.indexingFile(file);
+						EventsNotifier.eventIndexingFile(file);
 					}
 
 					InputStream is = file.getInputStream();

@@ -166,7 +166,7 @@ public class DirExplorer extends RunnableCancellable {
 
 		if (dir) {
 			if (again) {
-				EventsNotifier.scanningNewDir(file);
+				EventsNotifier.eventScanningNewDir(file);
 			}
 			if (sub) {
 				try {

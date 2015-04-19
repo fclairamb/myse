@@ -3,6 +3,8 @@ package com.webingenia.myse.common;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import static com.webingenia.myse.common.LOG.LOG;
+
 public class Hashing {
 
 	private static String byteArrayToHexString(byte[] b) {
@@ -18,7 +20,7 @@ public class Hashing {
 			MessageDigest md = MessageDigest.getInstance("SHA-1");
 			return byteArrayToHexString(md.digest(str.getBytes()));
 		} catch (NoSuchAlgorithmException ex) {
-			LOG.LOG.error("sha1", ex);
+			LOG.error("sha1", ex);
 			return null;
 		}
 	}

@@ -1,5 +1,7 @@
 package com.webingenia.myse.common;
 
+import static com.webingenia.myse.common.LOG.LOG;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -18,7 +20,7 @@ public class Files {
 			}
 			return true;
 		} catch (Exception ex) {
-			LOG.LOG.warn("copy", ex);
+			LOG.warn("copy", ex);
 		}
 		return false;
 	}

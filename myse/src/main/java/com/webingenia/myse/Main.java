@@ -1,5 +1,7 @@
 package com.webingenia.myse;
 
+import com.webingenia.myse.desktop.Browser;
+import com.webingenia.myse.desktop.TrayIconMgmt;
 import com.webingenia.myse.access.Source;
 import com.webingenia.myse.access.disk.SourceDisk;
 import com.webingenia.myse.access.vfs.SourceVFS;
@@ -14,13 +16,10 @@ import com.webingenia.myse.updater.Updater;
 import com.webingenia.myse.updater.Upgrader;
 import com.webingenia.myse.updater.VersionComparator;
 import com.webingenia.myse.webserver.JettyServer;
-import java.awt.Desktop;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +27,9 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import javax.persistence.EntityManager;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.cluster.metadata.IndexMetaData;
+import org.elasticsearch.common.collect.ImmutableOpenMap;
+import org.elasticsearch.common.hppc.cursors.ObjectCursor;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
 
@@ -38,8 +40,6 @@ public class Main {
 			start(args);
 		} catch (Exception ex) {
 			LOG.error("Problem starting !", ex);
-		} finally {
-			startBrowser(); // Browser 
 		}
 	}
 
@@ -50,8 +50,7 @@ public class Main {
 						@Override
 						public void handle(Signal signal) {
 							LOG.warn("Received a TERM signal !");
-							Main.stop();
-							System.exit(0);
+							Main.quit();
 						}
 					});
 		} catch (Throwable ex) {
@@ -61,6 +60,8 @@ public class Main {
 	}
 
 	public static void start(String[] args) throws SQLException, IOException, Exception {
+		TrayIconMgmt.start();
+
 		Upgrader.main(args); // Upgrading code
 
 		DBMgmt.start(); // RDB code
@@ -69,21 +70,21 @@ public class Main {
 
 		ElasticSearch.start();  // DDB code
 
+		Browser.showMyse();
+
 		versionCheck();
 
 		EntityManager em = DBMgmt.getEntityManager();
 		startIndexation(em);
 
 		deletePreviousSources(em);
+
+		//EventsNotifier.eventTextNotification("Finished loading", "MySE finished loading.");
 	}
 
 	private static boolean stopped = false;
 
 	public static void stop() {
-//
-//		new Thread(new Runnable() {
-//			@Override
-//			public void run() {
 		try {
 			stopped = true;
 			LOG.info("Stopping tasks...");
@@ -97,8 +98,12 @@ public class Main {
 		} catch (Exception ex) {
 			LOG.error("Main.stop", ex);
 		}
-//			}
-//		}, "Quitting").start();
+	}
+
+	public static void quit() {
+		stop();
+		LOG.info("Good bye !");
+		System.exit(0);
 	}
 
 	public static boolean running() {
@@ -114,15 +119,19 @@ public class Main {
 					nb = deleted.deleteDocs(em);
 					LOG.info("Deleted {} DB files.", nb);
 				}
-				nb = -1;
-				while (nb != 0) {
-					if (ElasticSearch.deleteIndex(deleted.getShortName())) {
-						LOG.info("Deleted index \"{}\".", deleted.getShortName());
-					}
+				if (ElasticSearch.deleteIndex(deleted.getShortName())) {
+					LOG.info("Deleted index \"{}\".", deleted.getShortName());
 				}
 				em.remove(deleted);
 			} finally {
 				em.getTransaction().commit();
+			}
+		}
+		for (String shortName : ElasticSearch.listIndexes()) {
+			DBDescSource dbSource = DBDescSource.get(shortName, em);
+			if (dbSource == null) {
+				LOG.warn("Deleting index \"{}\".", shortName);
+				ElasticSearch.deleteIndex(shortName);
 			}
 		}
 	}
@@ -258,12 +267,6 @@ public class Main {
 		} finally {
 			em.getTransaction().commit();
 			em.close();
-		}
-	}
-
-	private static void startBrowser() throws IOException, URISyntaxException {
-		if (Desktop.isDesktopSupported()) {
-			Desktop.getDesktop().browse(new URI("http://localhost:" + Config.get(JettyServer.PROP_PORT, 10080, false) + "/"));
 		}
 	}
 }

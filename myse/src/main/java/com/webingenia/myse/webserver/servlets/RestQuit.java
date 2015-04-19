@@ -17,9 +17,7 @@ public class RestQuit extends HttpServlet {
 
 			@Override
 			public void run() {
-				Main.stop();
-
-				System.exit(0);
+				Main.quit();
 			}
 		}, 2, TimeUnit.SECONDS);
 	}

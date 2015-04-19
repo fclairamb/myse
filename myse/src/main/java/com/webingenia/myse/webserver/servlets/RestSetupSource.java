@@ -23,6 +23,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static com.webingenia.myse.common.LOG.LOG;
+
 public class RestSetupSource extends HttpServlet {
 
 	private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -204,7 +206,7 @@ public class RestSetupSource extends HttpServlet {
 					exception.put("message", ex.getMessage());
 				}
 				output = core;
-				LOG.LOG.error("Error processing REST", ex);
+				LOG.error("Error processing REST", ex);
 			}
 		} finally {
 			context.em.close();
