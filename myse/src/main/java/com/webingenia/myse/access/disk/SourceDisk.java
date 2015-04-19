@@ -17,7 +17,8 @@ public class SourceDisk extends Source {
 		super(desc);
 	}
 
-	//TODO: Make sure the root path is finishing with a "/"
+	// DONE: Make sure the root path is finishing with a "/": Done using the
+	// Source class preSave method.
 	private String getRootPath() {
 		return desc.getProperties().get(PROP_PATH);
 	}
