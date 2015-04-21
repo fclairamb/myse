@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.webingenia.myse.Indexation;
 import com.webingenia.myse.access.Source;
 import com.webingenia.myse.access.disk.SourceDisk;
+import com.webingenia.myse.access.drive.SourceDrive;
 import com.webingenia.myse.access.smb.SourceSMB;
 import com.webingenia.myse.access.vfs.SourceVFS;
 import com.webingenia.myse.common.LOG;
@@ -86,13 +87,17 @@ public class RestSetupSource extends HttpServlet {
 				context.input.remove("_short");
 			}
 			dbSource.fromMap(mapStrObjToMapStrStr(context.input), context.em);
-			{ // We let the source apply it's pre-saving logic
+			{ // We let the source apply its pre-saving logic
 				Source source = Source.get(dbSource);
 				source.preSave();
 			}
 			context.em.persist(dbSource);
 			if (newSource) {
 				Indexation.start(Source.get(dbSource));
+			}
+			{ // We let the source apply its post-saving logic
+				Source source = Source.get(dbSource);
+				source.postSave();
 			}
 			return dbSource.asMap();
 		} finally {
@@ -153,7 +158,8 @@ public class RestSetupSource extends HttpServlet {
 		return new SourceType[]{
 			new SourceType(SourceSMB.TYPE, "Samba"),
 			new SourceType(SourceVFS.TYPE, "VFS"),
-			new SourceType(SourceDisk.TYPE, "Disk")
+			new SourceType(SourceDisk.TYPE, "Disk"),
+			new SourceType(SourceDrive.TYPE, "Google Drive")
 		};
 	}
 

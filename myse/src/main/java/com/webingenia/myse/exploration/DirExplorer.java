@@ -78,7 +78,8 @@ public class DirExplorer extends RunnableCancellable {
 			em.getTransaction().begin();
 
 			try { // We always start by a root dir analysis
-				DBDescFile df = DBDescFile.getOrCreate(source.getRootDir(), em);
+				File rootDir = source.getRootDir();
+				DBDescFile df = DBDescFile.getOrCreate(rootDir, em);
 				analyseFile(df, em, true);
 			} finally {
 				em.getTransaction().commit();
@@ -110,6 +111,7 @@ public class DirExplorer extends RunnableCancellable {
 			sd.setState(AccessException.AccessState.DENIED);
 			LOG.error("DirExplorer issue", ex);
 		} catch (Exception ex) {
+			LOG.error("DirExplorer issue", ex);
 			sd.setState(AccessException.AccessState.ERROR);
 		} finally {
 			em.close();

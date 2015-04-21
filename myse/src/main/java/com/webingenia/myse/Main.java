@@ -142,8 +142,7 @@ public class Main {
 			LOG.warn("NO SOURCE! Creating one !");
 			em.getTransaction().begin();
 
-			// Private NAS source
-			if (new File("private/nas.properties").exists()) {
+			if (new File("private/nas.properties").exists()) { // Private NAS source
 				DBDescSource smb = new DBDescSource();
 				Map<String, String> props = smb.getProperties();
 
@@ -160,8 +159,7 @@ public class Main {
 				em.persist(smb);
 			}
 
-			// Private documents source
-			{
+			{ // Private documents source
 				String home = System.getenv("user.home");
 				if (home == null) { // Java 8
 					home = System.getProperty("user.home");
@@ -185,8 +183,7 @@ public class Main {
 				}
 			}
 
-			// FTP Free source
-			{
+			{ // FTP Free source
 				DBDescSource docs = new DBDescSource();
 				docs.setName("assistance free", em);
 				docs.setType(SourceVFS.TYPE);
@@ -199,19 +196,19 @@ public class Main {
 				em.persist(docs);
 			}
 
+			{ // Some sample docs
+				File sampleDocsDir = new File("sample_docs");
+				if (sampleDocsDir.exists() || DBDescSource.get("Sample_docs", em) == null) {
+					DBDescSource sampleDocs = new DBDescSource();
+					sampleDocs.setName("Sample docs", em);
+					sampleDocs.setType(SourceDisk.TYPE);
+					sampleDocs.getProperties().put("path", sampleDocsDir.getAbsolutePath());
+					em.persist(sampleDocs);
+				}
+			}
+
 			em.getTransaction().commit();
 			allSources = DBDescSource.allExisting(em);
-		}
-
-		{
-			File sampleDocsDir = new File("sample_docs");
-			if (sampleDocsDir.exists() || DBDescSource.get("Sample_docs", em) == null) {
-				DBDescSource sampleDocs = new DBDescSource();
-				sampleDocs.setName("Sample docs", em);
-				sampleDocs.setType(SourceDisk.TYPE);
-				sampleDocs.getProperties().put("path", sampleDocsDir.getAbsolutePath());
-				em.persist(sampleDocs);
-			}
 		}
 
 		for (DBDescSource dbSource : allSources) {
@@ -219,7 +216,7 @@ public class Main {
 		}
 
 		//DONE: Delete all the non-existing sources and their respective documents
-		//TODO: Show tray icon if possible
+		//DONE: Show tray icon if possible : Double click opens the interface
 	}
 
 	private static void versionCheck() {

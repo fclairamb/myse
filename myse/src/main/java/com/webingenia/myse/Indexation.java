@@ -11,7 +11,7 @@ public class Indexation {
 
 	public static void start(Source source) {
 		ElasticSearch.prepare(source.getDesc());
-		Tasks.scheduleWithFixedDelay(new DirExplorer(source), 5, 30, TimeUnit.SECONDS);
+		Tasks.scheduleWithFixedDelay(new DirExplorer(source), 0, 30, TimeUnit.SECONDS);
 		Tasks.scheduleWithFixedDelay(new FileIndexer(source), 5, 30, TimeUnit.SECONDS);
 	}
 }

@@ -5,6 +5,7 @@ import com.webingenia.myse.db.model.Config;
 import com.webingenia.myse.webserver.servlets.PageDownload;
 import com.webingenia.myse.webserver.servlets.PageFavIcon;
 import com.webingenia.myse.webserver.servlets.PageIndex;
+import com.webingenia.myse.webserver.servlets.PageOAuth;
 import com.webingenia.myse.webserver.servlets.RestConfig;
 import com.webingenia.myse.webserver.servlets.PageStatic;
 import com.webingenia.myse.webserver.servlets.RestQuit;
@@ -57,6 +58,7 @@ public class JettyServer {
 		handler.addServletWithMapping(RestVersion.class, "/rest/version");
 		handler.addServletWithMapping(RestStats.class, "/rest/stats");
 		handler.addServletWithMapping(RestQuit.class, "/rest/quit");
+		handler.addServletWithMapping(PageOAuth.class, "/oauth/*");
 
 		// Add a websocket to a specific path spec
 		ServletHolder holderEvents = new ServletHolder("ws-events", WSServlet.class);

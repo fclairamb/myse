@@ -1,6 +1,7 @@
 package com.webingenia.myse.access;
 
 import com.webingenia.myse.access.disk.SourceDisk;
+import com.webingenia.myse.access.drive.SourceDrive;
 import com.webingenia.myse.access.ftps.SourceFTPS;
 import com.webingenia.myse.access.smb.SourceSMB;
 import com.webingenia.myse.access.vfs.SourceVFS;
@@ -59,6 +60,8 @@ public abstract class Source {
 			case SourceFTPS.TYPE_EXPLICIT:
 			case SourceFTPS.TYPE_IMPLICIT:
 				return new SourceFTPS(source);
+			case SourceDrive.TYPE:
+				return new SourceDrive(source);
 			default:
 				return null;
 		}
@@ -110,5 +113,9 @@ public abstract class Source {
 
 	public void preSave() {
 		preSaveChangePath();
+	}
+
+	public void postSave() {
+
 	}
 }

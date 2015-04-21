@@ -17,8 +17,8 @@ import org.apache.commons.net.ftp.FTPSClient;
 public class FileFTPS extends File {
 
 	private final SourceFTPS source;
-	private FTPFile file;
-	private String path;
+	private final FTPFile file;
+	private final String path;
 
 	public FileFTPS(String path, SourceFTPS source) {
 		this.path = path;
