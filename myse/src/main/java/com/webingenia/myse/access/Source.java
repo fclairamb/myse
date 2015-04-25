@@ -100,12 +100,14 @@ public abstract class Source {
 	protected List<PropertyDescription> getSharedProperties() {
 		return Arrays.asList(
 				new PropertyDescription(PROP_FILENAME_INCLUDE, PropertyDescription.Type.TEXT, "Files to include", "*.doc,*.docx,*.xls,*.xlsx,*.ppt,*.pptx,*.pdf,*.odt,*.ods,*.odp"),
-				new PropertyDescription(PROP_FILENAME_EXCLUDE, PropertyDescription.Type.TEXT, "Files to exclude", "*")
+				new PropertyDescription(PROP_FILENAME_EXCLUDE, PropertyDescription.Type.TEXT, "Files to exclude", "*"),
+				new PropertyDescription(PROP_INDEX, PropertyDescription.Type.BOOLEAN, "Do index", "true")
 		);
 	}
 
 	public static String PROP_FILENAME_INCLUDE = "filename_include",
-			PROP_FILENAME_EXCLUDE = "filename_exclude";
+			PROP_FILENAME_EXCLUDE = "filename_exclude",
+			PROP_INDEX = "index";
 
 	public abstract List<PropertyDescription> getProperties();
 

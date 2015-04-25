@@ -68,10 +68,10 @@ public class DirExplorer extends RunnableCancellable {
 		}
 
 		fetchSettings();
-		LOG.info("DirExplorer on " + source + " : STARTING !");
-		if (source.getDesc().deleted()) {
-			LOG.info("Deleted !");
+		if (! source.getDesc().doIndex()) {
+			return;
 		}
+		LOG.info("DirExplorer on " + source + " : STARTING !");
 		EntityManager em = DBMgmt.getEntityManager();
 		DBDescSource sd = source.getDesc();
 		try {

@@ -1,6 +1,7 @@
 package com.webingenia.myse.db.model;
 
 import com.webingenia.myse.access.AccessException;
+import com.webingenia.myse.access.Source;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -203,6 +204,11 @@ public class DBDescSource implements Serializable {
 			}
 		}
 		createShortName(em);
+	}
+
+	public boolean doIndex() {
+		String value = getProperties().get(Source.PROP_INDEX);
+		return !deleted && (value == null || value.equals("true"));
 	}
 
 	public int deleteDocs(EntityManager em) {

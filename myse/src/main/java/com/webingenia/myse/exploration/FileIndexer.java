@@ -38,10 +38,10 @@ public class FileIndexer extends RunnableCancellable {
 		EntityManager em = DBMgmt.getEntityManager();
 		Client esClient = ElasticSearch.client();
 		try {
-			LOG.info("FileIndexer on " + source + " : STARTING !");
-			if (source.getDesc().deleted()) {
-				LOG.info("Deleted !");
+			if (!source.getDesc().doIndex()) {
+				return;
 			}
+			LOG.info("FileIndexer on " + source + " : STARTING !");
 			for (DBDescFile desc : DBDescFile.listFiles(source.getDesc(), false, 300, em)) {
 				if (!Main.running()) {
 					LOG.warn("Bye bye !");

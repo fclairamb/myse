@@ -73,8 +73,8 @@ public class RestSetupSource extends HttpServlet {
 
 	private Object doProcessEdit(Context context) {
 		context.em.getTransaction().begin();
+		DBDescSource dbSource;
 		try {
-			DBDescSource dbSource;
 			boolean newSource = false;
 			if (context.input.containsKey("_id")) {
 				long id = Long.parseLong((String) context.input.get("_id"));
@@ -95,14 +95,14 @@ public class RestSetupSource extends HttpServlet {
 			if (newSource) {
 				Indexation.start(Source.get(dbSource));
 			}
-			{ // We let the source apply its post-saving logic
-				Source source = Source.get(dbSource);
-				source.postSave();
-			}
-			return dbSource.asMap();
 		} finally {
 			context.em.getTransaction().commit();
 		}
+		{ // We let the source apply its post-saving logic
+			Source source = Source.get(dbSource);
+			source.postSave();
+		}
+		return dbSource.asMap();
 	}
 
 	private Object doProcessDesc(Context context) {
