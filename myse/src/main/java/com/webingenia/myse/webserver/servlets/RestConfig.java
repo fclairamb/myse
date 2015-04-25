@@ -56,8 +56,8 @@ public class RestConfig extends HttpServlet {
 				List<ConfigDescription> list = Arrays.asList(
 						new ConfigDescription(Config.PAR_UPDATE_CHANNEL, ConfigDescription.Type.TEXT, "Update channel"),
 						new ConfigDescription(DirExplorer.CONF_LOG_NEW_DIRS, ConfigDescription.Type.BOOLEAN, "Log new dirs"),
-						new ConfigDescription(JettyServer.PROP_PORT, ConfigDescription.Type.TEXT, "Web server port"),
-						new ConfigDescription(Main.VERSION, ConfigDescription.Type.TEXT, "Software version")
+						new ConfigDescription(JettyServer.PROP_PORT, ConfigDescription.Type.TEXT, "Web server port")
+//						new ConfigDescription(Main.VERSION, ConfigDescription.Type.TEXT, "Software version")
 				);
 				output = list;
 				break;
