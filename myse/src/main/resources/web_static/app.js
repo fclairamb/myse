@@ -295,24 +295,24 @@
 					};
 
 					this.edit = function (name) {
-//						console.log("edit " + name);
 						this.values[ name ] = this.getValue(name);
 					};
 
 					this.editing = function (name) {
-//						console.log("editing " + name + " : " + this.values[ name ]);
 						return this.values[ name ] !== undefined;
 					};
 
 					this.save = function (name) {
-//						console.log("save " + name);
 						$http.get('/rest/setup/config?name=' + name + '&value=' + this.values[ name ]).success(
-								function (data) {
-									ctrl.values[ name ] = undefined;
-
+								function () {
+									delete ctrl.values[name];
 									ctrl.fetch();
 								}
 						);
+					};
+
+					this.cancel = function (name) {
+						delete ctrl.values[name];
 					};
 
 					this.fetch();
@@ -320,8 +320,8 @@
 			]);
 
 	app.controller('StatsCtrl',
-			['$http',
-				function ($http) {
+			['$http', '$scope', '$timeout',
+				function ($http, $scope, $timeout) {
 					var ctrl = this;
 					this.fetchPeriod = 5000; // 5s
 					this.all = {};
@@ -334,9 +334,13 @@
 					};
 
 					this.regularFetch = function () {
-						window.setTimeout(ctrl.regularFetch, ctrl.fetchPeriod);
+						this.timeoutPromise = $timeout(ctrl.regularFetch, ctrl.fetchPeriod);
 						ctrl.fetch();
 					};
+					
+					$scope.$on('$destroy', function() {
+						$timeout.cancel(this.timeoutPromise);
+					});
 
 					this.regularFetch();
 				}

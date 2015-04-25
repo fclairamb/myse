@@ -24,6 +24,7 @@
 			<td>
 				<a href class="btn btn-info" ng-if="!config.editing(par.name)" ng-click="config.edit(par.name)">Edit</a>
 				<a href class="btn btn-warning" ng-if="config.editing(par.name)" ng-click="config.save(par.name)">Save</a>
+				<a href class="btn btn-default" ng-if="config.editing(par.name)" ng-click="config.cancel(par.name)">Cancel</a>
 			</td>
 		</tr>
 	</tbody>
