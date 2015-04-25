@@ -26,5 +26,5 @@ public class DBTest {
 		Config.set("param1", "value2");
 		Assert.assertEquals("value2", Config.get("param1", "value3", true));
 	}
-
+	
 }
