@@ -21,10 +21,15 @@ public abstract class Source {
 		}
 
 		public PropertyDescription(String name, Type type, String description, String defaultValue) {
+			this(name, type, description, defaultValue, null);
+		}
+
+		public PropertyDescription(String name, Type type, String description, String defaultValue, String sampleValue) {
 			this.name = name;
 			this.type = type;
 			this.description = description;
 			this.defaultValue = defaultValue;
+			this.sampleValue = sampleValue;
 		}
 
 		public enum Type {
@@ -37,6 +42,7 @@ public abstract class Source {
 		public final Type type;
 		public final String description;
 		public final String defaultValue;
+		public final String sampleValue;
 	}
 
 	protected final DBDescSource desc;

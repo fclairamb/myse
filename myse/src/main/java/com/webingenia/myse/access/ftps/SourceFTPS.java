@@ -101,10 +101,10 @@ public class SourceFTPS extends Source {
 	public List<PropertyDescription> getProperties() {
 		ArrayList<PropertyDescription> list = new ArrayList<>();
 		list.addAll(Arrays.asList(
-				new PropertyDescription(PROP_HOST, PropertyDescription.Type.TEXT, "Host"),
-				new PropertyDescription(PROP_USER, PropertyDescription.Type.TEXT, "Username"),
-				new PropertyDescription(PROP_USER, PropertyDescription.Type.PASSWORD, "Password"),
-				new PropertyDescription(PROP_PATH, PropertyDescription.Type.TEXT, "Path of the directory to index")
+				new PropertyDescription(PROP_HOST, PropertyDescription.Type.TEXT, "Host", null, "192.168.1.1"),
+				new PropertyDescription(PROP_USER, PropertyDescription.Type.TEXT, "Username", null, "myuser"),
+				new PropertyDescription(PROP_USER, PropertyDescription.Type.PASSWORD, "Password", null, "mypass"),
+				new PropertyDescription(PROP_PATH, PropertyDescription.Type.TEXT, "Path of the directory to index", null, "/")
 		));
 		list.addAll(getSharedProperties());
 		return list;

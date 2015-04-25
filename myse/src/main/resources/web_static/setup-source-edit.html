@@ -10,9 +10,9 @@
 		<select id="input_type" ng-options="t.type as t.name for t in setup.types" ng-model="setup.props._type" class="form-control" ng-change="setup.typeChanged()"></select>
 	</div>
 	<div class="form-group" ng-repeat="desc in setup.descs">
-		<label for="input_{{desc.name}}">{{ desc.description}}</label><span ng-show="desc.defaultValue !== undefined"> - <a href ng-click="setup.setToDefault( desc.name )">(default)</a></span>
-		<input id="input_{{desc.name}}" ng-model="setup.props[ desc.name ]" type="text" class="form-control" ng-if="desc.type === 'TEXT'" />
-		<input id="input_{{desc.name}}" ng-model="setup.props[ desc.name ]" type="password" class="form-control" ng-if="desc.type === 'PASSWORD'" />
+		<label for="input_{{desc.name}}">{{ desc.description}}</label><span ng-show="desc.defaultValue !== undefined"> - <a href ng-click="setup.setToDefault(desc.name)">(default)</a></span>
+		<input id="input_{{desc.name}}" ng-model="setup.props[ desc.name ]" type="text" placeholder="{{desc.sampleValue}}" class="form-control" ng-if="desc.type === 'TEXT'" />
+		<input id="input_{{desc.name}}" ng-model="setup.props[ desc.name ]" type="password" placeholder="{{desc.sampleValue}}" class="form-control" ng-if="desc.type === 'PASSWORD'" />
 		<input id="input_{{desc.name}}" ng-model="setup.props[ desc.name ]" type="checkbox" class="form-control" ng-if="desc.type === 'BOOLEAN'" />
 	</div>
 	<button type="submit" class="btn btn-info" ng-click="setup.save()">Save</button>
