@@ -140,6 +140,10 @@ public class Updater implements Runnable {
 			}
 		} else {
 			LOG.debug("No upgrade necessary !");
+			for (File f : Paths.getUpgradeDir().listFiles()) {
+				LOG.info("Deleting old upgrade file \"{}\"", f.getName());
+				f.delete();
+			}
 		}
 	}
 
