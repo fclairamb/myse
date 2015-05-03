@@ -20,7 +20,7 @@ public class FileFTPS extends File {
 	private final FTPFile file;
 	private final String path;
 
-	public FileFTPS(String path, SourceFTPS source) {
+	FileFTPS(String path, SourceFTPS source) {
 		this.path = path;
 		this.source = source;
 		this.file = new FTPFile();
@@ -28,7 +28,7 @@ public class FileFTPS extends File {
 		this.file.setTimestamp(Calendar.getInstance());
 	}
 
-	public FileFTPS(String path, FTPFile file, SourceFTPS source) {
+	FileFTPS(String path, FTPFile file, SourceFTPS source) {
 		this.path = path;
 		this.file = file;
 		this.source = source;

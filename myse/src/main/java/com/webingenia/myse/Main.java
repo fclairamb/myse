@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import javax.persistence.EntityManager;
 import sun.misc.Signal;
@@ -113,10 +114,10 @@ public class Main {
 				int nb = -1;
 				while (nb != 0) {
 					nb = deleted.deleteDocs(em);
-					LOG.info("Deleted {} DB files.", nb);
+					LOG.info("Deleting {}: Deleted {} DB files.", deleted.getShortName(), nb);
 				}
 				if (ElasticSearch.deleteIndex(deleted.getShortName())) {
-					LOG.info("Deleted index \"{}\".", deleted.getShortName());
+					LOG.info("Deleting {}: Deleted index.", deleted.getShortName());
 				}
 				em.remove(deleted);
 			} finally {
@@ -208,7 +209,7 @@ public class Main {
 		}
 
 		for (DBDescSource dbSource : allSources) {
-			Indexation.start(Source.get(dbSource));
+			Indexation.start(dbSource);
 		}
 
 		//DONE: Delete all the non-existing sources and their respective documents
@@ -256,6 +257,9 @@ public class Main {
 				ElasticSearch.deleteIndex("all");
 
 			}
+
+			// Unique install ID
+			Config.get("install_id", UUID.randomUUID().toString(), true);
 //			}
 		} finally {
 			em.getTransaction().commit();

@@ -2,7 +2,6 @@ package com.webingenia.myse.webserver.servlets;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.webingenia.myse.Main;
 import com.webingenia.myse.db.model.Config;
 import com.webingenia.myse.exploration.DirExplorer;
 import com.webingenia.myse.webserver.JettyServer;

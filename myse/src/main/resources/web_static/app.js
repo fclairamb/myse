@@ -250,8 +250,12 @@
 					this.save = function () {
 						$http.post('/rest/setup/source/edit', this.props).success(
 								function (data) {
-									if (data) {
+									if (data.nextUrl !== undefined) {
+										window.location.href = data.nextUrl;
+									} else if (data.ok) {
 										$location.path('/setup/source/list');
+									} else {
+										window.alert('Something went WRONG ! ' + JSON.stringify(data));
 									}
 								}
 						);

@@ -110,6 +110,11 @@
 	  <artifactId>google-api-client-jackson2</artifactId>
 	  <version>1.20.0</version>
 	 </dependency>
+	 <dependency>
+	  <groupId>com.dropbox.core</groupId>
+	  <artifactId>dropbox-core-sdk</artifactId>
+	  <version>1.7.7</version>
+	 </dependency>
 	</dependencies>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

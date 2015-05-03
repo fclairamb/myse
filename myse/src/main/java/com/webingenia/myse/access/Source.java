@@ -1,11 +1,14 @@
 package com.webingenia.myse.access;
 
+import com.webingenia.myse.access.dbox.SourceDBox;
 import com.webingenia.myse.access.disk.SourceDisk;
 import com.webingenia.myse.access.drive.SourceDrive;
 import com.webingenia.myse.access.ftps.SourceFTPS;
 import com.webingenia.myse.access.smb.SourceSMB;
 import com.webingenia.myse.access.vfs.SourceVFS;
 import com.webingenia.myse.db.model.DBDescSource;
+import com.webingenia.myse.exploration.DirExplorer;
+import com.webingenia.myse.exploration.SourceExplorer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -68,6 +71,8 @@ public abstract class Source {
 				return new SourceFTPS(source);
 			case SourceDrive.TYPE:
 				return new SourceDrive(source);
+			case SourceDBox.TYPE:
+				return new SourceDBox(source);
 			default:
 				return null;
 		}
@@ -123,7 +128,26 @@ public abstract class Source {
 		preSaveChangePath();
 	}
 
-	public void postSave() {
+	/**
+	 * Post-saving method. This method is called after the source has been
+	 * saved. It allows to do processing and even redirect to the user to a new
+	 * URL.
+	 *
+	 * @param context The source editing context
+	 */
+	public void postSave(SourceEditingContext context) {
 
+	}
+
+	/**
+	 * Get an explorer for this source.
+	 *
+	 * The DirExplorer is the standard explorer. Some sources might want to
+	 * override this method to offer an explorer more adapted to them.
+	 *
+	 * @return Explorer working on this source
+	 */
+	public SourceExplorer getExplorer() {
+		return new DirExplorer(getDesc().getId());
 	}
 }

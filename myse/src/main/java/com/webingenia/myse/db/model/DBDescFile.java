@@ -49,6 +49,9 @@ public class DBDescFile implements Serializable {
 	@Column(name = "file_size")
 	private long fileSize;
 
+	@Column(name = "file_name")
+	private String fileName;
+
 	/**
 	 * If the file is a directory.
 	 */
@@ -117,6 +120,23 @@ public class DBDescFile implements Serializable {
 		this.fileSize = fileSize;
 	}
 
+	/**
+	 * Get the name of the file.
+	 * 
+	 * The name of the file is the name you would have on a POSIX OS. It is most
+	 * probably the last part of the path but this is not mandatory. The obvious
+	 * exception is Google Drive, where the path is an ID.
+	 * 
+	 * @return Name of the file
+	 */
+	public String getName() {
+		return fileName;
+	}
+
+	public void setName(String fileName) {
+		this.fileName = fileName;
+	}
+
 	public boolean isDirectory() {
 		return directory;
 	}
@@ -138,13 +158,7 @@ public class DBDescFile implements Serializable {
 	}
 
 	public String getExtension() {
-		String path = getPath();
-		int p = path.lastIndexOf(".");
-		return path.substring(p + 1).toLowerCase();
-	}
-
-	public String getName() {
-		String path = getPath();
+		String path = getName();
 		int p = path.lastIndexOf(".");
 		return path.substring(p + 1).toLowerCase();
 	}
@@ -231,11 +245,35 @@ public class DBDescFile implements Serializable {
 		return null;
 	}
 
-	public static List<DBDescFile> listFiles(DBDescSource s, boolean dir, int limit, EntityManager em) {
+	/**
+	 * List all files with the ones to analyse first.
+	 *
+	 * @param source Source
+	 * @param dir Directory
+	 * @param nb Number of files to fetch
+	 * @param em EntityManager instance (JPA)
+	 * @return List of files
+	 */
+	public static List<DBDescFile> listFilesAll(DBDescSource source, boolean dir, int nb, EntityManager em) {
 		return em.createQuery("SELECT f FROM DBDescFile f WHERE f.source = :source AND f.directory = :dir ORDER BY f.toAnalyse DESC, f.nextAnalysis ASC", DBDescFile.class)
-				.setParameter("source", s)
+				.setParameter("source", source)
 				.setParameter("dir", dir)
-				.setMaxResults(limit)
+				.setMaxResults(nb)
+				.getResultList();
+	}
+
+	/**
+	 * List all files that need to be analysed.
+	 *
+	 * @param s Source
+	 * @param nb Number of files to fetch
+	 * @param em EntityManager instance (JPA)
+	 * @return List of files
+	 */
+	public static List<DBDescFile> listFilesToAnalyse(DBDescSource s, int nb, EntityManager em) {
+		return em.createQuery("SELECT f FROM DBDescFile f WHERE f.source = :source AND f.toAnalyse = true ORDER BY f.nextAnalysis ASC", DBDescFile.class)
+				.setParameter("source", s)
+				.setMaxResults(nb)
 				.getResultList();
 	}
 
@@ -246,6 +284,7 @@ public class DBDescFile implements Serializable {
 			df = new DBDescFile();
 			df.setSource(file.getSource().getDesc());
 			df.setPath(file.getPath());
+			df.setName(file.getName());
 			df.setDirectory(file.isDirectory());
 			df.setDocId(df.generateDocId());
 		}
@@ -255,7 +294,7 @@ public class DBDescFile implements Serializable {
 
 	@Override
 	public String toString() {
-		return "DescFile{" + getPath() + "}";
+		return String.format("DescFile{path=\"%s\", name=\"%s\"}", getPath(), getName());
 	}
 
 	public void performingAnalysis() {

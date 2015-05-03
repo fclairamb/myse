@@ -1,8 +1,12 @@
 package com.webingenia.myse.access;
 
-// TODO: Allow to add some generic real-time monitoring of file modifications
+/**
+ * Realtime monitoring of files modifications.
+ *
+ */
 public abstract class Monitor {
 
+	// TODO: Allow to add some generic real-time monitoring of file modifications
 	public static interface FileEventListener {
 
 	}

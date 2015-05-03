@@ -6,31 +6,14 @@ import com.webingenia.myse.access.File;
 import com.webingenia.myse.access.Source;
 import com.webingenia.myse.common.EventsNotifier;
 import static com.webingenia.myse.common.LOG.LOG;
-import com.webingenia.myse.common.RunnableCancellable;
-import com.webingenia.myse.db.DBMgmt;
 import com.webingenia.myse.db.model.Config;
 import com.webingenia.myse.db.model.DBDescFile;
-import com.webingenia.myse.db.model.DBDescSource;
-import java.util.Map;
-import java.util.regex.Pattern;
 import javax.persistence.EntityManager;
-import org.elasticsearch.common.base.Strings;
 
-public class DirExplorer extends RunnableCancellable {
+public class DirExplorer extends SourceExplorer {
 
-	private final Source source;
-
-	public DirExplorer(Source source) {
-		this.source = source;
-	}
-
-	private boolean confLogDirsExploration;
-	private int confNbFilesToFetch;
-
-	private void fetchSettings() {
-
-		confLogDirsExploration = Config.get(CONF_LOG_NEW_DIRS, false, true);
-		confNbFilesToFetch = Config.get(CONF_NB_FILES_TO_FETCH, 100, true);
+	public DirExplorer(long sourceId) {
+		super(sourceId);
 	}
 
 	private static final String PRE = "direxplorer.";
@@ -39,91 +22,78 @@ public class DirExplorer extends RunnableCancellable {
 
 	public static final String CONF_NB_FILES_TO_FETCH = PRE + "nb_files_to_fetch";
 
-	public static Pattern compileWildcardRule(String wildCard) {
-		StringBuilder sb = new StringBuilder();
-
-		int count = 0;
-		for (String s : wildCard.split(",")) {
-			s = s.trim(); // We remove space
-			if (count++ > 0) {
-				sb.append("|");
-			}
-			sb.append(s.replace(".", "\\.").replace("*", ".*"));
-		}
-
-		return Pattern.compile(sb.toString(), Pattern.CASE_INSENSITIVE);
-	}
-
-	Pattern patternInclude, patternExclude;
+	protected boolean confLogDirsExploration;
+	protected int confNbFilesToFetch;
 
 	@Override
-	public void run() {
+	protected void fetchSettings() {
+		super.fetchSettings(); //To change body of generated methods, choose Tools | Templates.
+		confLogDirsExploration = Config.get(CONF_LOG_NEW_DIRS, false, true);
+		confNbFilesToFetch = Config.get(CONF_NB_FILES_TO_FETCH, 100, true);
+	}
 
-		{ // We compile the patterns at each run (because they might be run again)
-			Map<String, String> properties = source.getDesc().getProperties();
-			String strPatternInclude = properties.get(Source.PROP_FILENAME_INCLUDE);
-			String strPatternExclude = properties.get(Source.PROP_FILENAME_EXCLUDE);
-			patternInclude = Strings.isNullOrEmpty(strPatternInclude) ? null : compileWildcardRule(strPatternInclude);
-			patternExclude = Strings.isNullOrEmpty(strPatternExclude) ? null : compileWildcardRule(strPatternExclude);
-		}
+	private long MAX_RUNNING_TIME = 60000L;
 
-		fetchSettings();
-		if (! source.getDesc().doIndex()) {
-			return;
-		}
-		LOG.info("DirExplorer on " + source + " : STARTING !");
-		EntityManager em = DBMgmt.getEntityManager();
-		DBDescSource sd = source.getDesc();
+	@Override
+	public void explorerRun(EntityManager em) {
+		long start = System.currentTimeMillis();
 		try {
-			em.getTransaction().begin();
-
-			try { // We always start by a root dir analysis
-				File rootDir = source.getRootDir();
-				DBDescFile df = DBDescFile.getOrCreate(rootDir, em);
-				analyseFile(df, em, true);
-			} finally {
-				em.getTransaction().commit();
+			fetchSettings();
+			if (!source.getDesc().doIndex()) {
+				return;
 			}
+
+//			// We always start by a root dir analysis
+			File rootDir = source.getRootDir();
+			if ( rootDir == null ) {
+				LOG.error("{}: Could not get a rootdir !", this);
+				return;
+			}
+			DBDescFile df = DBDescFile.getOrCreate(rootDir, em);
+			analyseFile(source, df, rootDir, em, true);
 
 			boolean again = true;
 
-			for (int pass = 0; pass < 3 && again; pass++) {
+			for (int pass = 0; pass < 3 && again && (System.currentTimeMillis() - start) < MAX_RUNNING_TIME; pass++) {
 				if (confLogDirsExploration) {
 					LOG.info("Analysis pass {}", pass);
 				}
 				// We analyse all the previously listed dirs
-				em.getTransaction().begin();
-				try {
-					for (DBDescFile desc : DBDescFile.listFiles(sd, true, confNbFilesToFetch, em)) {
-						if (!Main.running()) {
-							LOG.warn("Bye bye !");
-							return;
-						}
-						if (analyseFile(desc, em, true)) {
-							again = true;
-						}
+				for (DBDescFile desc : DBDescFile.listFilesAll(dbSource, true, confNbFilesToFetch, em)) {
+					if (!Main.running()) {
+						LOG.warn("Bye bye !");
+						return;
 					}
-				} finally {
-					em.getTransaction().commit();
+					if (analyseFile(source, desc, em, true)) {
+						again = true;
+					}
 				}
 			}
 		} catch (AccessException ex) {
-			sd.setState(AccessException.AccessState.DENIED);
+			if (dbSource != null) {
+				dbSource.setState(AccessException.AccessState.DENIED);
+			}
 			LOG.error("DirExplorer issue", ex);
 		} catch (Exception ex) {
+			if (dbSource != null) {
+				dbSource.setState(AccessException.AccessState.ERROR);
+			}
 			LOG.error("DirExplorer issue", ex);
-			sd.setState(AccessException.AccessState.ERROR);
-		} finally {
-			em.close();
 		}
 	}
 
-	private boolean analyseFile(DBDescFile desc, EntityManager em, boolean sub) throws Exception {
+	private boolean analyseFile(Source source, DBDescFile desc, EntityManager em, boolean sub) throws Exception {
+		return analyseFile(source, desc, null, em, sub);
+	}
+
+	private boolean analyseFile(Source source, DBDescFile desc, File file, EntityManager em, boolean sub) throws Exception {
 		if (!Main.running()) {
 			LOG.warn("Bye bye !");
 			return false;
 		}
-		File file = source.getFile(desc.getPath());
+		if (file == null) {
+			file = source.getFile(desc.getPath());
+		}
 		boolean dir = file.isDirectory();
 		if (confLogDirsExploration) {
 			LOG.info("[{}] Analysing {} \"{}\" : {}", dir ? "dir" : "file", source, file.getPath(), file.getLastModified());
@@ -180,7 +150,7 @@ public class DirExplorer extends RunnableCancellable {
 						}
 						try {
 							DBDescFile df = DBDescFile.getOrCreate(f, em);
-							if (analyseFile(df, em, false)) {
+							if (analyseFile(source, df, f, em, false)) {
 								again = true;
 							}
 						} catch (AccessException ex) {
@@ -199,5 +169,10 @@ public class DirExplorer extends RunnableCancellable {
 		em.persist(desc);
 
 		return again;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("DirExplorer{%s}", source);
 	}
 }

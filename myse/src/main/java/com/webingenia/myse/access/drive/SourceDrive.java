@@ -3,26 +3,33 @@ package com.webingenia.myse.access.drive;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.About;
+import com.google.api.services.drive.model.FileList;
 import com.webingenia.myse.access.AccessException;
 import com.webingenia.myse.access.File;
 import com.webingenia.myse.access.Source;
-import com.webingenia.myse.db.DBMgmt;
+import com.webingenia.myse.access.SourceEditingContext;
+import static com.webingenia.myse.common.LOG.LOG;
 import com.webingenia.myse.db.model.DBDescSource;
-import com.webingenia.myse.desktop.Browser;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import javax.persistence.EntityManager;
 
+/**
+ * Google drive source implementation. Fetches all the files from google drive.
+ */
 public class SourceDrive extends Source {
 
 	public static final String TYPE = "gdrive",
@@ -31,9 +38,11 @@ public class SourceDrive extends Source {
 			PROP_ACCESS_TOKEN = "access_token",
 			PROP_REFRESH_TOKEN = "refresh_token";
 
-	public static final String OAUTH_CLIENT_ID = "387222605329-591p43omt8atr1lcmfm65kgeaaaerq2e.apps.googleusercontent.com",
-			OAUTH_CLIENT_SECRET = "xovxNSNQDHKMXeZHJST8k3fk",
+	public static final String OAUTH_CLIENT_ID = "387222605329-8uivjucupiajrg4ed0v2flm6kquon46d.apps.googleusercontent.com",
+			OAUTH_CLIENT_SECRET = "flyEB2wXpC1MdLWwip-pVt1h",
 			OAUTH_REDIRECT_URI = "http://localhost:10080/oauth/";
+
+	static final boolean DEBUG = true;
 
 	public SourceDrive(DBDescSource desc) {
 		super(desc);
@@ -42,7 +51,8 @@ public class SourceDrive extends Source {
 	@Override
 	public File getRootDir() throws AccessException {
 		try {
-			return new FileDrive("D:" + getAbout().getRootFolderId(), this);
+			About a = getAbout();
+			return (a != null) ? new FileDrive(a.getRootFolderId(), true, this) : null;
 		} catch (IOException ex) {
 			throw new AccessException(AccessException.AccessState.ERROR, ex);
 		}
@@ -52,7 +62,8 @@ public class SourceDrive extends Source {
 
 	private About getAbout() throws IOException {
 		if (about == null) {
-			about = getDrive().about().get().execute();
+			Drive drive = getDrive();
+			about = drive != null ? drive.about().get().execute() : null;
 		}
 		return about;
 	}
@@ -69,7 +80,7 @@ public class SourceDrive extends Source {
 	public List<PropertyDescription> getProperties() {
 		ArrayList<PropertyDescription> list = new ArrayList<>();
 		list.addAll(Arrays.asList(
-				new PropertyDescription(PROP_CODE, PropertyDescription.Type.TEXT, "Google drive authorization code")
+				new PropertyDescription(PROP_CODE, PropertyDescription.Type.TEXT, "Google drive authorization code", null, "Will be filled after you save")
 		//new PropertyDescription(PROP_PATH, PropertyDescription.Type.TEXT, "Path of the directory to index")
 		));
 		list.addAll(getSharedProperties());
@@ -80,10 +91,12 @@ public class SourceDrive extends Source {
 	JsonFactory jsonFactory = new JacksonFactory();
 
 	@Override
-	public void postSave() {
+	public void postSave(SourceEditingContext context) {
 		DBDescSource dbSource = getDesc();
-		String url = getAuthCodeFlow().newAuthorizationUrl().setRedirectUri(OAUTH_REDIRECT_URI + "?source_id=" + dbSource.getId()).build();
-		Browser.show(url);
+		if (Strings.isNullOrEmpty(getCode())) {
+			context.ok = false;
+			context.nextUrl = getAuthCodeFlow().newAuthorizationUrl().setRedirectUri(OAUTH_REDIRECT_URI + "?source_id=" + dbSource.getId()).build();
+		}
 	}
 
 	GoogleAuthorizationCodeFlow codeFlow;
@@ -92,8 +105,8 @@ public class SourceDrive extends Source {
 		if (codeFlow == null) {
 			codeFlow = new GoogleAuthorizationCodeFlow.Builder(
 					httpTransport, jsonFactory, OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, Arrays.asList(DriveScopes.DRIVE))
-					.setAccessType("online")
-					.setApprovalPrompt("auto").build();
+					.setAccessType("offline")
+					.build();
 		}
 		return codeFlow;
 	}
@@ -110,35 +123,99 @@ public class SourceDrive extends Source {
 	private Drive driveService;
 
 	Drive getDrive() throws IOException {
+		return getDrive(0);
+	}
+
+	Drive getDrive(int attempt) throws IOException {
+		if (attempt > 3) {
+			return null;
+		}
 		if (driveService == null) {
-			EntityManager em = DBMgmt.getEntityManager();
-			try {
-				em.getTransaction().begin();
-				DBDescSource dbSource = getDesc();
+			DBDescSource dbSource = getDesc();
+
+			Map<String, String> props = dbSource.getProperties();
+
+			if (props.containsKey(PROP_CODE)) {
 				GoogleCredential credential;
-				Map<String, String> props = dbSource.getProperties();
 				if (!props.containsKey(PROP_ACCESS_TOKEN)) {
-					GoogleTokenResponse response = getAuthCodeFlow().newTokenRequest(getCode()).setRedirectUri(OAUTH_REDIRECT_URI + "?source_id=" + dbSource.getId()).execute();
-					credential = new GoogleCredential().setFromTokenResponse(response);
-					String accessToken = credential.getAccessToken();
-					props.put(PROP_ACCESS_TOKEN, accessToken);
-					String refreshToken = credential.getRefreshToken();
-					if (refreshToken != null) {
-						props.put(PROP_REFRESH_TOKEN, refreshToken);
-					} else {
-						props.remove(PROP_REFRESH_TOKEN);
+					try {
+						GoogleTokenResponse response = getAuthCodeFlow().newTokenRequest(getCode()).setRedirectUri(OAUTH_REDIRECT_URI + "?source_id=" + dbSource.getId()).execute();
+						props.put(PROP_ACCESS_TOKEN, response.getAccessToken());
+						props.put(PROP_REFRESH_TOKEN, response.getRefreshToken());
+					} catch (Exception ex) {
+						LOG.warn("Issue while fetching drive credentials", ex);
+						props.remove(PROP_CODE);
+						return getDrive(attempt + 1);
 					}
-					em.persist(dbSource);
-				} else {
-					credential = new GoogleCredential().setAccessToken(props.get(PROP_ACCESS_TOKEN)).setRefreshToken(props.get(PROP_REFRESH_TOKEN));
 				}
-				driveService = new Drive.Builder(httpTransport, jsonFactory, credential).build();
-			} finally {
-				em.getTransaction().commit();
-				em.close();
+				credential = new GoogleCredential.Builder().setJsonFactory(jsonFactory).setTransport(httpTransport).setClientSecrets(OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET).build();
+				credential.setAccessToken(props.get(PROP_ACCESS_TOKEN));
+				credential.setRefreshToken(props.get(PROP_REFRESH_TOKEN));
+				Drive drive = new Drive.Builder(httpTransport, jsonFactory, credential).build();
+				try {
+					about = drive.about().get().execute();
+				} catch (GoogleJsonResponseException ex) {
+					props.remove(PROP_ACCESS_TOKEN);
+					return getDrive(attempt + 1);
+				}
+				driveService = drive;
 			}
 		}
 		return driveService;
 	}
 
+	private final SourceDrive self = this;
+
+	public class FilesLister implements Iterator<File> {
+
+		private String pageToken;
+
+		private LinkedList<File> files = new LinkedList<>();
+
+		private void fetch() throws IOException {
+			FileList list = getDrive().files().list().setPageToken(pageToken).execute();
+			pageToken = list.getNextPageToken();
+			List<com.google.api.services.drive.model.File> items = list.getItems();
+			if (items.isEmpty()) {
+				files = null;
+			} else {
+				for (com.google.api.services.drive.model.File f : items) {
+					files.add(new FileDrive(f, self));
+				}
+			}
+		}
+
+		@Override
+		public boolean hasNext() {
+			try {
+				if (files.isEmpty()) {
+					fetch();
+				}
+			} catch (Exception ex) {
+				LOG.error("FilesLister", ex);
+			}
+			return files != null;
+		}
+
+		@Override
+		public File next() {
+			return files.poll();
+		}
+
+	}
+
+	public Iterable<File> getFilesLister() {
+		return new Iterable<File>() {
+
+			@Override
+			public Iterator<File> iterator() {
+				return new FilesLister();
+			}
+		};
+	}
+
+//	@Override
+//	public SourceExplorer getExplorer() {
+//		return new DriveExplorer(getDesc().getId());
+//	}
 }

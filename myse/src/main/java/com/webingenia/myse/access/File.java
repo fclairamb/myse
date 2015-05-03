@@ -67,10 +67,18 @@ public abstract class File {
 
 	@Override
 	public String toString() {
-		return "File{" + getSource() + ":" + getPath() + "}";
+		return String.format("File{%s (%s)}", getPath(), getSource());
 	}
 
-	public String getName() {
+	/**
+	 * Get the name of the file. It is not necessarly the end of the path. Some
+	 * source implementations can have ID in the path, this function must still
+	 * return the name of the original file.
+	 *
+	 * @return Name of the file
+	 * @throws AccessException
+	 */
+	public String getName() throws AccessException {
 		String path = getPath();
 		int p = path.lastIndexOf("/");
 		return path.substring(p + 1);

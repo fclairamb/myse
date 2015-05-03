@@ -1,6 +1,5 @@
 package com.webingenia.myse.webserver.servlets;
 
-import com.webingenia.myse.access.AccessException;
 import com.webingenia.myse.access.File;
 import com.webingenia.myse.access.Source;
 import static com.webingenia.myse.common.LOG.LOG;
@@ -10,8 +9,6 @@ import com.webingenia.myse.db.model.DBDescSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -46,7 +43,7 @@ public class PageDownload extends HttpServlet {
 				}
 			}
 		} catch (Exception ex) {
-			LOG.error("Could not access " + sSource + ":" + path, ex);
+			LOG.error("Could not access {}", docId);
 		} finally {
 			em.close();
 		}

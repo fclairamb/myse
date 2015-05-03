@@ -16,7 +16,7 @@ public class FileSMB extends File {
 	private final SmbFile file;
 	private final SourceSMB source;
 
-	public FileSMB(SmbFile file, SourceSMB source) {
+	FileSMB(SmbFile file, SourceSMB source) {
 		this.file = file;
 		this.source = source;
 	}

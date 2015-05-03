@@ -27,28 +27,37 @@ import org.xml.sax.ContentHandler;
 
 public class FileIndexer extends RunnableCancellable {
 
-	private final Source source;
+	private final long sourceId;
 
-	public FileIndexer(Source source) {
-		this.source = source;
+	public FileIndexer(long sourceId) {
+		this.sourceId = sourceId;
 	}
 
+	private final boolean reAnalyse = true;
+
+	private static final int FILES_TO_FETCH = 100;
+
+	DBDescSource dbSource;
+	Source source;
+	
 	@Override
 	public void run() {
 		EntityManager em = DBMgmt.getEntityManager();
-		Client esClient = ElasticSearch.client();
-		try {
+		dbSource = DBDescSource.get(sourceId, em);
+		source = Source.get(dbSource);
+		try (Client esClient = ElasticSearch.client()) {
 			if (!source.getDesc().doIndex()) {
 				return;
 			}
 			LOG.info("FileIndexer on " + source + " : STARTING !");
-			for (DBDescFile desc : DBDescFile.listFiles(source.getDesc(), false, 300, em)) {
+			for (DBDescFile desc : reAnalyse ? DBDescFile.listFilesAll(source.getDesc(), false, FILES_TO_FETCH, em) : DBDescFile.listFilesToAnalyse(dbSource, FILES_TO_FETCH, em)) {
 				if (!Main.running()) {
 					LOG.warn("Bye bye !");
 					return;
 				}
-				analyseFile(desc, em, esClient);
+				analyseFile(source, desc, em, esClient);
 			}
+			LOG.info(("FileIndexer: ENDED !"));
 		} catch (Exception ex) {
 			LOG.error("FileIndexer.run", ex);
 		} finally {
@@ -59,12 +68,11 @@ public class FileIndexer extends RunnableCancellable {
 	private final ParseContext context = new ParseContext();
 
 	public static final String ES_DOC_TYPE = "Document";
-	//public static final String ES_INDEX_NAME = "all";
 
 	public static final int VERSION = 1;
 
-	private void analyseFile(DBDescFile desc, EntityManager em, Client esClient) {
-		LOG.info("Analysing " + desc);
+	private void analyseFile(Source source, DBDescFile desc, EntityManager em, Client esClient) {
+		LOG.info("{}: Analysing {}", this, desc);
 
 		try {
 			try {
@@ -101,9 +109,7 @@ public class FileIndexer extends RunnableCancellable {
 					Map<String, Object> data = new HashMap<>();
 					String title = metadata.get(TikaCoreProperties.TITLE);
 					if (title == null || title.trim().isEmpty()) {
-						title = desc.getPath();
-						title = title.substring(title.lastIndexOf("/") + 1);
-						title = title.substring(title.lastIndexOf("\"") + 1);
+						title = desc.getName();
 					}
 					data.put("title", title);
 					data.put("name", desc.getName());
@@ -121,7 +127,7 @@ public class FileIndexer extends RunnableCancellable {
 					}
 					IndexRequest req = new IndexRequestBuilder(esClient).setIndex(ds.getShortName()).setType(ES_DOC_TYPE).setId(docId).setSource(data).request();
 					boolean created = esClient.index(req).actionGet().isCreated();
-					LOG.info("Document {} {} !", docId, created ? "created" : "updated");
+					LOG.info("{}: Document {} {} !", this, docId, created ? "created" : "updated");
 				} catch (Exception ex) {
 					// If anything happens, we need to save it !
 					desc.performingAnalysis();
@@ -136,4 +142,9 @@ public class FileIndexer extends RunnableCancellable {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return String.format("FileIndexer{%s}", source);
+	}
+	
 }

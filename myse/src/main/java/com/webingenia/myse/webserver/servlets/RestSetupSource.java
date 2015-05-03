@@ -4,11 +4,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.webingenia.myse.Indexation;
 import com.webingenia.myse.access.Source;
+import com.webingenia.myse.access.SourceEditingContext;
+import com.webingenia.myse.access.dbox.SourceDBox;
 import com.webingenia.myse.access.disk.SourceDisk;
 import com.webingenia.myse.access.drive.SourceDrive;
 import com.webingenia.myse.access.smb.SourceSMB;
 import com.webingenia.myse.access.vfs.SourceVFS;
-import com.webingenia.myse.common.LOG;
 import com.webingenia.myse.db.DBMgmt;
 import com.webingenia.myse.db.model.DBDescSource;
 import java.io.IOException;
@@ -25,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static com.webingenia.myse.common.LOG.LOG;
+import java.io.StringWriter;
 
 public class RestSetupSource extends HttpServlet {
 
@@ -74,8 +76,9 @@ public class RestSetupSource extends HttpServlet {
 	private Object doProcessEdit(Context context) {
 		context.em.getTransaction().begin();
 		DBDescSource dbSource;
+		boolean newSource = false;
 		try {
-			boolean newSource = false;
+
 			if (context.input.containsKey("_id")) {
 				long id = Long.parseLong((String) context.input.get("_id"));
 				dbSource = DBDescSource.get(id, context.em);
@@ -92,17 +95,20 @@ public class RestSetupSource extends HttpServlet {
 				source.preSave();
 			}
 			context.em.persist(dbSource);
-			if (newSource) {
-				Indexation.start(Source.get(dbSource));
+
+			SourceEditingContext editContext = new SourceEditingContext();
+//		editContext.httpSession = context.req.getSession();
+			{ // We let the source apply its post-saving logic
+				Source source = Source.get(dbSource);
+				source.postSave(editContext);
+				if (newSource) {
+					Indexation.start(dbSource);
+				}
 			}
+			return editContext;
 		} finally {
 			context.em.getTransaction().commit();
 		}
-		{ // We let the source apply its post-saving logic
-			Source source = Source.get(dbSource);
-			source.postSave();
-		}
-		return dbSource.asMap();
 	}
 
 	private Object doProcessDesc(Context context) {
@@ -159,7 +165,8 @@ public class RestSetupSource extends HttpServlet {
 			new SourceType(SourceSMB.TYPE, "Samba"),
 			new SourceType(SourceVFS.TYPE, "VFS"),
 			new SourceType(SourceDisk.TYPE, "Disk"),
-			new SourceType(SourceDrive.TYPE, "Google Drive")
+			new SourceType(SourceDrive.TYPE, "Google Drive"),
+			new SourceType(SourceDBox.TYPE, "Dropbox")
 		};
 	}
 
@@ -206,10 +213,9 @@ public class RestSetupSource extends HttpServlet {
 			} catch (Exception ex) {
 				Map<String, Object> core = new HashMap<>();
 				{
-					Map<String, Object> exception = new HashMap<>();
-					core.put("exception", exception);
-					exception.put("class", ex.getClass().toString());
-					exception.put("message", ex.getMessage());
+					StringWriter errors = new StringWriter();
+					ex.printStackTrace(new PrintWriter(errors));
+					core.put("exception", errors.toString());
 				}
 				output = core;
 				LOG.error("Error processing REST", ex);
