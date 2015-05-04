@@ -2,7 +2,9 @@ package io.myse.webserver.servlets;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.myse.common.LOG;
+import io.myse.common.Files;
+import static io.myse.common.LOG.LOG;
+import io.myse.common.Paths;
 import io.myse.db.DBMgmt;
 import io.myse.db.model.DBDescSource;
 import io.myse.embeddedes.ElasticSearch;
@@ -32,11 +34,19 @@ public class RestStats extends HttpServlet {
 		public long docsDeletedCount;
 	}
 
+	public static class Stats {
+
+		List<SourceStats> sources;
+		public long totalSize;
+		public long esSize;
+		public long logsSize;
+		public long h2Size;
+	}
+
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		Object output;
-		List<SourceStats> list = new ArrayList<>();
-		output = list;
+		Stats stats = new Stats();
+		stats.sources = new ArrayList<>();
 
 		EntityManager em = DBMgmt.getEntityManager();
 		try (Client esClt = ElasticSearch.client()) {
@@ -44,33 +54,40 @@ public class RestStats extends HttpServlet {
 				try {
 					DBDescSource dbSource = DBDescSource.get(indexName, em);
 					SourceStats indexStats = new SourceStats();
-					list.add(indexStats);
-					IndicesStatsResponse stats = esClt.admin().indices().prepareStats()
+					stats.sources.add(indexStats);
+					IndicesStatsResponse isr = esClt.admin().indices().prepareStats()
 							.clear()
 							.setIndices(indexName)
 							.setStore(true)
 							.setDocs(true)
 							.execute().actionGet();
-					long size = stats.getTotal().getStore().getSize().bytes();
+					long size = isr.getTotal().getStore().getSize().bytes();
 					if (dbSource != null) {
 						indexStats.name = dbSource.getName();
 					}
 					indexStats.shortName = indexName;
 					indexStats.size = size;
-					indexStats.docsCount = stats.getTotal().getDocs().getCount();
-					indexStats.docsDeletedCount = stats.getTotal().getDocs().getDeleted();
+					indexStats.docsCount = isr.getTotal().getDocs().getCount();
+					indexStats.docsDeletedCount = isr.getTotal().getDocs().getDeleted();
 				} catch (Exception ex) {
-					LOG.LOG.warn("Stats", ex);
+					LOG.warn("Stats", ex);
 				}
 			}
 
 			long total = 0;
-			for (SourceStats stats : list) {
-				total += stats.size;
+			for (SourceStats ss : stats.sources) {
+				total += ss.size;
 			}
-			for (SourceStats stats : list) {
-				stats.sizePercentage = total != 0 ? (int) (stats.size * 100 / total) : 0;
+			for (SourceStats ss : stats.sources) {
+				ss.sizePercentage = total != 0 ? (int) (ss.size * 100 / total) : 0;
 			}
+
+			stats.h2Size = Files.sizeR(Paths.getH2Dir());
+			stats.esSize = Files.sizeR(Paths.getESDir());
+			stats.logsSize = Files.sizeR(Paths.getLogsDir());
+			stats.totalSize = Files.sizeR(Paths.getAppDir());
+		} catch (Exception ex) {
+			LOG.error("RestStats", ex);
 		} finally {
 			em.close();
 		}
@@ -78,7 +95,7 @@ public class RestStats extends HttpServlet {
 		{ // The response
 			resp.setContentType("application/json; charset=utf8");
 			try (PrintWriter out = resp.getWriter()) {
-				out.write(gson.toJson(output));
+				out.write(gson.toJson(stats));
 			}
 		}
 	}

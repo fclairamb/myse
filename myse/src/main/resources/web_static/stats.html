@@ -9,7 +9,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="s in stats.all">
+		<tr ng-repeat="s in stats.data.sources">
 			<td>{{ s.name}}</td>
 			<td>{{ s.docsCount}}</td>
 			<td>{{ s.size | filesize }} - {{ s.sizePercentage}}%</td>
@@ -18,7 +18,34 @@
 </table>
 
 <div class="progress">
-	<div ng-repeat="s in stats.all track by $index" class="progress-bar" ng-class="{ 'progress-bar-success': ($index % 2 == 0)}" role="progressbar" aria-valuenow="{{ s.sizePercentage}}" aria-valuemin="0" aria-valuemax="100" style="width: {{ s.sizePercentage}}%;">
+	<div ng-repeat="s in stats.data.sources track by $index" class="progress-bar" ng-class="{ 'progress-bar-success': ($index % 2 == 0)}" role="progressbar" aria-valuenow="{{ s.sizePercentage}}" aria-valuemin="0" aria-valuemax="100" style="width: {{ s.sizePercentage}}%;">
 		{{ s.name}} ({{ s.sizePercentage}}%)
 	</div>
 </div>
+
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Size</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>H2</td>
+			<td>{{ stats.data.h2Size | filesize }}</td>
+		</tr>
+		<tr>
+			<td>ES</td>
+			<td>{{ stats.data.esSize | filesize }}</td>
+		</tr>
+		<tr>
+			<td>Logs</td>
+			<td>{{ stats.data.logsSize | filesize }}</td>
+		</tr>
+		<tr>
+			<td><strong>TOTAL</strong></td>
+			<td><strong>{{ stats.data.totalSize | filesize }}</strong></td>
+		</tr>
+	</tbody>
+</table>

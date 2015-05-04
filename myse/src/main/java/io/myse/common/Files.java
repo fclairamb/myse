@@ -32,4 +32,17 @@ public class Files {
 		}
 		return ok;
 	}
+
+	public static long sizeR(File file) {
+		if (file.isDirectory()) {
+			long total = 0;
+			File[] files = file.listFiles();
+			for (File f : files) {
+				total += sizeR(f);
+			}
+			return total;
+		} else {
+			return file.length();
+		}
+	}
 }

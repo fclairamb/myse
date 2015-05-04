@@ -59,6 +59,14 @@ public class Paths {
 		return file;
 	}
 
+	public static File getH2Dir() {
+		File file = new File(getAppDir(), "h2");
+		if (!file.exists()) {
+			file.mkdir();
+		}
+		return file;
+	}
+
 	public static File getCacheDir() {
 		File file = new File(getAppDir(), "cache");
 		if (!file.exists()) {
