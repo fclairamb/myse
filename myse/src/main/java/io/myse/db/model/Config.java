@@ -91,6 +91,14 @@ public class Config implements Serializable {
 		}
 	}
 
+	public String getName() {
+		return name;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
 	@Override
 	public String toString() {
 		return name + "=" + value;

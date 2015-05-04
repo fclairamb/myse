@@ -16,7 +16,7 @@ public class Indexation {
 		}
 		ElasticSearch.prepare(dbSource);
 		Source source = Source.get(dbSource);
-		Tasks.scheduleWithFixedDelay(source.getExplorer(), 0, 10, TimeUnit.SECONDS);
-		Tasks.scheduleWithFixedDelay(new FileIndexer(dbSource.getId()), 5, 30, TimeUnit.SECONDS);
+		Tasks.schedule(source.getExplorer());
+		Tasks.schedule(new FileIndexer(dbSource.getId()));
 	}
 }

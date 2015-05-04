@@ -10,8 +10,11 @@ import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 
 import static io.myse.common.LOG.LOG;
+import io.myse.common.Tasks;
+import io.myse.exploration.SourcesDeleter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.hppc.cursors.ObjectCursor;
@@ -96,5 +99,9 @@ public class ElasticSearch {
 
 	public static Client client() {
 		return node.client();
+	}
+	
+	public static void planCleanup() {
+		Tasks.getService().schedule(new SourcesDeleter(), 2, TimeUnit.SECONDS);
 	}
 }

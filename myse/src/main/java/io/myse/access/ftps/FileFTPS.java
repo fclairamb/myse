@@ -3,7 +3,6 @@ package io.myse.access.ftps;
 import io.myse.access.AccessException;
 import io.myse.access.File;
 import io.myse.access.Source;
-import static io.myse.common.LOG.LOG;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -37,6 +36,11 @@ public class FileFTPS extends File {
 	@Override
 	public boolean isDirectory() throws AccessException {
 		return file.isDirectory() || path.equals("/");
+	}
+
+	@Override
+	public boolean exists() throws AccessException {
+		return file.isFile() || isDirectory();
 	}
 
 	@Override

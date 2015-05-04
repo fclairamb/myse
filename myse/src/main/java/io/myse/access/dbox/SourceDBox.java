@@ -13,6 +13,7 @@ import io.myse.access.SourceEditingContext;
 import io.myse.common.BuildInfo;
 import static io.myse.common.LOG.LOG;
 import io.myse.db.model.DBDescSource;
+import io.myse.exploration.SourceExplorer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -56,7 +57,7 @@ public class SourceDBox extends Source {
 	public List<PropertyDescription> getProperties() {
 		ArrayList<PropertyDescription> list = new ArrayList<>();
 		list.addAll(Arrays.asList(
-				new PropertyDescription(PROP_CODE, PropertyDescription.Type.TEXT, "Dropbox authorization code", null, "Will be filled after you save")
+				new PropertyDescription(PROP_CODE, PropertyDescription.Type.TEXT, "Dropbox authorization code", null, "Click on the save button and copy/paste the code")
 		));
 		list.addAll(getSharedProperties());
 		return list;
@@ -94,5 +95,10 @@ public class SourceDBox extends Source {
 				LOG.error("Dropbox exception", ex);
 			}
 		}
+	}
+
+	@Override
+	public SourceExplorer getExplorer() {
+		return new DBoxExplorer(desc.getId());
 	}
 }

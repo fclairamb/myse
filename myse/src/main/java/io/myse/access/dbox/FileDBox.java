@@ -18,6 +18,7 @@ public class FileDBox extends File {
 	private final SourceDBox source;
 	private String path;
 	private DbxEntry entry;
+	private boolean notFound;
 
 	FileDBox(String path, SourceDBox source) {
 		this.path = path;
@@ -30,14 +31,22 @@ public class FileDBox extends File {
 	}
 
 	private DbxEntry getEntry() throws AccessException {
-		if (entry == null) {
+		if (entry == null && !notFound) {
 			try {
 				entry = source.getClient().getMetadata(path);
+				if (entry == null) {
+					notFound = true;
+				}
 			} catch (DbxException ex) {
 				throw new AccessException(AccessException.AccessState.ERROR, ex);
 			}
 		}
 		return entry;
+	}
+
+	@Override
+	public boolean exists() throws AccessException {
+		return getEntry() != null;
 	}
 
 	@Override

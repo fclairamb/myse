@@ -3,151 +3,153 @@ package io.myse.exploration;
 import io.myse.Main;
 import io.myse.access.AccessException;
 import io.myse.access.File;
-import io.myse.access.Source;
-import io.myse.common.EventsNotifier;
 import static io.myse.common.LOG.LOG;
 import io.myse.db.model.Config;
 import io.myse.db.model.DBDescFile;
+import java.util.List;
 import javax.persistence.EntityManager;
 
+/**
+ * Directory explorer. This explorer is a multi-pass explorer. It will look into
+ * each directory of a source and list of the files.
+ */
 public class DirExplorer extends SourceExplorer {
 
 	public DirExplorer(long sourceId) {
 		super(sourceId);
+		delay = 500;
 	}
 
 	private static final String PRE = "direxplorer.";
 
 	public static final String CONF_LOG_NEW_DIRS = PRE + "log_new_dirs";
 
-	public static final String CONF_NB_FILES_TO_FETCH = PRE + "nb_files_to_fetch";
-
+	public static final String CONF_NB_DIRS_TO_WATCH_PER_PASS = PRE + "nb_dirs_to_watch_per_pass";
 	protected boolean confLogDirsExploration;
-	protected int confNbFilesToFetch;
+	protected int confNbDirsToWatchPerPass;
 
 	@Override
 	protected void fetchSettings() {
 		super.fetchSettings(); //To change body of generated methods, choose Tools | Templates.
-		confLogDirsExploration = Config.get(CONF_LOG_NEW_DIRS, false, true);
-		confNbFilesToFetch = Config.get(CONF_NB_FILES_TO_FETCH, 100, true);
+		confLogDirsExploration = Config.get(CONF_LOG_NEW_DIRS, true, true);
+		confNbDirsToWatchPerPass = Config.get(CONF_NB_DIRS_TO_WATCH_PER_PASS, 5, true);
 	}
-
-	private long MAX_RUNNING_TIME = 60000L;
 
 	@Override
 	public void explorerRun(EntityManager em) {
-		long start = System.currentTimeMillis();
 		try {
-			fetchSettings();
 			if (!source.getDesc().doIndex()) {
+				if (!source.getDesc().deleted()) {
+					LOG.warn("Source got deleted! Cancelling...");
+					cancel();
+				}
 				return;
 			}
 
-//			// We always start by a root dir analysis
-			File rootDir = source.getRootDir();
-			if (rootDir == null) {
-				LOG.error("{}: Could not get a rootdir !", this);
-				return;
-			}
-			DBDescFile df = getDbFile(rootDir, em);
-			analyseFile(source, df, rootDir, em, true);
+			List<DBDescFile> files = DBDescFile.listFilesAll(dbSource, true, confNbDirsToWatchPerPass, em);
 
-			boolean again = true;
+			int nbFiles = 0;
 
-			for (int pass = 0; pass < 3 && again && (System.currentTimeMillis() - start) < MAX_RUNNING_TIME; pass++) {
-				if (confLogDirsExploration) {
-					LOG.info("Analysis pass {}", pass);
+			if (files.isEmpty()) {
+				File rootDir = source.getRootDir();
+				if (rootDir == null) {
+					LOG.error("{}: Could not get a rootdir !", this);
+					return;
 				}
-				// We analyse all the previously listed dirs
-				for (DBDescFile desc : DBDescFile.listFilesAll(dbSource, true, confNbFilesToFetch, em)) {
-					if (!Main.running()) {
-						LOG.warn("Bye bye !");
-						return;
-					}
-					if (analyseFile(source, desc, em, true)) {
-						again = true;
-					}
-				}
+
+				DBDescFile df = getDbFile(rootDir, em);
+				nbFiles += analyseFile(df, rootDir, em);
 			}
+
+			// We analyse all the previously listed dirs
+			for (DBDescFile desc : files) {
+				if (!Main.running()) {
+					LOG.warn("Bye bye !");
+					return;
+				}
+				nbFiles += analyseFile(desc, em);
+			}
+
+			if (nbFiles < 1) {
+				delay += 50;
+			} else if (nbFiles > 1) {
+				delay -= 5000;
+			}
+
 		} catch (AccessException ex) {
 			if (dbSource != null) {
-				dbSource.setState(AccessException.AccessState.DENIED);
+				dbSource.setState(ex.state());
 			}
 			LOG.error("DirExplorer issue", ex);
+			delay += 10000;
 		} catch (Exception ex) {
 			if (dbSource != null) {
 				dbSource.setState(AccessException.AccessState.ERROR);
 			}
 			LOG.error("DirExplorer issue", ex);
+			delay += 20000;
 		}
 	}
 
-	private boolean analyseFile(Source source, DBDescFile desc, EntityManager em, boolean sub) throws Exception {
-		return analyseFile(source, desc, null, em, sub);
+	private static final long PERIOD_MIN = 100, PERIOD_MAX = 600000;
+
+	@Override
+	protected void after() {
+		if (delay < PERIOD_MIN) {
+			delay = PERIOD_MIN;
+		} else if (delay > PERIOD_MAX) {
+			delay = PERIOD_MAX;
+		}
+
+		super.after(); //To change body of generated methods, choose Tools | Templates.
 	}
 
-	private boolean analyseFile(Source source, DBDescFile desc, File file, EntityManager em, boolean sub) throws Exception {
+	protected int analyseFile(DBDescFile desc, EntityManager em) throws Exception {
+		return analyseFile(desc, source.getFile(desc.getPath()), em);
+	}
+
+	protected int analyseFile(DBDescFile desc, File file, EntityManager em) throws Exception {
 		if (!Main.running()) {
 			LOG.warn("Bye bye !");
-			return false;
+			return 0;
 		}
-		if (file == null) {
-			file = source.getFile(desc.getPath());
-		}
-		boolean dir = file.isDirectory();
 		if (confLogDirsExploration) {
-			LOG.info("[{}] Analysing {} \"{}\" : {}", dir ? "dir" : "file", source, file.getPath(), file.getLastModified());
+			LOG.info("[{}] Analysing {} \"{}\" : {}", file.isDirectory() ? "dir" : "file", source, file.getPath(), file.getLastModified());
 		}
 
-		if (mustSkip(file)) {
-			return false;
+		int nbNewFiles = 0;
+
+//		if (desc.getLastModified() == null) {
+//			nbNewFiles += 1;
+//		}
+		if (!file.exists()) {
+			em.remove(desc);
+			return 1;
 		}
 
-		boolean again = false;
+		desc.performingAnalysis();
 
-		if (desc.getLastModified() == null) {
-			again = true;
-		}
-
-		desc.setLastModified(file.getLastModified());
-		desc.setDirectory(dir);
-		if (!dir) {
-			desc.setSize(file.getSize());
-		}
-
-		desc.updateNextAnalysis();
-
-		if (dir) {
-			if (again) {
-				EventsNotifier.eventScanningNewDir(file);
-			}
-			if (sub) {
-				try {
-					desc.performingAnalysis();
-					for (File f : file.listFiles()) {
-						if (!Main.running()) {
-							LOG.warn("Bye bye !");
-							return false;
+		if (file.isDirectory()) {
+			try {
+				for (File f : file.listFiles()) {
+					try {
+						if (indexFile(f, em)) {
+							nbNewFiles += 1;
 						}
-						try {
-							DBDescFile df = getDbFile(f, em);
-							if (analyseFile(source, df, f, em, false)) {
-								again = true;
-							}
-						} catch (AccessException ex) {
-							LOG.warn("analyse.file: " + ex);
-						}
-					}
-				} catch (AccessException ex) {
-					LOG.warn("analyse.listing: " + ex);
-					if (ex.state() == AccessException.AccessState.UNKNOWN) {
-
+					} catch (AccessException ex) {
+						LOG.warn("analyse.file", ex);
 					}
 				}
+			} catch (AccessException ex) {
+				LOG.warn("analyse.listing", ex);
 			}
 		}
 
-		return again;
+		if (indexFile(desc, file, em)) {
+			nbNewFiles += 1;
+		}
+
+		return nbNewFiles;
 	}
 
 	@Override

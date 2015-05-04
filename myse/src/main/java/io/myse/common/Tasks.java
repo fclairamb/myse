@@ -1,9 +1,7 @@
 package io.myse.common;
 
 import static io.myse.common.LOG.LOG;
-import io.myse.common.RunnableCancellable;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
@@ -31,12 +29,8 @@ public class Tasks {
 		return tasks;
 	}
 
-	public static void scheduleWithFixedDelay(RunnableCancellable cmd,
-			long initialDelay,
-			long delay,
-			TimeUnit unit) {
-		ScheduledFuture<?> future = getService().scheduleWithFixedDelay(cmd, initialDelay, delay, unit);
-		cmd.setFuture(future);
+	public static void schedule(Runnable runnable) {
+		getService().schedule(runnable, 0, TimeUnit.SECONDS);
 	}
 
 	public static void stop() throws InterruptedException {

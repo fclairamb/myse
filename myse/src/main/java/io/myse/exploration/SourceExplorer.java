@@ -4,7 +4,7 @@ import io.myse.access.AccessException;
 import io.myse.access.File;
 import io.myse.access.Source;
 import static io.myse.common.LOG.LOG;
-import io.myse.common.RunnableCancellable;
+import io.myse.common.ReschedulingRunnable;
 import io.myse.db.DBMgmt;
 import io.myse.db.model.DBDescFile;
 import io.myse.db.model.DBDescSource;
@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 import javax.persistence.EntityManager;
 import org.elasticsearch.common.base.Strings;
 
-public abstract class SourceExplorer extends RunnableCancellable {
+public abstract class SourceExplorer extends ReschedulingRunnable {
 
 	private final long sourceId;
 
@@ -30,6 +30,9 @@ public abstract class SourceExplorer extends RunnableCancellable {
 
 	protected void init(EntityManager em) {
 		dbSource = DBDescSource.get(sourceId, em);
+		if ( dbSource == null ) {
+			cancel();
+		}
 		source = Source.get(dbSource);
 	}
 
@@ -80,13 +83,41 @@ public abstract class SourceExplorer extends RunnableCancellable {
 		}
 		return false;
 	}
-	
-	protected DBDescFile getDbFile(File file, EntityManager em ) throws AccessException {
+
+	protected boolean indexFile(DBDescFile desc, File file, EntityManager em) throws AccessException {
+		if (!file.exists()) {
+			em.remove(desc);
+			return true;
+		}
+
+		if (mustSkip(file)) {
+			return false;
+		}
+
+		boolean changed = desc.setLastModified(file.getLastModified());
+		desc.setDirectory(file.isDirectory());
+		if (!file.isDirectory()) {
+			desc.setSize(file.getSize());
+		}
+
+		desc.updateNextAnalysis();
+		return changed;
+	}
+
+	protected boolean indexFile(File file, EntityManager em) throws AccessException {
+		return indexFile(DBDescFile.getOrCreate(file, em), file, em);
+	}
+
+	protected DBDescFile getDbFile(File file, EntityManager em) throws AccessException {
 		return DBDescFile.getOrCreate(file, em);
 	}
 
+	protected File getSourceFile(DBDescFile file) throws AccessException {
+		return source.getFile(file.getPath());
+	}
+
 	@Override
-	public void run() {
+	public void actualRun() {
 		EntityManager em = DBMgmt.getEntityManager();
 		em.getTransaction().begin();
 		try {
@@ -94,9 +125,9 @@ public abstract class SourceExplorer extends RunnableCancellable {
 			fetchSettings();
 			LOG.info("{}: Starting exploration...", this);
 			explorerRun(em);
-			LOG.info("{}: Exploration ended...", this);
+			LOG.info("{}: Exploration ended... / delay = {}", this, delay);
 		} catch (Exception ex) {
-			LOG.error("Issues running explorerRun of {}", sourceId, ex);
+			LOG.error("{}: Issues running explorerRun", ex);
 		} finally {
 			em.getTransaction().commit();
 			em.close();

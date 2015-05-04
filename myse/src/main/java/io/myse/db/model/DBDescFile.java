@@ -2,11 +2,11 @@ package io.myse.db.model;
 
 import io.myse.access.AccessException;
 import io.myse.access.File;
+import io.myse.access.Source;
 import io.myse.common.Hashing;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
@@ -38,7 +38,7 @@ public class DBDescFile implements Serializable {
 	private long id;
 
 	@JoinColumn(name = "source_id")
-	@ManyToOne(cascade = CascadeType.REMOVE)
+	@ManyToOne()
 	private DBDescSource source;
 	/**
 	 * Path of the file
@@ -122,11 +122,11 @@ public class DBDescFile implements Serializable {
 
 	/**
 	 * Get the name of the file.
-	 * 
+	 *
 	 * The name of the file is the name you would have on a POSIX OS. It is most
 	 * probably the last part of the path but this is not mandatory. The obvious
 	 * exception is Google Drive, where the path is an ID.
-	 * 
+	 *
 	 * @return Name of the file
 	 */
 	public String getName() {
@@ -149,12 +149,14 @@ public class DBDescFile implements Serializable {
 		return dateMod;
 	}
 
-	public void setLastModified(Date date) {
+	public boolean setLastModified(Date date) {
 
 		if (dateMod == null || date.compareTo(dateMod) > 0) {
 			this.toAnalyse = true;
 			this.dateMod = date;
+			return true;
 		}
+		return false;
 	}
 
 	public String getExtension() {
@@ -193,13 +195,18 @@ public class DBDescFile implements Serializable {
 			nextAnalysis += Math.log(elapsed);
 		}
 
-		{ // And by its size
+		if (fileSize > 0) { // And by its size
 			nextAnalysis += Math.log(fileSize);
 		}
 
 		{ // And by its extension
 			int priority = extensionToPriority(getExtension());
 			nextAnalysis += priority;
+		}
+
+		// This should never happen
+		if (nextAnalysis < 0) {
+			nextAnalysis = 0;
 		}
 	}
 
@@ -228,9 +235,13 @@ public class DBDescFile implements Serializable {
 	}
 
 	public static DBDescFile get(File file, EntityManager em) {
+		return get(file.getSource(), file.getPath(), em);
+	}
+
+	public static DBDescFile get(Source source, String path, EntityManager em) {
 		for (DBDescFile f : em.createQuery("SELECT f FROM DBDescFile f WHERE f.source = :source AND f.filePath = :path", DBDescFile.class)
-				.setParameter("source", file.getSource().getDesc())
-				.setParameter("path", file.getPath()).getResultList()) {
+				.setParameter("source", source.getDesc())
+				.setParameter("path", path).getResultList()) {
 			return f;
 		}
 		return null;
@@ -266,13 +277,15 @@ public class DBDescFile implements Serializable {
 	 * List all files that need to be analysed.
 	 *
 	 * @param s Source
+	 * @param dir List directories
 	 * @param nb Number of files to fetch
 	 * @param em EntityManager instance (JPA)
 	 * @return List of files
 	 */
-	public static List<DBDescFile> listFilesToAnalyse(DBDescSource s, int nb, EntityManager em) {
-		return em.createQuery("SELECT f FROM DBDescFile f WHERE f.source = :source AND f.toAnalyse = true ORDER BY f.nextAnalysis ASC", DBDescFile.class)
+	public static List<DBDescFile> listFilesToAnalyse(DBDescSource s, boolean dir, int nb, EntityManager em) {
+		return em.createQuery("SELECT f FROM DBDescFile f WHERE f.source = :source AND f.directory = :dir AND f.toAnalyse = true ORDER BY f.nextAnalysis ASC", DBDescFile.class)
 				.setParameter("source", s)
+				.setParameter("dir", dir)
 				.setMaxResults(nb)
 				.getResultList();
 	}
@@ -284,9 +297,11 @@ public class DBDescFile implements Serializable {
 			df = new DBDescFile();
 			df.setSource(file.getSource().getDesc());
 			df.setPath(file.getPath());
-			df.setName(file.getName());
-			df.setDirectory(file.isDirectory());
 			df.setDocId(df.generateDocId());
+			if (file.exists()) {
+				df.setName(file.getName());
+				df.setDirectory(file.isDirectory());
+			}
 			em.persist(df);
 		}
 

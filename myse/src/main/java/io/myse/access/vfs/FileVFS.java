@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
@@ -26,6 +28,15 @@ public class FileVFS extends File {
 	public boolean isDirectory() throws AccessException {
 		try {
 			return file.getType() == FileType.FOLDER;
+		} catch (FileSystemException ex) {
+			throw source.convertException(ex);
+		}
+	}
+
+	@Override
+	public boolean exists() throws AccessException {
+		try {
+			return file.exists();
 		} catch (FileSystemException ex) {
 			throw source.convertException(ex);
 		}

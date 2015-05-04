@@ -4,14 +4,16 @@
 	<thead>
 		<tr>
 			<th>Name</th>
-			<th>Number of docs</th>
+			<th>Indexed document</th>
+			<th>Left to analyse</th>
 			<th>Size</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr ng-repeat="s in stats.data.sources">
 			<td>{{ s.name}}</td>
-			<td>{{ s.docsCount}}</td>
+			<td>{{ s.docsNbIndexed }}</td>
+			<td>{{ s.docsNbToAnalyse }}</td>
 			<td>{{ s.size | filesize }} - {{ s.sizePercentage}}%</td>
 		</tr>
 	</tbody>
@@ -23,6 +25,7 @@
 	</div>
 </div>
 
+<h2>Disk usage</h2>
 <table class="table table-striped">
 	<thead>
 		<tr>
@@ -32,11 +35,11 @@
 	</thead>
 	<tbody>
 		<tr>
-			<td>H2</td>
+			<td>H2 (relational database)</td>
 			<td>{{ stats.data.h2Size | filesize }}</td>
 		</tr>
 		<tr>
-			<td>ES</td>
+			<td>ES (documents database)</td>
 			<td>{{ stats.data.esSize | filesize }}</td>
 		</tr>
 		<tr>

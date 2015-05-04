@@ -21,6 +21,11 @@ public class FileDisk extends File {
 	}
 
 	@Override
+	public boolean exists() throws AccessException {
+		return file.exists();
+	}
+
+	@Override
 	public boolean isDirectory() throws AccessException {
 		return file.isDirectory();
 	}
@@ -63,4 +68,8 @@ public class FileDisk extends File {
 		return file.length();
 	}
 
+	@Override
+	public String toString() {
+		return String.format("FileDisk{%s}", file.getPath());
+	}
 }

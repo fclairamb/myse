@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static io.myse.common.LOG.LOG;
+import io.myse.embeddedes.ElasticSearch;
 import java.io.StringWriter;
 
 public class RestSetupSource extends HttpServlet {
@@ -131,6 +132,7 @@ public class RestSetupSource extends HttpServlet {
 		try {
 			int id = Integer.parseInt(context.req.getParameter("id"));
 			DBDescSource.delete(id, context.em);
+			ElasticSearch.planCleanup();
 			return true;
 		} finally {
 			context.em.getTransaction().commit();

@@ -10,6 +10,13 @@ import java.util.List;
 public abstract class File {
 
 	/**
+	 * If the file exists.
+	 * @return ture if it exists
+	 * @throws AccessException 
+	 */
+	public abstract boolean exists() throws AccessException;
+	
+	/**
 	 * If it is a directory.
 	 *
 	 * @return true for a directory
