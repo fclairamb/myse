@@ -23,7 +23,6 @@ public class PageOAuth extends HttpServlet {
 					em.getTransaction().begin();
 					DBDescSource dbSource = DBDescSource.get(Integer.parseInt(sourceId), em);
 					dbSource.getProperties().put("code", code);
-					em.persist(dbSource);
 					em.getTransaction().commit();
 					resp.sendRedirect("/static/index.html#/setup/source/edit/" + sourceId);
 				} finally {

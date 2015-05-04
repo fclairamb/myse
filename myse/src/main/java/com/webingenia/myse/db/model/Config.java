@@ -54,16 +54,15 @@ public class Config implements Serializable {
 
 		EntityManager em = DBMgmt.getEntityManager();
 		try {
+			EntityTransaction tr = em.getTransaction();
+			tr.begin();
 			Config c = getConfig(name, em);
 			if (c == null) {
 				c = new Config();
 				c.name = name;
+				em.persist(c);
 			}
-
 			c.value = value;
-			EntityTransaction tr = em.getTransaction();
-			tr.begin();
-			em.persist(c);
 			tr.commit();
 		} finally {
 			em.close();

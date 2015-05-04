@@ -45,11 +45,11 @@ public class DirExplorer extends SourceExplorer {
 
 //			// We always start by a root dir analysis
 			File rootDir = source.getRootDir();
-			if ( rootDir == null ) {
+			if (rootDir == null) {
 				LOG.error("{}: Could not get a rootdir !", this);
 				return;
 			}
-			DBDescFile df = DBDescFile.getOrCreate(rootDir, em);
+			DBDescFile df = getDbFile(rootDir, em);
 			analyseFile(source, df, rootDir, em, true);
 
 			boolean again = true;
@@ -99,27 +99,8 @@ public class DirExplorer extends SourceExplorer {
 			LOG.info("[{}] Analysing {} \"{}\" : {}", dir ? "dir" : "file", source, file.getPath(), file.getLastModified());
 		}
 
-		// File name checking doesn't apply to directories
-		if (!dir) {
-			String name = file.getName();
-			boolean index = true;
-			// We don't care about hidden files and lock files by default
-			if (name.startsWith("~$") || name.startsWith(".")) {
-				index = false;
-			}
-
-			if (index && patternExclude != null) {
-				index = !patternExclude.matcher(name).matches();
-			}
-
-			if (!index && patternInclude != null) {
-				index = patternInclude.matcher(name).matches();
-			}
-
-			if (!index) {
-				//LOG.info("This filename was excluded: " + name);
-				return false;
-			}
+		if (mustSkip(file)) {
+			return false;
 		}
 
 		boolean again = false;
@@ -149,7 +130,7 @@ public class DirExplorer extends SourceExplorer {
 							return false;
 						}
 						try {
-							DBDescFile df = DBDescFile.getOrCreate(f, em);
+							DBDescFile df = getDbFile(f, em);
 							if (analyseFile(source, df, f, em, false)) {
 								again = true;
 							}
@@ -165,8 +146,6 @@ public class DirExplorer extends SourceExplorer {
 				}
 			}
 		}
-
-		em.persist(desc);
 
 		return again;
 	}

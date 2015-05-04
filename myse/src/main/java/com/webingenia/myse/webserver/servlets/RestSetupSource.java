@@ -95,6 +95,9 @@ public class RestSetupSource extends HttpServlet {
 				source.preSave();
 			}
 			context.em.persist(dbSource);
+			
+			context.em.getTransaction().commit();
+			context.em.getTransaction().begin();
 
 			SourceEditingContext editContext = new SourceEditingContext();
 //		editContext.httpSession = context.req.getSession();

@@ -84,7 +84,7 @@ public class SourceDBox extends Source {
 			//DbxWebAuth webAuth = new DbxWebAuth(config, appInfo, OAUTH_REDIRECT_URI + "?source_id=" + getDesc().getId(), null);
 
 			context.nextUrl = webAuth.start();
-		} else {
+		} else if (!properties.containsKey(PROP_ACCESS_TOKEN)) {
 			try {
 				String code = properties.get(PROP_CODE);
 				DbxAuthFinish finish = webAuth.finish(code);

@@ -1,9 +1,12 @@
 package com.webingenia.myse.exploration;
 
+import com.webingenia.myse.access.AccessException;
+import com.webingenia.myse.access.File;
 import com.webingenia.myse.access.Source;
 import static com.webingenia.myse.common.LOG.LOG;
 import com.webingenia.myse.common.RunnableCancellable;
 import com.webingenia.myse.db.DBMgmt;
+import com.webingenia.myse.db.model.DBDescFile;
 import com.webingenia.myse.db.model.DBDescSource;
 import static com.webingenia.myse.exploration.DirExplorer.compileWildcardRule;
 import java.util.Map;
@@ -54,6 +57,33 @@ public abstract class SourceExplorer extends RunnableCancellable {
 	}
 
 	protected abstract void explorerRun(EntityManager em) throws Exception;
+
+	protected boolean mustSkip(File file) throws AccessException {
+		// File name checking doesn't apply to directories
+		if (!file.isDirectory()) {
+			String name = file.getName();
+			boolean index = true;
+			// We don't care about hidden files and lock files by default
+			if (name.startsWith("~$") || name.startsWith(".")) {
+				index = false;
+			}
+			if (index && patternExclude != null) {
+				index = !patternExclude.matcher(name).matches();
+			}
+			if (!index && patternInclude != null) {
+				index = patternInclude.matcher(name).matches();
+			}
+			if (!index) {
+				//LOG.info("This filename was excluded: " + name);
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	protected DBDescFile getDbFile(File file, EntityManager em ) throws AccessException {
+		return DBDescFile.getOrCreate(file, em);
+	}
 
 	@Override
 	public void run() {

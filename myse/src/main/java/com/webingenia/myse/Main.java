@@ -252,7 +252,7 @@ public class Main {
 						// It's easier to just reindex everything
 						source.deleteDocs(em);
 					}
-					em.persist(source);
+					//em.persist(source);
 				}
 				ElasticSearch.deleteIndex("all");
 

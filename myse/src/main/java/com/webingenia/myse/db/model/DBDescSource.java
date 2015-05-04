@@ -154,7 +154,6 @@ public class DBDescSource implements Serializable {
 	public static void delete(long id, EntityManager em) {
 		DBDescSource dbs = get(id, em);
 		dbs.deleted = true;
-		em.persist(dbs);
 	}
 
 	public static DBDescSource get(long id, EntityManager em) {

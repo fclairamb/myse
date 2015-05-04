@@ -287,6 +287,7 @@ public class DBDescFile implements Serializable {
 			df.setName(file.getName());
 			df.setDirectory(file.isDirectory());
 			df.setDocId(df.generateDocId());
+			em.persist(df);
 		}
 
 		return df;
