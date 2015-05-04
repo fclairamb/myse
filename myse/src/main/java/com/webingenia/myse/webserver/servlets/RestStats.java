@@ -69,7 +69,7 @@ public class RestStats extends HttpServlet {
 				total += stats.size;
 			}
 			for (SourceStats stats : list) {
-				stats.sizePercentage = (int) (stats.size * 100 / total);
+				stats.sizePercentage = total != 0 ? (int) (stats.size * 100 / total) : 0;
 			}
 		} finally {
 			em.close();
