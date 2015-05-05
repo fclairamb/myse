@@ -13,6 +13,7 @@ import io.myse.db.model.Config;
 import io.myse.db.model.DBDescSource;
 import io.myse.embeddedes.ElasticSearch;
 import io.myse.common.Tasks;
+import io.myse.exploration.SourcesDeleter;
 import io.myse.updater.Updater;
 import io.myse.updater.Upgrader;
 import io.myse.updater.VersionComparator;
@@ -60,9 +61,9 @@ public class Main {
 	public static void start(String[] args) throws SQLException, IOException, Exception {
 		TrayIconMgmt.start();
 
-		Upgrader.main(args); // Upgrading code
-
-		DBMgmt.start(); // RDB code
+		DBMgmt.start(); // RDB
+		
+		Upgrader.main(args); // Upgrading
 
 		JettyServer.start(); // Web server
 
@@ -109,29 +110,7 @@ public class Main {
 	}
 
 	private static void deletePreviousSources(EntityManager em) throws IOException {
-		for (DBDescSource deleted : DBDescSource.allDeleted(em)) {
-			em.getTransaction().begin();
-			try {
-				int nb = -1;
-				while (nb != 0) {
-					nb = deleted.deleteDocs(em);
-					LOG.info("Deleting {}: Deleted {} DB files.", deleted.getShortName(), nb);
-				}
-				if (ElasticSearch.deleteIndex(deleted.getShortName())) {
-					LOG.info("Deleting {}: Deleted index.", deleted.getShortName());
-				}
-				em.remove(deleted);
-			} finally {
-				em.getTransaction().commit();
-			}
-		}
-		for (String shortName : ElasticSearch.listIndexes()) {
-			DBDescSource dbSource = DBDescSource.get(shortName, em);
-			if (dbSource == null) {
-				LOG.warn("Deleting index \"{}\".", shortName);
-				ElasticSearch.deleteIndex(shortName);
-			}
-		}
+		Tasks.schedule(new SourcesDeleter());
 	}
 
 	private static void startIndexation(EntityManager em) throws IOException {

@@ -10,15 +10,13 @@ Logs rows:
 	<thead>
 		<tr class="small">
 			<th>Date</th>
-			<th>Type</th>
-			<th>Path</th>
+			<th>Message</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr ng-repeat="row in logs.rows" class="small">
 			<td>{{ row.date | date:'HH:mm:ss' }}</td>
-			<td>{{ row.type}}</td>
-			<td>[{{ row.source}}] {{ row.path}}</td>
+			<td>{{ row.message }}</td>
 		</tr>
 	</tbody>
 </table>

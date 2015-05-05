@@ -30,8 +30,10 @@ public class RestStats extends HttpServlet {
 		public String name;
 		public long size;
 		public int sizePercentage;
-		public long docsCount;
-		public long docsDeletedCount;
+		public long docsNbIndexed;
+		public long docsNbDeleted;
+		public int docsNbToAnalyse;
+		private int docsNbTotal;
 	}
 
 	public static class Stats {
@@ -51,27 +53,29 @@ public class RestStats extends HttpServlet {
 		EntityManager em = DBMgmt.getEntityManager();
 		try (Client esClt = ElasticSearch.client()) {
 			for (String indexName : ElasticSearch.listIndexes()) {
-				try {
-					DBDescSource dbSource = DBDescSource.get(indexName, em);
-					SourceStats indexStats = new SourceStats();
-					stats.sources.add(indexStats);
-					IndicesStatsResponse isr = esClt.admin().indices().prepareStats()
-							.clear()
-							.setIndices(indexName)
-							.setStore(true)
-							.setDocs(true)
-							.execute().actionGet();
-					long size = isr.getTotal().getStore().getSize().bytes();
-					if (dbSource != null) {
-						indexStats.name = dbSource.getName();
-					}
-					indexStats.shortName = indexName;
-					indexStats.size = size;
-					indexStats.docsCount = isr.getTotal().getDocs().getCount();
-					indexStats.docsDeletedCount = isr.getTotal().getDocs().getDeleted();
-				} catch (Exception ex) {
-					LOG.warn("Stats", ex);
+//				try {
+				DBDescSource dbSource = DBDescSource.get(indexName, em);
+				SourceStats indexStats = new SourceStats();
+				stats.sources.add(indexStats);
+				IndicesStatsResponse isr = esClt.admin().indices().prepareStats()
+						.clear()
+						.setIndices(indexName)
+						.setStore(true)
+						.setDocs(true)
+						.execute().actionGet();
+				long size = isr.getTotal().getStore().getSize().bytes();
+				if (dbSource != null) {
+					indexStats.name = dbSource.getName();
+//						indexStats.docsNbTotal = dbSource.getTotalNbDocs(em);
+					indexStats.docsNbToAnalyse = dbSource.getNbDocsToAnalyse(em);
 				}
+				indexStats.shortName = indexName;
+				indexStats.size = size;
+				indexStats.docsNbIndexed = isr.getTotal().getDocs().getCount();
+				indexStats.docsNbDeleted = isr.getTotal().getDocs().getDeleted();
+//				} catch (Exception ex) {
+//					LOG.warn("Stats", ex);
+//				}
 			}
 
 			long total = 0;
@@ -87,7 +91,12 @@ public class RestStats extends HttpServlet {
 			stats.logsSize = Files.sizeR(Paths.getLogsDir());
 			stats.totalSize = Files.sizeR(Paths.getAppDir());
 		} catch (Exception ex) {
+			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal error");
+			try (PrintWriter out = resp.getWriter()) {
+				ex.printStackTrace(out);
+			}
 			LOG.error("RestStats", ex);
+			return;
 		} finally {
 			em.close();
 		}

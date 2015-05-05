@@ -1,12 +1,15 @@
 package io.myse.db;
 
 import static io.myse.common.LOG.LOG;
+import io.myse.db.model.Config;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceException;
+import org.h2.jdbc.JdbcSQLException;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.h2.tools.Server;
 
@@ -95,6 +98,8 @@ public class DBMgmt {
 		if (serverMode || httpServer) {
 			startH2Server();
 		}
+		checkDatabase();
+//		init();
 	}
 
 	public static void stop() {
@@ -125,4 +130,44 @@ public class DBMgmt {
 	public static EntityManager getEntityManager() {
 		return getEntityManagerFactory().createEntityManager();
 	}
+
+	private static void listConfig() {
+		EntityManager em = DBMgmt.getEntityManager();
+		try {
+			LOG.info("Config:");
+			for (Config c : Config.all(em)) {
+				LOG.info("* {} = {}", c.getName(), c.getValue());
+			}
+		} finally {
+			em.close();
+		}
+	}
+
+	public static void checkDatabase() {
+		try {
+			listConfig();
+		} catch (Exception ex) {
+			while (ex != null) {
+				ex = (Exception) ex.getCause();
+				if (ex instanceof JdbcSQLException) {
+					JdbcSQLException jdbcEx = (JdbcSQLException) ex;
+					if (jdbcEx.getErrorCode() == 90030) {
+						LOG.warn("Oh no! DB got corrupted");
+						System.exit(1);
+					}
+				}
+			}
+		}
+	}
+
+//  This is only useful on the 1.3.x h2 version
+//	private static void init() {
+//		try {
+//			try (Connection conn = getConnection()) {
+//				conn.prepareStatement("SET DEFAULT_LOCK_TIMEOUT 10000;").execute();
+//			}
+//		} catch (Exception ex) {
+//			LOG.error("init", ex);
+//		}
+//	}
 }

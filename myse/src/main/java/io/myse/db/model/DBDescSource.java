@@ -21,6 +21,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
+import org.eclipse.persistence.annotations.CascadeOnDelete;
 
 @Entity
 @Table(
@@ -29,6 +30,7 @@ import javax.persistence.Table;
 			@Index(name = "shortName", columnList = "shortName", unique = true)
 		}
 )
+@CascadeOnDelete
 public class DBDescSource implements Serializable {
 
 	@Id
@@ -85,7 +87,7 @@ public class DBDescSource implements Serializable {
 
 			for (int i = 0; i < 100; i++) {
 				String sn = osn + (i == 0 ? "" : "_" + i);
-				List<DBDescSource> list = em.createQuery("select s FROM DBDescSource s WHERE s.deleted = false AND s.shortName = :shortName", DBDescSource.class).setParameter("shortName", sn).getResultList();
+				List<DBDescSource> list = em.createQuery("SELECT s FROM DBDescSource s WHERE s.deleted = false AND s.shortName = :shortName", DBDescSource.class).setParameter("shortName", sn).getResultList();
 				if (list.isEmpty() || (list.size() == 1 && list.get(0).id == id)) {
 					this.shortName = sn;
 					break;
@@ -217,5 +219,13 @@ public class DBDescSource implements Serializable {
 //		} finally {
 //			em.getTransaction().commit();
 //		}
+	}
+	
+	public int getNbDocsToAnalyse(EntityManager em) {
+		return (int) (long) em.createQuery("SELECT COUNT(f) FROM DBDescFile f WHERE f.source = :source AND f.directory = FALSE AND f.toAnalyse = TRUE").setParameter("source", this).getSingleResult();
+	}
+	
+	public int getTotalNbDocs(EntityManager em) {
+		return (int) (long) em.createQuery("SELECT COUNT(f) FROM DBDescFile f WHERE f.source = :source AND f.directory = FALSE").setParameter("source", this).getSingleResult();
 	}
 }

@@ -22,6 +22,7 @@ public class FileDrive extends File {
 	private final String fileId;
 	private Boolean dir;
 	private final SourceDrive source;
+	private boolean notFound;
 
 	FileDrive(String fileId, SourceDrive source) {
 		this.fileId = fileId;
@@ -96,11 +97,17 @@ public class FileDrive extends File {
 	private com.google.api.services.drive.model.File driveFile;
 
 	private com.google.api.services.drive.model.File getFile() throws AccessException {
-		if (driveFile == null) {
+		if (driveFile == null && !notFound) {
 			try {
 				driveFile = source.getDrive().files().get(fileId).execute();
-				if (SourceDrive.DEBUG) {
+				if (SourceDrive.DEBUG && driveFile != null) {
 					LOG.info("{}.getFile(): title = \"{}\"", this, driveFile.getTitle());
+				}
+			} catch (com.google.api.client.googleapis.json.GoogleJsonResponseException ex) {
+				if (ex.getStatusCode() == 404) {
+					notFound = true;
+				} else {
+					throw new AccessException(AccessException.AccessState.ERROR, ex);
 				}
 			} catch (Exception ex) {
 				if (SourceDrive.DEBUG) {
@@ -214,6 +221,12 @@ public class FileDrive extends File {
 	@Override
 	public String toString() {
 		return String.format("FileDrive{fileId=\"%s\"}", fileId);
+	}
+
+	@Override
+	public boolean exists() throws AccessException {
+		getFile();
+		return !notFound;
 	}
 
 }

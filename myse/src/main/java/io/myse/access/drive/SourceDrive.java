@@ -19,6 +19,7 @@ import io.myse.access.Source;
 import io.myse.access.SourceEditingContext;
 import static io.myse.common.LOG.LOG;
 import io.myse.db.model.DBDescSource;
+import io.myse.exploration.SourceExplorer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -214,8 +215,8 @@ public class SourceDrive extends Source {
 		};
 	}
 
-//	@Override
-//	public SourceExplorer getExplorer() {
-//		return new DriveExplorer(getDesc().getId());
-//	}
+	@Override
+	public SourceExplorer getExplorer() {
+		return new DriveExplorer(getDesc().getId());
+	}
 }

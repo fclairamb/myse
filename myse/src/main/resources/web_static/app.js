@@ -325,13 +325,13 @@
 			['$http', '$scope', '$timeout',
 				function ($http, $scope, $timeout) {
 					var ctrl = this;
-					this.fetchPeriod = 10000; // 10s
+					this.fetchPeriod = 3000; // 3s
 					this.data = {};
 
 					this.fetch = function () {
 						$http.get('/rest/stats').success(
 								function (data) {
-									ctrl.data = data;
+										ctrl.data = data;
 								});
 					};
 

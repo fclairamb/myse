@@ -44,6 +44,15 @@ public class FileSMB extends File {
 	}
 
 	@Override
+	public boolean exists() throws AccessException {
+		try {
+			return file.exists();
+		} catch (SmbException ex) {
+			throw convertException(ex);
+		}
+	}
+
+	@Override
 	public Date getLastModified() throws AccessException {
 		try {
 			return new Date(file.lastModified());

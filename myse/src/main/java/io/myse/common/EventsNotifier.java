@@ -1,9 +1,8 @@
 package io.myse.common;
 
-import io.myse.desktop.TrayIconMgmt;
+import io.myse.access.AccessException;
 import static io.myse.common.LOG.LOG;
 import io.myse.access.File;
-import java.awt.TrayIcon;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -13,34 +12,12 @@ public class EventsNotifier {
 
 	public static class Event {
 
-		public Event(String type) {
-			this.type = type;
-		}
-		final String type;
+		final String message;
 		final long date = System.currentTimeMillis();
-	}
 
-	public static class EventFile extends Event {
-
-		public EventFile(String type, File file) {
-			super(type);
-			this.path = file.getPath();
-			this.source = file.getSource().getDesc().getShortName();
-		}
-
-		String path;
-		String source;
-	}
-
-	public static class EventTextNotification extends Event {
-
-		public EventTextNotification(String title, String message) {
-			super("notification");
-			this.title = title;
+		public Event(String message) {
 			this.message = message;
 		}
-
-		String title, message;
 	}
 
 	public static interface EventReceiver {
@@ -52,19 +29,19 @@ public class EventsNotifier {
 	private static final List<EventReceiver> receivers = Collections.synchronizedList(new ArrayList<EventReceiver>());
 
 	public static void eventScanningNewDir(File dir) {
-		EventFile event = new EventFile("newDir", dir);
-		addEvent(event);
+		addEvent(String.format("A new directory was discovered: ", dir));
 	}
 
 	public static void eventIndexingFile(File file) {
-		EventFile event = new EventFile("newFile", file);
-		addEvent(event);
+		try {
+			addEvent(String.format("A new file was discovered: %s (%s)", file.getName(), file.getPath()));
+		} catch (AccessException ex) {
+			LOG.error("EventsNotifier", ex);
+		}
 	}
 
-	public static void eventTextNotification(String title, String content) {
-		EventTextNotification notification = new EventTextNotification(title, content);
-		addEvent(notification);
-		TrayIconMgmt.displayMessage(title, content, TrayIcon.MessageType.INFO);
+	public static void addEvent(String message) {
+		addEvent(new Event(message));
 	}
 
 	private static void addEvent(Event event) {
