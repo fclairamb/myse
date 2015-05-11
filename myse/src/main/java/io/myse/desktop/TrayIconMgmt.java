@@ -70,7 +70,7 @@ public class TrayIconMgmt {
 				}
 			});
 			systemTray.add(icon);
-		} catch (Exception ex) {
+		} catch (Throwable ex) {
 			LOG.error("TrayIconMgmt.start", ex);
 		}
 	}

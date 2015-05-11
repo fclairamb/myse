@@ -106,11 +106,14 @@ public class Updater implements Runnable {
 		return false;
 	}
 
-	private String status;
-
 	@Override
 	public void run() {
 		LOG.debug("Checking current version...");
+		
+		if ( ! new File("/usr/share/myse").exists() ) {
+			LOG.info("No update on Linux standard installation !");
+			return;
+		}
 
 		boolean upgrade;
 

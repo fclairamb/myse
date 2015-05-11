@@ -2,9 +2,6 @@
 
 set -x
 
-VERSION_MAJOR=1
-VERSION_MINOR=0
-
 if [ "$release" = "" ]; then
 	echo "No release !"
 	exit 1
@@ -13,14 +10,15 @@ fi
 ROOT=$(pwd)
 
 export BUILD_DATE=$(date +%Y-%m-%d_%H-%M-%S)
+export PACKAGE_VERSION=$(LANG=C dpkg-parsechangelog | grep Version: | cut -d' ' -f2-)
 export GIT_COMMIT=$(git rev-parse HEAD)
 export GIT_COMMIT_SHORT=$(git rev-parse HEAD|head -c5)
 export GIT_COMMIT_COUNT=$(git rev-list HEAD --count)
-export VERSION=${VERSION_MAJOR}.${VERSION_MINOR}.${GIT_COMMIT_COUNT}
+export VERSION=${PACKAGE_VERSION}.${GIT_COMMIT_COUNT}
 
 cd $ROOT/myse
 mvn clean
-mvn assembly:assembly
+mvn package -DskipTests
 
 cd $ROOT
 mkdir -p dist/
@@ -56,4 +54,25 @@ if [ "$release" = "stable" ]; then
 	git push --tags
 fi
 
-rsync -av dist/ myse.io@localhost:update/
+# We create the debian package
+if [ ! -f Makefile ]; then
+	ln debian/Makefile Makefile
+fi
+
+if [ "$DEB_KEY" != "" -a "$release" = "stable" ]; then
+	dpkg-buildpackage -b -k${DEB_KEY}
+	mkdir -p dist/package
+	mv ../myse_* dist/package
+else
+	dpkg-buildpackage -b -us -uc
+	mkdir -p dist/unsigned_package
+	mv ../myse_* dist/unsigned_package
+fi
+
+# TODO: less dirty
+HOST=$(hostname)
+if [ "$HOST" = "ovh3" ]; then
+	echo "Syncing updates website."
+	rsync -av dist/ myse.io@localhost:update/
+fi
+

@@ -1,0 +1,18 @@
+myse (0.1.0) unstable; urgency=low
+
+  * Breaking previous numbering rules
+  * Indexing is supported on:
+    * Local folder
+    * FTPS
+    * Samba
+    * Google Drive
+    * Dropbox
+  * Basic support of files deletion. They are still not deleted on ElasticSearch though.
+
+ -- Florent Clairambault <florent@clairambault.fr>  Mon, 11 May 2015 22:54:11 +0200
+
+myse (0.0.1) unstable; urgency=low
+
+  * Initial Release: Setting up the package
+
+ -- Florent Clairambault <florent@clairambault.fr>  Thu, 07 May 2015 22:09:35 +0200

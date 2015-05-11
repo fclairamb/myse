@@ -1,5 +1,6 @@
 package io.myse;
 
+import com.sun.akuma.Daemon;
 import io.myse.common.Indexation;
 import io.myse.desktop.Browser;
 import io.myse.desktop.TrayIconMgmt;
@@ -42,6 +43,32 @@ public class Main {
 		}
 	}
 
+	private static boolean parseArgs(String[] args) {
+		try {
+			for (int i = 0; i < args.length; i++) {
+
+				switch (args[i]) {
+					case "-d":
+					case "--daemon": {
+						Daemon d = new Daemon();
+						if (!d.isDaemonized()) {
+							d.daemonize();
+							if (!d.isDaemonized()) {
+								System.exit(0);
+							}
+						}
+
+						break;
+					}
+				}
+			}
+			return true;
+		} catch (Exception ex) {
+			LOG.error("Error parsing args", ex);
+			return false;
+		}
+	}
+
 	private void signalHandling() {
 		try {
 			Signal.handle(new Signal("TERM"),
@@ -59,10 +86,15 @@ public class Main {
 	}
 
 	public static void start(String[] args) throws SQLException, IOException, Exception {
+
+		if (!parseArgs(args)) {
+			return;
+		}
+
 		TrayIconMgmt.start();
 
 		DBMgmt.start(); // RDB
-		
+
 		Upgrader.main(args); // Upgrading
 
 		JettyServer.start(); // Web server
@@ -175,7 +207,7 @@ public class Main {
 
 			{ // Some sample docs
 				File sampleDocsDir = new File("sample_docs");
-				if (sampleDocsDir.exists() || DBDescSource.get("Sample_docs", em) == null) {
+				if (sampleDocsDir.exists() && DBDescSource.get("sample_docs", em) == null) {
 					DBDescSource sampleDocs = new DBDescSource();
 					sampleDocs.setName("Sample docs", em);
 					sampleDocs.setType(SourceDisk.TYPE);

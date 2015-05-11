@@ -22,15 +22,32 @@ public class Paths {
 		return file;
 	}
 
-	public static File getAppDir() {
-		File homeDir = new File(System.getProperty("user.home"));
-		File appDir = new File(homeDir, ".myse");
+	private static File appDir;
 
-		//File appDir = new File("data");
-		if (!appDir.exists()) {
-			appDir.mkdir();
+	public static boolean setAppDir(File f) {
+		if (f.exists() && f.isDirectory()) {
+			appDir = f;
+			return true;
 		}
+		return false;
+	}
 
+	public static File getAppDir() {
+		if (appDir == null) {
+			File dir = new File("/var/lib/myse");
+
+			if (!dir.exists() || !dir.canWrite()) {
+				File homeDir = new File(System.getProperty("user.home"));
+				dir = new File(homeDir, ".myse");
+			}
+
+			//File appDir = new File("data");
+			if (!dir.exists()) {
+				dir.mkdir();
+			}
+
+			return dir;
+		}
 		return appDir;
 	}
 

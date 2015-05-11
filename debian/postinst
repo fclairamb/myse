@@ -1,0 +1,40 @@
+#!/bin/sh
+
+# MySE user setup
+exists=false
+getent passwd myse >/dev/null 2>&1 && exists=true
+
+if ! $exists; then
+    printf "Creating user myse..."
+    useradd -b /var/lib/myse -d /var/lib/myse -U myse && printf " OK\n" || printf "FAILED\n"
+fi
+
+# MySE user setup
+exists=false
+getent passwd myse >/dev/null 2>&1 && exists=true
+
+if ! $exists; then
+    printf "Creating user myse..."
+    useradd -b /var/lib/myse -d /var/lib/myse -U myse && printf " OK\n" || printf "FAILED\n"
+fi
+
+LINK=/var/lib/myse/.myse/logs
+TARGET=/var/log/myse
+mkdir -p $(dirname $LINK) $TARGET
+if [ ! -L $LINK -o ! -d $LINK ]; then
+	rm -Rf $LINK
+	ln -s $TARGET $LINK
+fi
+
+LINK=/var/lib/myse/.myse/h2
+TARGET=/var/lib/myse/h2
+mkdir -p $(dirname $LINK) $TARGET
+if [ ! -L $LINK -o ! -d $LINK ]; then
+	rm -Rf $LINK
+	ln -s $TARGET $LINK
+fi
+
+printf "Fixing user rights..."
+chown -R myse:myse /var/lib/myse /var/log/myse && printf " OK\n" || printf "FAILED\n"
+
+service myse start
