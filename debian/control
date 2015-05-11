@@ -1,0 +1,15 @@
+Source: myse
+Section: server
+Priority: optional
+Maintainer: Florent Clairambault <florent@clairambault.fr>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.4
+Homepage: <insert the upstream URL, if relevant>
+#Vcs-Git: git://git.debian.org/collab-maint/myse.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/myse.git;a=summary
+
+Package: myse
+Architecture: all
+Depends: ${misc:Depends}
+Description: MySE - My Search Engine
+ MySE allows to index different datasources (local, server and cloud) on your server.
