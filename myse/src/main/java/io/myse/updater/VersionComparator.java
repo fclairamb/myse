@@ -19,6 +19,9 @@ public class VersionComparator implements Comparator<String> {
 	public static int compareVersions(String o1, String o2) {
 
 		{ // For dev environment only
+			if (o1.startsWith("${")) {
+				o1 = SIMULATED_DEV_VERSION;
+			}
 			if (o2.startsWith("${")) {
 				o2 = SIMULATED_DEV_VERSION;
 			}

@@ -89,8 +89,8 @@ public class DriveExplorer extends SourceExplorer {
 					// because we lock the table for too much time
 					if (!indexEverything(srcDrive, em)) { // If we still have things to index...
 						delay = 100;
-						return;
 					}
+					return; // We have to return now anyway, to re-read the lastChangeId
 				}
 			}
 

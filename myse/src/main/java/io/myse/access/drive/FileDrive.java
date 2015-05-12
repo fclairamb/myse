@@ -11,7 +11,6 @@ import io.myse.access.Source;
 import static io.myse.common.LOG.LOG;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -43,7 +42,7 @@ public class FileDrive extends File {
 	@Override
 	public boolean isDirectory() throws AccessException {
 		if (dir == null) {
-			dir = TYPE_FOLDER.equals(getFile().getMimeType());
+			dir = TYPE_GD_FOLDER.equals(getFile().getMimeType());
 		}
 		return dir;
 	}
@@ -53,13 +52,17 @@ public class FileDrive extends File {
 		return new Date(getFile().getModifiedDate().getValue());
 	}
 
-	static final String TYPE_FOLDER = "application/vnd.google-apps.folder";
-	static final String TYPE_EXCEL = "application/vnd.google-apps.spreadsheet";
-	static final String TYPE_WORD = "application/vnd.google-apps.document";
-	static final String TYPE_GMAP = "application/vnd.google-apps.map";
-	static final String TYPE_POWERPOINT = "application/vnd.google-apps.presentation";
-	static final String TYPE_FORM = "application/vnd.google-apps.form";
-	static final String TYPE_VISIO = "application/vnd.google-apps.drawing";
+	static final String TYPE_GD_FOLDER = "application/vnd.google-apps.folder",
+			TYPE_GD_SPREADSHEET = "application/vnd.google-apps.spreadsheet",
+			TYPE_GD_DOCS = "application/vnd.google-apps.document",
+			TYPE_GD_SLIDES = "application/vnd.google-apps.presentation",
+			TYPE_GD_FORM = "application/vnd.google-apps.form",
+			TYPE_GD_DRAWING = "application/vnd.google-apps.drawing",
+			TYPE_GMAP = "application/vnd.google-apps.map",
+			TYPE_MS_EXCEL = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+			TYPE_MS_POWERPOINT = "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+			TYPE_MS_WORD = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+			TYPE_PDF = "application/pdf";
 
 	/**
 	 * List files of a directory. This method can take A LOT of time to execute.
@@ -151,18 +154,34 @@ public class FileDrive extends File {
 		}
 	}
 
+	private String getPreferredFormatMime(String type, Map<String, String> exportLinks) {
+		String targetType;
+		switch (type) {
+			case TYPE_GD_SPREADSHEET:
+				targetType = TYPE_MS_EXCEL;
+				break;
+			case TYPE_GD_SLIDES:
+				targetType = TYPE_MS_POWERPOINT;
+				break;
+			case TYPE_GD_DOCS:
+				targetType = TYPE_MS_WORD;
+				break;
+			default:
+				targetType = exportLinks.entrySet().iterator().next().getKey();
+		}
+		return exportLinks.get(targetType);
+	}
+
 	@Override
 	public InputStream getInputStream() throws AccessException {
 		try {
 			String type = getFile().getMimeType();
 			if (isGdriveMime(type)) {
 				Map<String, String> exportLinks = getFile().getExportLinks();
-				for (Map.Entry<String, String> me : exportLinks.entrySet()) {
-					return downloadFile(source.getDrive(), me.getValue());
-				}
+				return downloadFile(source.getDrive(), getPreferredFormatMime(type, exportLinks));
 			} else {
 				switch (type) {
-					case TYPE_FOLDER:
+					case TYPE_GD_FOLDER:
 						return null;
 					default:
 						source.getDrive().files().get(fileId).executeAsInputStream();
@@ -176,12 +195,12 @@ public class FileDrive extends File {
 
 	private static boolean isGdriveMime(String mime) {
 		switch (mime) {
-			case TYPE_EXCEL:
-			case TYPE_WORD:
-			case TYPE_POWERPOINT:
+			case TYPE_GD_SPREADSHEET:
+			case TYPE_GD_DOCS:
+			case TYPE_GD_SLIDES:
 			case TYPE_GMAP:
-			case TYPE_FORM:
-			case TYPE_VISIO:
+			case TYPE_GD_FORM:
+			case TYPE_GD_DRAWING:
 				return true;
 			default:
 				return false;
@@ -190,19 +209,19 @@ public class FileDrive extends File {
 
 	private static String mimeToExtension(String mime) {
 		switch (mime) {
-			case TYPE_FOLDER:
+			case TYPE_GD_FOLDER:
 				return "";
-			case TYPE_EXCEL:
+			case TYPE_GD_SPREADSHEET:
 				return ".xls";
-			case TYPE_WORD:
+			case TYPE_GD_DOCS:
 				return ".doc";
-			case TYPE_POWERPOINT:
+			case TYPE_GD_SLIDES:
 				return ".ppt";
 			case TYPE_GMAP:
 				return ".gmap";
-			case TYPE_FORM:
+			case TYPE_GD_FORM:
 				return ".form";
-			case TYPE_VISIO:
+			case TYPE_GD_DRAWING:
 				return ".vsd";
 			default:
 				return ".xxx";

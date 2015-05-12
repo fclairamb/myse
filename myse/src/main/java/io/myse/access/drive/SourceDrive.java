@@ -171,9 +171,15 @@ public class SourceDrive extends Source {
 
 		private String pageToken;
 
+		private boolean lastFetch;
+
 		private LinkedList<File> files = new LinkedList<>();
 
 		private void fetch() throws IOException {
+			if (lastFetch) {
+				files = null;
+				return;
+			}
 			FileList list = getDrive().files().list().setPageToken(pageToken).execute();
 			pageToken = list.getNextPageToken();
 			List<com.google.api.services.drive.model.File> items = list.getItems();
@@ -183,6 +189,9 @@ public class SourceDrive extends Source {
 				for (com.google.api.services.drive.model.File f : items) {
 					files.add(new FileDrive(f, self));
 				}
+			}
+			if ( pageToken == null ) {
+				lastFetch = true;
 			}
 		}
 
