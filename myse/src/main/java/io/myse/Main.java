@@ -43,6 +43,8 @@ public class Main {
 		}
 	}
 
+	private static boolean noUpdate;
+
 	private static boolean parseArgs(String[] args) {
 		try {
 			for (int i = 0; i < args.length; i++) {
@@ -58,6 +60,12 @@ public class Main {
 							}
 						}
 
+						break;
+					}
+					// Mostly useful during development
+					case "-n":
+					case "--no-update": {
+						noUpdate = true;
 						break;
 					}
 				}
@@ -229,7 +237,9 @@ public class Main {
 	}
 
 	private static void versionCheck() {
-		Tasks.getService().scheduleWithFixedDelay(new Updater(), 0, 3, TimeUnit.MINUTES);
+		if (!noUpdate) {
+			Tasks.getService().scheduleWithFixedDelay(new Updater(), 0, 3, TimeUnit.MINUTES);
+		}
 
 		{ // We check the version
 			String currentVersion = BuildInfo.VERSION;
