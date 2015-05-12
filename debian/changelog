@@ -1,3 +1,11 @@
+myse (0.1.1) unstable; urgency=low
+
+  * Google Drive: Indexation was running forever: It was never switching to "changes" mode
+  * Google Drive: Export of spreadsheets docs was done in CSV instead of Excel
+
+
+ -- Florent Clairambault <florent@clairambault.fr>  Wed, 13 May 2015 01:12:59 +0200
+
 myse (0.1.0) unstable; urgency=low
 
   * Breaking previous numbering rules
