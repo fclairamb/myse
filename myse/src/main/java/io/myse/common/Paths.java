@@ -60,7 +60,12 @@ public class Paths {
 	}
 
 	public static File getLogsDir() {
-		File file = new File(getAppDir(), "logs");
+		File file = new File("/var/log/myse");
+		if (file.exists()) {
+			return file;
+		}
+
+		file = new File(getAppDir(), "logs");
 		if (!file.exists()) {
 			file.mkdir();
 		}
