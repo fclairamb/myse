@@ -1,6 +1,8 @@
 package io.myse.access.drive;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
@@ -18,6 +20,7 @@ import io.myse.access.File;
 import io.myse.access.Source;
 import io.myse.access.SourceEditingContext;
 import static io.myse.common.LOG.LOG;
+import io.myse.db.model.Config;
 import io.myse.db.model.DBDescSource;
 import io.myse.exploration.SourceExplorer;
 import java.io.IOException;
@@ -40,8 +43,15 @@ public class SourceDrive extends Source {
 			PROP_REFRESH_TOKEN = "refresh_token";
 
 	public static final String OAUTH_CLIENT_ID = "387222605329-8uivjucupiajrg4ed0v2flm6kquon46d.apps.googleusercontent.com",
-			OAUTH_CLIENT_SECRET = "flyEB2wXpC1MdLWwip-pVt1h",
-			OAUTH_REDIRECT_URI = "http://localhost:10080/oauth/";
+			OAUTH_CLIENT_SECRET = "flyEB2wXpC1MdLWwip-pVt1h";
+
+	private static String getOAuthRedirectUri(String remaining) {
+		String hostname = Config.get("hostname", "", false);
+		if (hostname == null || !hostname.startsWith("localhost:")) {
+			return "urn:ietf:wg:oauth:2.0:oob";
+		}
+		return "http://" + Config.get("hostname", "", false) + "/oauth/" + remaining;
+	}
 
 	static final boolean DEBUG = true;
 
@@ -96,7 +106,7 @@ public class SourceDrive extends Source {
 		DBDescSource dbSource = getDesc();
 		if (Strings.isNullOrEmpty(getCode())) {
 			context.ok = false;
-			context.nextUrl = getAuthCodeFlow().newAuthorizationUrl().setRedirectUri(OAUTH_REDIRECT_URI + "?source_id=" + dbSource.getId()).build();
+			context.nextUrl = getAuthCodeFlow().newAuthorizationUrl().setRedirectUri(getOAuthRedirectUri("?source_id=" + dbSource.getId())).build();
 		}
 	}
 
@@ -140,7 +150,7 @@ public class SourceDrive extends Source {
 				GoogleCredential credential;
 				if (!props.containsKey(PROP_ACCESS_TOKEN)) {
 					try {
-						GoogleTokenResponse response = getAuthCodeFlow().newTokenRequest(getCode()).setRedirectUri(OAUTH_REDIRECT_URI + "?source_id=" + dbSource.getId()).execute();
+						GoogleTokenResponse response = getAuthCodeFlow().newTokenRequest(getCode()).setRedirectUri(getOAuthRedirectUri("?source_id=" + dbSource.getId())).execute();
 						props.put(PROP_ACCESS_TOKEN, response.getAccessToken());
 						props.put(PROP_REFRESH_TOKEN, response.getRefreshToken());
 					} catch (Exception ex) {
@@ -190,7 +200,7 @@ public class SourceDrive extends Source {
 					files.add(new FileDrive(f, self));
 				}
 			}
-			if ( pageToken == null ) {
+			if (pageToken == null) {
 				lastFetch = true;
 			}
 		}
