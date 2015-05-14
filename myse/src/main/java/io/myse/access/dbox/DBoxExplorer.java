@@ -7,7 +7,6 @@ import com.dropbox.core.DbxException;
 import io.myse.access.AccessException;
 import io.myse.access.File;
 import static io.myse.common.LOG.LOG;
-import io.myse.db.model.DBDescFile;
 import io.myse.exploration.SourceExplorer;
 import javax.persistence.EntityManager;
 
@@ -42,29 +41,28 @@ public class DBoxExplorer extends SourceExplorer {
 					} else {
 						LOG.info("{}: {} deleted", this, e.lcPath);
 						// If the file has been deleted
-						DBDescFile dbFile = DBDescFile.get(e.lcPath, em);
-						if (dbFile != null) {
-							// TODO: Delete the document as well
-							em.remove(dbFile);
-						}
+						File file = new FileDBox(e.lcPath, src);
+						indexFile(file, em);
 					}
 				}
 				cursor = delta.cursor;
 				src.getDesc().getProperties().put(PROP_DELTA_CURSOR, cursor);
 				if (delta.hasMore) {
-					delay -= 60000;
+					delay = 100;
+				} else {
+					delay /= 2;
 				}
 			} else {
 				delay += 15000;
 				LOG.info("{}: No changes", this);
 			}
 		} catch (DbxException ex) {
-			delay += 60000;
+			delay += 20000;
 			throw new AccessException(AccessException.AccessState.ERROR, ex);
 		}
 	}
 
-	private static final long PERIOD_MIN = 100, PERIOD_MAX = 600000;
+	private static final long PERIOD_MIN = 100, PERIOD_MAX = 300000;
 
 	@Override
 	protected void after() {

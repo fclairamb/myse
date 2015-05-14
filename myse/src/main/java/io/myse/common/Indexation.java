@@ -5,7 +5,6 @@ import static io.myse.common.LOG.LOG;
 import io.myse.db.model.DBDescSource;
 import io.myse.embeddedes.ElasticSearch;
 import io.myse.exploration.FileIndexer;
-import java.util.concurrent.TimeUnit;
 
 public class Indexation {
 

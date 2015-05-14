@@ -2,12 +2,16 @@ package io.myse.access.smb;
 
 import io.myse.access.AccessException;
 import io.myse.access.File;
+import io.myse.access.Link;
+import io.myse.access.LinkContext;
 import io.myse.access.Source;
+import io.myse.db.model.DBDescSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 
@@ -105,6 +109,21 @@ public class FileSMB extends File {
 		} catch (SmbException ex) {
 			throw convertException(ex);
 		}
+	}
+
+	@Override
+	public Link getLink(LinkContext context) {
+		Map<String, String> props = source.getDesc().getProperties();
+		Link l = new Link();
+		l.type = Link.LinkType.COPY_PASTE;
+		if (context.os == LinkContext.OSType.WINDOWS) {
+			l.address = props.get(SourceSMB.PROP_HOST) + "\\" + props.get(SourceSMB.PROP_PATH).replaceAll("/", "\\\\") + "\\" + getPath().replaceAll("/", "\\\\");
+			l.address = "\\\\" + l.address.replaceAll("\\\\\\\\", "\\\\");
+		} else {
+			l.address = props.get(SourceSMB.PROP_HOST) + "/" + props.get(SourceSMB.PROP_PATH) + "/" + getPath();
+			l.address = "smb://" + l.address.replaceAll("//", "/");
+		}
+		return l;
 	}
 
 }

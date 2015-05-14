@@ -4,11 +4,13 @@ import io.myse.access.File;
 import io.myse.access.Source;
 import static io.myse.common.LOG.LOG;
 import io.myse.db.DBMgmt;
+import io.myse.db.model.Config;
 import io.myse.db.model.DBDescFile;
 import io.myse.db.model.DBDescSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import javax.persistence.EntityManager;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -20,6 +22,15 @@ public class PageDownload extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+		if (!Config.get(Config.PAR_ALLOW_DOWNLOAD, true, true)) {
+			resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Download is forbidden !");
+			try (PrintWriter out = resp.getWriter()) {
+				out.println("Download is forbidden !");
+			}
+			return;
+		}
+
 		String sSource = req.getParameter("source");
 		String path = req.getParameter("path");
 		String docId = req.getParameter("docId");

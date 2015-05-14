@@ -3,6 +3,7 @@ package io.myse.webserver.servlets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.myse.common.BuildInfo;
+import io.myse.db.model.Config;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -30,6 +31,13 @@ public class RestVersion extends HttpServlet {
 			resp.setContentType("application/json; charset=utf8");
 			try (PrintWriter out = resp.getWriter()) {
 				out.write(gson.toJson(info));
+			}
+		}
+		
+		if ( Config.get("hostname", null, false) == null ){
+			String host = req.getHeader("host");
+			if ( host != null ) {
+				Config.set("hostname", host);
 			}
 		}
 	}

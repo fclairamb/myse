@@ -61,6 +61,14 @@
 									controllerAs: 'stats'
 								}
 						)
+						.when(
+								"/link/:docId",
+								{
+									templateUrl: '/static/link.html',
+									controller: 'LinkCtrl',
+									controllerAs: 'link'
+								}
+						)
 						.otherwise(
 								{
 									redirectTo: '/search'
@@ -290,10 +298,11 @@
 					this.getValue = function (name) {
 						for (i = 0; i < ctrl.parameters.length; ++i) {
 							var p = ctrl.parameters[i];
-							if (p.name === name) {
+							if (p.name === name && p.value !== undefined) {
 								return p.value;
 							}
 						}
+						return "";
 					};
 
 					this.edit = function (name) {
@@ -331,7 +340,7 @@
 					this.fetch = function () {
 						$http.get('/rest/stats').success(
 								function (data) {
-										ctrl.data = data;
+									ctrl.data = data;
 								});
 					};
 
@@ -345,6 +354,20 @@
 					});
 
 					this.regularFetch();
+				}
+			]);
+
+	app.controller('LinkCtrl',
+			['$http', '$scope', '$routeParams',
+				function ($http, $scope, $routeParams) {
+					var ctrl = this;
+					this.docId = $routeParams.docId;
+					this.data = {'name':'(loading)'};
+
+					$http.get('/rest/link?docId=' + ctrl.docId).success(
+							function (data) {
+								ctrl.data = data;
+							});
 				}
 			]);
 

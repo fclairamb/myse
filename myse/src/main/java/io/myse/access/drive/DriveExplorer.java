@@ -58,6 +58,8 @@ public class DriveExplorer extends SourceExplorer {
 
 		return false;
 	}
+	
+	private static final long PERIOD_MIN = 100, PERIOD_MAX = 300000;
 
 	@Override
 	protected void explorerRun(EntityManager em) throws AccessException {
@@ -77,7 +79,7 @@ public class DriveExplorer extends SourceExplorer {
 			// changes using the change number.
 			Drive.Changes.List request = srcDrive.getDrive().changes().list();
 
-			long lastChangeId = 0;
+			long lastChangeId;
 
 			{
 				String sLastChangeId = properties.get(PROP_LAST_CHANGE_ID);
@@ -98,7 +100,7 @@ public class DriveExplorer extends SourceExplorer {
 			ChangeList changeList = request.execute();
 			List<Change> items = changeList.getItems();
 			if (items.isEmpty()) {
-				delay = 30000;
+				delay += 30000;
 				return;
 			} else {
 				delay = 100;
@@ -120,6 +122,16 @@ public class DriveExplorer extends SourceExplorer {
 		} catch (IOException ex) {
 			throw new AccessException(AccessException.AccessState.ERROR, ex);
 		}
+	}
+
+	@Override
+	protected void after() {
+		if ( delay < PERIOD_MIN ) {
+			delay = PERIOD_MIN;
+		} else if ( delay > PERIOD_MAX ) {
+			delay = PERIOD_MAX;
+		}
+		super.after(); //To change body of generated methods, choose Tools | Templates.
 	}
 
 	@Override

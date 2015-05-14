@@ -27,7 +27,8 @@ import javax.persistence.TemporalType;
 			@Index(name = "path", columnList = "source_id,file_path", unique = true),
 			@Index(name = "next", columnList = "source_id,directory,to_analyse,date_mod", unique = false),
 			@Index(name = "date_mod", columnList = "date_mod", unique = false),
-			@Index(name = "docId", columnList = "docId", unique = true)
+			@Index(name = "docId", columnList = "docId", unique = true),
+			@Index(name = "deleted", columnList = "deleted", unique = false)
 		}
 )
 public class DBDescFile implements Serializable {
@@ -87,6 +88,9 @@ public class DBDescFile implements Serializable {
 
 	@Column(name = "doc_id")
 	private String docId;
+
+	@Column(name = "deleted")
+	private boolean deleted;
 
 	public long getId() {
 		return id;
@@ -190,23 +194,27 @@ public class DBDescFile implements Serializable {
 	}
 
 	public void updateNextAnalysis() {
-		{ // We increment it by its age
-			long elapsed = (System.currentTimeMillis() - dateMod.getTime()) + nbErrors * 3600 * 1000;
-			nextAnalysis += Math.log(elapsed);
-		}
-
-		if (fileSize > 0) { // And by its size
-			nextAnalysis += Math.log(fileSize);
-		}
-
-		{ // And by its extension
-			int priority = extensionToPriority(getExtension());
-			nextAnalysis += priority;
-		}
-
-		// This should never happen
-		if (nextAnalysis < 0) {
+		if (deleted) {
 			nextAnalysis = 0;
+		} else {
+			{ // We increment it by its age
+				long elapsed = (System.currentTimeMillis() - dateMod.getTime()) + nbErrors * 3600 * 1000;
+				nextAnalysis += Math.log(elapsed);
+			}
+
+			if (fileSize > 0) { // And by its size
+				nextAnalysis += Math.log(fileSize);
+			}
+
+			{ // And by its extension
+				int priority = extensionToPriority(getExtension());
+				nextAnalysis += priority;
+			}
+
+			// This should never happen
+			if (nextAnalysis < 0) {
+				nextAnalysis = 0;
+			}
 		}
 	}
 
@@ -330,5 +338,16 @@ public class DBDescFile implements Serializable {
 
 	public String getDocId() {
 		return docId;
+	}
+	
+	public boolean getDeleted() {
+		return deleted;
+	}
+	
+	public boolean setDeleted(boolean deleted) {
+		boolean changed = this.deleted != deleted;
+		this.deleted = deleted;
+		this.toAnalyse = true;
+		return changed;
 	}
 }

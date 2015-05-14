@@ -3,6 +3,7 @@ package io.myse.webserver.servlets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import static io.myse.common.LOG.LOG;
+import io.myse.db.model.Config;
 import io.myse.embeddedes.ElasticSearch;
 import io.myse.exploration.FileIndexer;
 import java.io.IOException;
@@ -33,6 +34,8 @@ public class RestSearch extends HttpServlet {
 
 		public List<SearchResult> results = new ArrayList<>();
 		public String error;
+		public boolean download;
+		public boolean link;
 		public long time;
 	}
 
@@ -75,6 +78,8 @@ public class RestSearch extends HttpServlet {
 		}
 
 		MyseSearchResponse response = new MyseSearchResponse();
+		response.download = Config.get(Config.PAR_ALLOW_DOWNLOAD, true, true);
+		response.link = Config.get(Config.PAR_ALLOW_LINK, true, true);
 		try {
 			try (Client client = ElasticSearch.client()) {
 				long before = System.currentTimeMillis();
@@ -121,12 +126,12 @@ public class RestSearch extends HttpServlet {
 						r.size = (Integer) source.get("size");
 						
 
-						HighlightField highContent = hit.getHighlightFields().get("content");
+						HighlightField hlContent = hit.getHighlightFields().get("content");
 
-						if (highContent.fragments() != null) {
+						if (hlContent != null && hlContent.fragments() != null) {
 							StringBuilder sb = new StringBuilder();
 							int c = 0;
-							for (Text fragment : highContent.fragments()) {
+							for (Text fragment : hlContent.fragments()) {
 								if (c++ > 0) {
 									sb.append(" ... ");
 								}

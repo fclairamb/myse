@@ -2,6 +2,8 @@ package io.myse.access.disk;
 
 import io.myse.access.AccessException;
 import io.myse.access.File;
+import io.myse.access.Link;
+import io.myse.access.LinkContext;
 import io.myse.access.Source;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -71,5 +73,13 @@ public class FileDisk extends File {
 	@Override
 	public String toString() {
 		return String.format("FileDisk{%s}", file.getPath());
+	}
+
+	@Override
+	public Link getLink(LinkContext context) {
+		Link l = new Link();
+		l.type = Link.LinkType.COPY_PASTE;
+		l.address = file.getPath();
+		return l;
 	}
 }

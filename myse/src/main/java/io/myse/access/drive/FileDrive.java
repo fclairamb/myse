@@ -7,6 +7,8 @@ import com.google.api.services.drive.model.ChildList;
 import com.google.api.services.drive.model.ChildReference;
 import io.myse.access.AccessException;
 import io.myse.access.File;
+import io.myse.access.Link;
+import io.myse.access.LinkContext;
 import io.myse.access.Source;
 import static io.myse.common.LOG.LOG;
 import java.io.IOException;
@@ -246,6 +248,11 @@ public class FileDrive extends File {
 	public boolean exists() throws AccessException {
 		getFile();
 		return !notFound;
+	}
+
+	@Override
+	public Link getLink(LinkContext context) throws AccessException {
+		return new Link(getFile().getAlternateLink());
 	}
 
 }

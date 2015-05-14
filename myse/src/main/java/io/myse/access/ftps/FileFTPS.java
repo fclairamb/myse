@@ -2,6 +2,8 @@ package io.myse.access.ftps;
 
 import io.myse.access.AccessException;
 import io.myse.access.File;
+import io.myse.access.Link;
+import io.myse.access.LinkContext;
 import io.myse.access.Source;
 import java.io.IOException;
 import java.io.InputStream;
@@ -91,6 +93,11 @@ public class FileFTPS extends File {
 	@Override
 	public long getSize() throws AccessException {
 		return file.getSize();
+	}
+
+	@Override
+	public Link getLink(LinkContext context) {
+		return null;
 	}
 
 }

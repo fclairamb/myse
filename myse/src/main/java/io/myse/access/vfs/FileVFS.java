@@ -2,14 +2,14 @@ package io.myse.access.vfs;
 
 import io.myse.access.AccessException;
 import io.myse.access.File;
+import io.myse.access.Link;
+import io.myse.access.LinkContext;
 import io.myse.access.Source;
 import static io.myse.common.LOG.LOG;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
@@ -102,6 +102,15 @@ public class FileVFS extends File {
 			return file.getContent().getSize();
 		} catch (FileSystemException ex) {
 			throw source.convertException(ex);
+		}
+	}
+
+	@Override
+	public Link getLink(LinkContext context) {
+		try {
+			return new Link(file.getURL().toString());
+		} catch (FileSystemException ex) {
+			return null;
 		}
 	}
 

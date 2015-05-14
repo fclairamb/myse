@@ -34,7 +34,31 @@ public class EventsNotifier {
 
 	public static void eventIndexingFile(File file) {
 		try {
-			addEvent(String.format("A new file was discovered: %s (%s)", file.getName(), file.getPath()));
+			addEvent(String.format("Indexing file: %s (%s)", file.getName(), file.getPath()));
+		} catch (AccessException ex) {
+			LOG.error("EventsNotifier", ex);
+		}
+	}
+
+	public static void eventDeletingFile(File file) {
+		try {
+			addEvent(String.format("Deleting file: %s (%s)", file.getName(), file.getPath()));
+		} catch (AccessException ex) {
+			LOG.error("EventsNotifier", ex);
+		}
+	}
+
+	public static void eventPreparingIndexation(File file) {
+		try {
+			addEvent(String.format("Detected file change: %s (%s)", file.getName(), file.getPath()));
+		} catch (AccessException ex) {
+			LOG.error("EventsNotifier", ex);
+		}
+	}
+
+	public static void eventPreparingDeletion(File file) {
+		try {
+			addEvent(String.format("Detected file disappearence: %s (%s)", file.getName(), file.getPath()));
 		} catch (AccessException ex) {
 			LOG.error("EventsNotifier", ex);
 		}

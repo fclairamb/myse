@@ -3,7 +3,10 @@ package io.myse.db.model;
 import static io.myse.common.LOG.LOG;
 import io.myse.db.DBMgmt;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
@@ -22,9 +25,20 @@ public class Config implements Serializable {
 	@Column(name = "VALUE")
 	private String value;
 
-	public static final String PAR_UPDATE_CHANNEL = "update.channel";
+	public static final String PAR_UPDATE_CHANNEL = "update.channel",
+			PAR_HOSTNAME = "hostname",
+			PAR_ALLOW_DOWNLOAD = "allow_download",
+			PAR_ALLOW_LINK = "allow_link";
+
+	private static final Map<String, String> cache = Collections.synchronizedMap(new TreeMap());
 
 	public static String get(String name, String defaultValue, boolean save) {
+
+		if (cache.containsKey(name)) {
+			return cache.get(name);
+		}
+
+		String value;
 
 		EntityManager em = DBMgmt.getEntityManager();
 		try {
@@ -33,12 +47,16 @@ public class Config implements Serializable {
 				if (defaultValue != null && save) {
 					set(name, defaultValue);
 				}
-				return defaultValue;
+				value = defaultValue;
+			} else {
+				value = c.value;
 			}
-			return c.value;
+			cache.put(name, value);
 		} finally {
 			em.close();
 		}
+
+		return value;
 	}
 
 	public static int get(String name, int defaultValue, boolean save) {
@@ -66,6 +84,7 @@ public class Config implements Serializable {
 			tr.commit();
 		} finally {
 			em.close();
+			cache.remove(name);
 		}
 	}
 

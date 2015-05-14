@@ -11,11 +11,12 @@ public abstract class File {
 
 	/**
 	 * If the file exists.
+	 *
 	 * @return ture if it exists
-	 * @throws AccessException 
+	 * @throws AccessException
 	 */
 	public abstract boolean exists() throws AccessException;
-	
+
 	/**
 	 * If it is a directory.
 	 *
@@ -63,6 +64,14 @@ public abstract class File {
 	 * @return Source of the file
 	 */
 	public abstract Source getSource();
+
+	/**
+	 * Get an external link.
+	 * @param context Context
+	 * @return Return a link
+	 * @throws io.myse.access.AccessException
+	 */
+	public abstract Link getLink(LinkContext context) throws AccessException;
 
 	/**
 	 * Get the input stream of the file

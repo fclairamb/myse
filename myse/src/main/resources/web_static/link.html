@@ -1,0 +1,13 @@
+<h1 class="page-header">{{ link.data.name}}</h1>
+
+
+<div>
+	<p ng-if="link.data.type === 'COPY_PASTE'">Copy/paste this address:</p>
+	<p class="well">{{ link.data.address }}</p>
+	<p ng-if="link.data.type === 'DIRECT'"><a class="btn btn-primary btn-lg" href="{{ link.data.address }}" role="button">Go there</a></p>
+</div>
+<div>Data: {{ link.data}}</div>
+
+<div class="alert alert-danger" role="alert" ng-show="search.response.error">
+	<strong>Internal error !</strong><pre>{{ search.response.error}}</pre>
+</div>

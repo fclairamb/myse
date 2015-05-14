@@ -4,6 +4,7 @@ import io.myse.db.model.Config;
 import io.myse.webserver.servlets.PageDownload;
 import io.myse.webserver.servlets.PageFavIcon;
 import io.myse.webserver.servlets.PageIndex;
+import io.myse.webserver.servlets.RestLink;
 import io.myse.webserver.servlets.PageOAuth;
 import io.myse.webserver.servlets.RestConfig;
 import io.myse.webserver.servlets.PageStatic;
@@ -54,6 +55,7 @@ public class JettyServer {
 		handler.addServletWithMapping(RestSearch.class, "/rest/search");
 		handler.addServletWithMapping(RestSetupSource.class, "/rest/setup/source/*");
 		handler.addServletWithMapping(RestConfig.class, "/rest/setup/config/*");
+		handler.addServletWithMapping(RestLink.class, "/rest/link");
 		handler.addServletWithMapping(RestVersion.class, "/rest/version");
 		handler.addServletWithMapping(RestStats.class, "/rest/stats");
 		handler.addServletWithMapping(RestQuit.class, "/rest/quit");

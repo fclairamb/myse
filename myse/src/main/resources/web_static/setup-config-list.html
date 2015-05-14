@@ -17,8 +17,14 @@
 				<span ng-if="!config.editing(par.name)">
 					{{ par.value}}
 				</span>
-				<span ng-if="config.editing(par.name)" ng-click="config.edit(par.name)">
-					<input type="text" name="value_{{ par.name }}" ng-model="config.values[ par.name ]" class="form-control" />
+				<span ng-if="config.editing(par.name)">
+					<div ng-if="par.type !== 'BOOLEAN'">
+						<input type="text" name="value_{{par.name}}" ng-model="config.values[ par.name ]" class="form-control" />
+					</div>
+
+					<div ng-if="par.type === 'BOOLEAN'">
+						<input type="checkbox" name="value_{{par.name }}" ng-model="config.values[ par.name ]" ng-true-value="'true'" ng-false-value="'false'" /> ({{config.values[ par.name ]}})
+					</div>
 				</span>
 			</td>
 			<td>

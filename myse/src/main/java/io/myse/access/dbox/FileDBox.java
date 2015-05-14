@@ -4,6 +4,8 @@ import com.dropbox.core.DbxEntry;
 import com.dropbox.core.DbxException;
 import io.myse.access.AccessException;
 import io.myse.access.File;
+import io.myse.access.Link;
+import io.myse.access.LinkContext;
 import io.myse.access.Source;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -12,6 +14,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class FileDBox extends File {
 
@@ -21,7 +25,9 @@ public class FileDBox extends File {
 	private boolean notFound;
 
 	FileDBox(String path, SourceDBox source) {
-		this.path = path;
+		// Dropbox paths must be lowercase because they are set
+		// to lowercase for deletion.
+		this.path = path.toLowerCase();
 		this.source = source;
 	}
 
@@ -104,6 +110,21 @@ public class FileDBox extends File {
 		} catch (IOException | DbxException ex) {
 			throw new AccessException(AccessException.AccessState.ERROR, ex);
 		}
+	}
+
+	//private static final String URL_PREVIEW = "https://www.dropbox.com/home%s?preview=%s";
+	private String shareableLink;
+
+	@Override
+	public Link getLink(LinkContext context) throws AccessException {
+		if (shareableLink == null) {
+			try {
+				shareableLink = source.getClient().createShareableUrl(path);
+			} catch (DbxException ex) {
+				throw new AccessException(AccessException.AccessState.ERROR, ex);
+			}
+		}
+		return new Link(shareableLink);
 	}
 
 	@Override

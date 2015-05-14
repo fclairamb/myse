@@ -21,6 +21,9 @@ import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.BodyContentHandler;
+import org.elasticsearch.action.ActionFuture;
+import org.elasticsearch.action.delete.DeleteRequest;
+import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.client.Client;
@@ -97,7 +100,11 @@ public class FileIndexer extends ReschedulingRunnable {
 
 				if (!file.exists()) {
 					// TODO: Delete ES doc as well
-					LOG.info("{}: Deleting {}", this, desc);
+					EventsNotifier.eventDeletingFile(file);
+					ActionFuture<DeleteResponse> delete = esClient.delete(new DeleteRequest(source.getDesc().getShortName(), ES_DOC_TYPE, desc.getDocId()));
+					if (!delete.actionGet().isFound()) {
+						LOG.warn("Document {}:{} ({}) could not be found in ES. This is not good !", source.getDesc().getShortName(), desc.getDocId(), desc.getPath());
+					}
 					em.remove(desc);
 					return;
 				}
@@ -149,7 +156,7 @@ public class FileIndexer extends ReschedulingRunnable {
 				}
 				IndexRequest req = new IndexRequestBuilder(esClient).setIndex(ds.getShortName()).setType(ES_DOC_TYPE).setId(docId).setSource(data).request();
 				boolean created = esClient.index(req).actionGet().isCreated();
-				LOG.info("{}: Document {} {} !", this, docId, created ? "created" : "updated");
+				LOG.info("{}: Document {}:{} ({}) {} !", this, ds.getShortName(), docId, desc.getPath(), created ? "created" : "updated");
 			} catch (Exception ex) {
 				// If anything happens, we need to save it !
 				desc.performingAnalysis();

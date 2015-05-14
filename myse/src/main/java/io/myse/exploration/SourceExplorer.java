@@ -3,6 +3,7 @@ package io.myse.exploration;
 import io.myse.access.AccessException;
 import io.myse.access.File;
 import io.myse.access.Source;
+import io.myse.common.EventsNotifier;
 import static io.myse.common.LOG.LOG;
 import io.myse.common.ReschedulingRunnable;
 import io.myse.db.DBMgmt;
@@ -30,8 +31,9 @@ public abstract class SourceExplorer extends ReschedulingRunnable {
 
 	protected void init(EntityManager em) {
 		dbSource = DBDescSource.get(sourceId, em);
-		if ( dbSource == null ) {
+		if (dbSource == null) {
 			cancel();
+			return;
 		}
 		source = Source.get(dbSource);
 	}
@@ -85,22 +87,32 @@ public abstract class SourceExplorer extends ReschedulingRunnable {
 	}
 
 	protected boolean indexFile(DBDescFile desc, File file, EntityManager em) throws AccessException {
+		boolean changed;
 		if (!file.exists()) {
-			em.remove(desc);
-			return true;
-		}
+			changed = desc.setDeleted(true);
+		} else {
 
-		if (mustSkip(file)) {
-			return false;
-		}
+			if (mustSkip(file)) {
+				return false;
+			}
 
-		boolean changed = desc.setLastModified(file.getLastModified());
-		desc.setDirectory(file.isDirectory());
-		if (!file.isDirectory()) {
-			desc.setSize(file.getSize());
+			changed = desc.setLastModified(file.getLastModified());
+			desc.setDirectory(file.isDirectory());
+			if (!file.isDirectory()) {
+				desc.setSize(file.getSize());
+			}
 		}
 
 		desc.updateNextAnalysis();
+
+		if (changed) {
+			if (file.exists()) {
+				EventsNotifier.eventPreparingIndexation(file);
+			} else {
+				EventsNotifier.eventPreparingDeletion(file);
+			}
+		}
+
 		return changed;
 	}
 

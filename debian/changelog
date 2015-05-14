@@ -1,8 +1,26 @@
+myse (0.2.0) unstable; urgency=low
+
+  * General indexation (FileIndexer): Files are now deleted when detected missing
+  * Dropbox: Path is now stored lower case to allow deletion
+  * OAuth code registration for Google Drive: If hostname is not "localhost", then oauth automatic redirection is disabled
+  * User management: Added some draft code
+  * Fixed a Small NPE in SourceExplorer
+  * Changed indexation period handling on Google Drive and Dropbox
+  * Added some events notifications about newly detected files and files to index
+  * Any config parameter request is cached. This is to allow more intensive config usage.
+  * Fixed angular boolean config editing
+  * Allowing to disable download
+  * All file implementation now have to provide a link address
+  * Search results now have a link to the actual file address
+  * Allowing to disable links
+  * Added a link page and controller
+
+ -- Florent Clairambault <florent@clairambault.fr>  Fri, 14 May 2015 19:06:17 +0200
+
 myse (0.1.1) unstable; urgency=low
 
   * Google Drive: Indexation was running forever: It was never switching to "changes" mode
   * Google Drive: Export of spreadsheets docs was done in CSV instead of Excel
-
 
  -- Florent Clairambault <florent@clairambault.fr>  Wed, 13 May 2015 01:12:59 +0200
 
