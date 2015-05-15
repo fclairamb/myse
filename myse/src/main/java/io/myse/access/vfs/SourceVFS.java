@@ -42,11 +42,12 @@ public class SourceVFS extends Source {
 	public SourceVFS(DBDescSource desc) {
 		super(desc);
 
+		Map<String, String> props = getDesc().getProperties();
+		String scheme = props.get(PROP_SCHEME);
+
 		{ // We work on the FS options
 			this.fsOpts = new FileSystemOptions();
 			try {
-				Map<String, String> props = getDesc().getProperties();
-				String scheme = props.get(PROP_SCHEME);
 				if (scheme != null) {
 					switch (scheme) {
 						case "sftp":
@@ -54,7 +55,7 @@ public class SourceVFS extends Source {
 							SftpFileSystemConfigBuilder.getInstance().setStrictHostKeyChecking(fsOpts, "no");
 							break;
 						case "ftpes":
-							props.put(PROP_SCHEME, "ftps");
+							scheme = "ftps";
 							FtpsFileSystemConfigBuilder.getInstance().setFtpsType(fsOpts, "explicit");
 							FtpsFileSystemConfigBuilder.getInstance().setPassiveMode(fsOpts, true);
 							break;
@@ -66,15 +67,14 @@ public class SourceVFS extends Source {
 		}
 
 		{ // We build the fsUrl
-			Map<String, String> props = desc.getProperties();
 			StringBuilder url = new StringBuilder();
-			url.append(props.get(PROP_SCHEME)).append("://");
+			url.append(scheme).append("://");
 
 			{
 				String user = props.get(PROP_USER);
 				String pass = props.get(PROP_PASS);
 				if (!Strings.isNullOrEmpty(user)) {
-					url.append(":").append(pass).append("@");
+					url.append(user).append(":").append(pass).append("@");
 				}
 			}
 
@@ -86,6 +86,8 @@ public class SourceVFS extends Source {
 					url.append(":").append(port);
 				}
 			}
+			
+			url.append('/');
 
 			url.append(props.get(PROP_PATH));
 
