@@ -367,7 +367,14 @@
 					$http.get('/rest/link?docId=' + ctrl.docId).success(
 							function (data) {
 								ctrl.data = data;
+								ctrl.considerLink();
 							});
+							
+					ctrl.considerLink = function() {
+						if ( ctrl.data.type === 'DIRECT' ) {
+							window.location.href = ctrl.data.address;
+						}
+					};
 				}
 			]);
 
