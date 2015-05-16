@@ -10,11 +10,14 @@
 			<div class="row">
 				<div class="col-md-2 sidebar">
 					<ul class="nav nav-sidebar">
-						<li ng-class="nav.class('/search')"><a href="#/search">Search</a></li>
-						<li ng-class="nav.class('/setup/source')"><a href="#/setup/source/list">Sources</a></li>
-						<li ng-class="nav.class('/setup/config')"><a href="#/setup/config">Parameters</a></li>
-						<li ng-class="nav.class('/stats')"><a href="#/stats">Stats</a></li>
-						<li><a href ng-click="nav.quit()">Quit</a></li>
+						<li ng-class="nav.class('/search')" ng-if="nav.auth.connected"><a href="#/search">Search</a></li>
+						<li ng-class="nav.class('/stats')" ng-if="nav.auth.connected"><a href="#/stats">Stats</a></li>
+						<li ng-class="nav.class('/setup/source')" ng-if="nav.auth.admin"><a href="#/setup/source/list">Sources</a></li>
+						<li ng-class="nav.class('/setup/user')" ng-if="nav.auth.admin"><a href="#/setup/user/list">Users</a></li>
+						<li ng-class="nav.class('/setup/config')" ng-if="nav.auth.admin"><a href="#/setup/config">Parameters</a></li>
+						<li ng-class="nav.class('/login')" ng-if="!nav.auth.connected"><a href="#/login">Login</a></li>
+						<li ng-class="nav.class('/logout')" ng-if="nav.auth.connected"><a href="#/logout">Logout</a></li>
+						<li><a href ng-click="nav.quit()" ng-if="nav.auth.admin">Stop server</a></li>
 					</ul>
 				</div>
 				<div class="col-md-10 main">
@@ -23,14 +26,15 @@
 			</div>
 		</div>
 
-		<script type="text/javascript" src="/static/jquery-1.11.2/jquery.min.js"></script>
-		<script type="text/javascript" src="/static/boostrap-3.3.4/js/bootstrap.min.js"></script>
-		<script type="text/javascript" src="/static/angular-1.4.0b6/angular.min.js"></script>
-		<script type="text/javascript" src="/static/angular-1.4.0b6/angular-route.min.js"></script>
-		<script type="text/javascript" src="/static/app.js"></script>
-	</body>
 	<myse-logs></myse-logs>
 	<div ng-controller="Version as v">
 		{{ v.props.general}}
 	</div>
+
+	<script type="text/javascript" src="/static/jquery-1.11.2/jquery.min.js"></script>
+	<script type="text/javascript" src="/static/boostrap-3.3.4/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/static/angular-1.4.0b6/angular.min.js"></script>
+	<script type="text/javascript" src="/static/angular-1.4.0b6/angular-route.min.js"></script>
+	<script type="text/javascript" src="/static/app.js"></script>
+</body>
 </html>

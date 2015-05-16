@@ -55,6 +55,11 @@ public class RestSearch extends HttpServlet {
 	private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
 	protected void doRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+		if (!Session.get(req).checkIsUser(resp)) {
+			return;
+		}
+
 		final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 		String q = null;
 
@@ -88,7 +93,7 @@ public class RestSearch extends HttpServlet {
 						.setSearchType(SearchType.DFS_QUERY_AND_FETCH)
 						//.setQuery(QueryBuilders.termQuery("multi", q)) // Query
 						.setQuery(query)
-						.addHighlightedField("title")
+						//.addHighlightedField("title")
 						.addHighlightedField("content")
 						.setHighlighterFragmentSize(200)
 						.setHighlighterNumOfFragments(5)
@@ -124,7 +129,6 @@ public class RestSearch extends HttpServlet {
 						r.path = (String) source.get("path");
 						r.source = (String) source.get("source_short");
 						r.size = (Integer) source.get("size");
-						
 
 						HighlightField hlContent = hit.getHighlightFields().get("content");
 

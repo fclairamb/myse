@@ -1,0 +1,31 @@
+<h1 class="page-header">Login</h1>
+<form class="form-horizontal">
+	<div class="form-group">
+		<label for="input_name" class="col-sm-2 control-label">Name</label>
+		<div class="col-sm-10">
+			<input id="input_name" ng-model="login.name" type="text" class="form-control" placeholder="Your username" ng-focus="login.focus()" />
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="input_password" class="col-sm-2 control-label">Password</label>
+		<div class="col-sm-10">
+			<input id="input_password" ng-model="login.pass" type="password" class="form-control" placeholder="Your password" ng-focus="login.focus()" />
+		</div>
+	</div>
+<!--	
+	<div class="form-group">
+		<label for="input_admin" class="col-sm-2 control-label">Admin right</label>
+		<div class="col-sm-10">
+			<input id="input_password" ng-model="setup.props.admin" type="checkbox" />
+		</div>
+	</div>
+-->
+	<div class="form-group">
+		<div class="col-sm-offset-2 col-sm-10">
+			<button type="submit" class="btn btn-info" ng-click="login.login()">Login</button>
+			<div ng-if="login.response.error" class="alert alert-danger" style="margin-top: 20px">
+				<strong>Error!</strong> {{ login.response.error }}
+			</div>
+		</div>
+	</div>
+</form>

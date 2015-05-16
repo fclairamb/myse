@@ -38,6 +38,10 @@ public class RestLink extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
+		if (!Session.get(req).checkIsUser(resp)) {
+			return;
+		}
+
 		if (!Config.get(Config.PAR_ALLOW_LINK, true, true)) {
 			resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Linking is forbidden !");
 			try (PrintWriter out = resp.getWriter()) {
@@ -45,19 +49,19 @@ public class RestLink extends HttpServlet {
 			}
 			return;
 		}
-		
+
 		LinkContext context = new LinkContext();
 		{
 			String agent = req.getHeader("user-agent");
-			if ( agent.contains("Windows") ) {
+			if (agent.contains("Windows")) {
 				context.os = LinkContext.OSType.WINDOWS;
-			} else if ( agent.contains("Mac")) {
+			} else if (agent.contains("Mac")) {
 				context.os = LinkContext.OSType.MAC_OS_X;
-			} else if ( agent.contains("Linux")) {
+			} else if (agent.contains("Linux")) {
 				context.os = LinkContext.OSType.LINUX;
 			}
 		}
-		
+
 		String sSource = req.getParameter("source");
 		String path = req.getParameter("path");
 		String docId = req.getParameter("docId");

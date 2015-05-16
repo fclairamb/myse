@@ -6,16 +6,23 @@ import io.myse.access.Source;
 import io.myse.common.Hashing;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -25,10 +32,10 @@ import javax.persistence.TemporalType;
 		name = "file",
 		indexes = {
 			@Index(name = "path", columnList = "source_id,file_path", unique = true),
-			@Index(name = "next", columnList = "source_id,directory,to_analyse,date_mod", unique = false),
-			@Index(name = "date_mod", columnList = "date_mod", unique = false),
-			@Index(name = "docId", columnList = "docId", unique = true),
-			@Index(name = "deleted", columnList = "deleted", unique = false)
+			@Index(name = "next", columnList = "source_id,directory,to_analyse,date_mod"),
+			@Index(name = "date_mod", columnList = "date_mod"),
+			@Index(name = "docId", columnList = "docId"),
+			@Index(name = "deleted", columnList = "deleted")
 		}
 )
 public class DBDescFile implements Serializable {
@@ -86,11 +93,17 @@ public class DBDescFile implements Serializable {
 	@Column(name = "nb_errors")
 	private int nbErrors;
 
-	@Column(name = "doc_id")
+	@Column(name = "doc_id", unique = true)
 	private String docId;
 
 	@Column(name = "deleted")
 	private boolean deleted;
+
+	@ElementCollection(fetch = FetchType.LAZY)
+	@CollectionTable(name = "file_property")
+	@JoinTable(name = "file_property", joinColumns = @JoinColumn(name = "file_id"))
+	@MapKeyColumn(name = "name", nullable = false)
+	private Map<String, String> properties = new HashMap<>();
 
 	public long getId() {
 		return id;
@@ -164,9 +177,12 @@ public class DBDescFile implements Serializable {
 	}
 
 	public String getExtension() {
-		String path = getName();
-		int p = path.lastIndexOf(".");
-		return path.substring(p + 1).toLowerCase();
+		String name = getName();
+		if (name == null) {
+			return null;
+		}
+		int p = name.lastIndexOf(".");
+		return name.substring(p + 1).toLowerCase();
 	}
 
 	private static int extensionToPriority(String extension) {
@@ -339,15 +355,23 @@ public class DBDescFile implements Serializable {
 	public String getDocId() {
 		return docId;
 	}
-	
+
 	public boolean getDeleted() {
 		return deleted;
 	}
-	
+
 	public boolean setDeleted(boolean deleted) {
 		boolean changed = this.deleted != deleted;
 		this.deleted = deleted;
 		this.toAnalyse = true;
 		return changed;
+	}
+
+	public Map<String, String> getProperties() {
+		return properties;
+	}
+
+	public void setProperties(Map<String, String> properties) {
+		this.properties = properties;
 	}
 }

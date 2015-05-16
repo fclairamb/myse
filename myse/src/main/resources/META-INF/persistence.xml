@@ -5,6 +5,7 @@
     <class>io.myse.db.model.Config</class>
     <class>io.myse.db.model.DBDescFile</class>
     <class>io.myse.db.model.DBDescSource</class>
+    <class>io.myse.db.model.DBUser</class>
     <shared-cache-mode>ALL</shared-cache-mode>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:h2:file:~/.myse/h2/main"/>

@@ -46,6 +46,30 @@
 								}
 						)
 						.when(
+								"/setup/user/list",
+								{
+									templateUrl: '/static/setup-user-list.html',
+									controller: 'SetupUserListCtrl',
+									controllerAs: 'setup'
+								}
+						)
+						.when(
+								"/setup/user/edit/:userId",
+								{
+									templateUrl: '/static/setup-user-edit.html',
+									controller: 'SetupUserEditCtrl',
+									controllerAs: 'setup'
+								}
+						)
+						.when(
+								"/setup/user/edit",
+								{
+									templateUrl: '/static/setup-user-edit.html',
+									controller: 'SetupUserEditCtrl',
+									controllerAs: 'setup'
+								}
+						)
+						.when(
 								"/setup/config",
 								{
 									templateUrl: '/static/setup-config-list.html',
@@ -59,6 +83,22 @@
 									templateUrl: '/static/stats.html',
 									controller: 'StatsCtrl',
 									controllerAs: 'stats'
+								}
+						)
+						.when(
+								"/login",
+								{
+									templateUrl: '/static/login.html',
+									controller: 'LoginCtrl',
+									controllerAs: 'login'
+								}
+						)
+						.when(
+								"/logout",
+								{
+									templateUrl: '/static/logout.html',
+									controller: 'LogoutCtrl',
+									controllerAs: 'logout'
 								}
 						)
 						.when(
@@ -111,6 +151,9 @@
 	app.controller('NavCtrl', [
 		'$location', '$http',
 		function ($location, $http) {
+			ctrl = this;
+			app.nav = this;
+			
 			this.isSelected = function (page) {
 				return $location.path().startsWith(page);
 			};
@@ -128,8 +171,17 @@
 					});
 				}
 			};
+			
+			this.getAuthStatus = function() {
+				$http.post('/rest/login').success(function (data) {
+						app.nav.auth = data;
+					});
+			};
+			
+			this.getAuthStatus();
 		}
 	]);
+
 	app.controller('Version', ['$http', function ($http) {
 			this.props = {};
 			var ctrl = this;
@@ -137,6 +189,35 @@
 				ctrl.props = data;
 			});
 		}]);
+
+	app.controller('LoginCtrl', [
+		'$location', '$http',
+		function ($location, $http) {
+			ctrl = this;
+			this.login = function () {
+				$http.post('/rest/login', {'name': ctrl.name, 'pass': ctrl.pass}).success(function (data) {
+					ctrl.response = data;
+					app.nav.auth = data;
+					if (ctrl.response.ok) {
+						$location.path('/search');
+					}
+				});
+			};
+			
+			this.focus = function() {
+				delete ctrl.response;
+			};
+		}
+	]);
+
+	app.controller('LogoutCtrl', [
+		'$location', '$http',
+		function ($location, $http) {
+			$http.get('/rest/logout').success(function () {
+				app.nav.getAuthStatus();
+			});
+		}
+	]);
 
 	app.controller('SearchCtrl', ['$http', '$location', '$scope', '$sce', function ($http, $location, $scope, $sce) {
 			// CONTROLLER CODE
@@ -277,13 +358,75 @@
 							}
 						}
 					};
-					
-					this.test = function() {
+
+					this.test = function () {
 						delete ctrl.testResult;
 						$http.post('/rest/setup/source/edit?action=test', this.props).success(
-							function(data) {
-								ctrl.testResult = data;
-							}
+								function (data) {
+									ctrl.testResult = data;
+								}
+						);
+					};
+				}
+			]);
+
+	app.controller(
+			'SetupUserListCtrl',
+			['$http', '$window',
+				function ($http, $window) {
+					var ctrl = this;
+					this.users = [];
+					this.fetchUsers = function () {
+						$http.get('/rest/setup/user/list').success(
+								function (data) {
+									ctrl.users = data.users;
+								});
+					};
+
+					this.delete = function (sourceId) {
+						$http.get('/rest/setup/user/delete?id=' + sourceId).success(
+								function (data) {
+									if (data) {
+										ctrl.fetchUsers();
+									}
+								}
+						);
+					};
+
+					this.deleteAfterConfirm = function (sourceId) {
+						if ($window.confirm('Do you really want to delete this user ?')) {
+							ctrl.delete(sourceId);
+						}
+					};
+
+					this.fetchUsers();
+				}
+			]);
+
+	app.controller(
+			'SetupUserEditCtrl',
+			['$http', '$routeParams', '$location',
+				function ($http, $routeParams, $location) {
+					var ctrl = this;
+					this.props = {'admin': false};
+
+					if ($routeParams.userId !== undefined) {
+						this.userId = $routeParams.userId;
+					}
+
+					if (this.userId !== undefined) {
+						$http.get('/rest/setup/user/get?id=' + this.userId).success(
+								function (data) {
+									ctrl.props = data;
+								}
+						);
+					}
+
+					this.save = function () {
+						$http.post('/rest/setup/user/edit', this.props).success(
+								function () {
+									$location.path('/setup/user/list');
+								}
 						);
 					};
 				}
@@ -371,16 +514,16 @@
 				function ($http, $scope, $routeParams) {
 					var ctrl = this;
 					this.docId = $routeParams.docId;
-					this.data = {'name':'(loading)'};
+					this.data = {'name': '(loading)'};
 
 					$http.get('/rest/link?docId=' + ctrl.docId).success(
 							function (data) {
 								ctrl.data = data;
 								ctrl.considerLink();
 							});
-							
-					ctrl.considerLink = function() {
-						if ( ctrl.data.type === 'DIRECT' ) {
+
+					ctrl.considerLink = function () {
+						if (ctrl.data.type === 'DIRECT') {
 							window.location.href = ctrl.data.address;
 						}
 					};

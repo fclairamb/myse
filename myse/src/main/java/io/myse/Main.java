@@ -4,9 +4,7 @@ import com.sun.akuma.Daemon;
 import io.myse.common.Indexation;
 import io.myse.desktop.Browser;
 import io.myse.desktop.TrayIconMgmt;
-import io.myse.access.Source;
 import io.myse.access.disk.SourceDisk;
-import io.myse.access.vfs.SourceVFS;
 import io.myse.common.BuildInfo;
 import static io.myse.common.LOG.LOG;
 import io.myse.db.DBMgmt;
@@ -14,6 +12,7 @@ import io.myse.db.model.Config;
 import io.myse.db.model.DBDescSource;
 import io.myse.embeddedes.ElasticSearch;
 import io.myse.common.Tasks;
+import io.myse.db.model.DBUser;
 import io.myse.exploration.SourcesDeleter;
 import io.myse.updater.Updater;
 import io.myse.updater.Upgrader;
@@ -77,6 +76,23 @@ public class Main {
 		}
 	}
 
+//	private static void usersCheck() {
+//		EntityManager em = DBMgmt.getEntityManager();
+//		try {
+//			em.getTransaction().begin();
+//			DBUser user = DBUser.get("guest", em);
+//			if (user == null) {
+//				user = new DBUser();
+//				user.setName("guest");
+//				user.setAdmin(true);
+//				em.persist(user);
+//			}
+//			em.getTransaction().commit();
+//		} finally {
+//			em.close();
+//		}
+//	}
+
 	private void signalHandling() {
 		try {
 			Signal.handle(new Signal("TERM"),
@@ -108,6 +124,8 @@ public class Main {
 		JettyServer.start(); // Web server
 
 		ElasticSearch.start();  // DDB code
+
+//		usersCheck();
 
 		Browser.showMyse();
 
@@ -197,30 +215,6 @@ public class Main {
 					}
 				} else {
 					LOG.warn("Could not find $HOME env var.");
-				}
-			}
-
-			{ // FTP Free source
-				DBDescSource docs = new DBDescSource();
-				docs.setName("assistance free", em);
-				docs.setType(SourceVFS.TYPE);
-				Map<String, String> props = docs.getProperties();
-				props.put(SourceVFS.PROP_SCHEME, "ftp");
-				props.put(SourceVFS.PROP_HOST, "ftp.free.fr");
-				props.put(SourceVFS.PROP_PATH, "/pub/assistance/");
-				props.put(Source.PROP_FILENAME_INCLUDE, "*.pdf");
-				props.put(Source.PROP_FILENAME_EXCLUDE, "*");
-				em.persist(docs);
-			}
-
-			{ // Some sample docs
-				File sampleDocsDir = new File("sample_docs");
-				if (sampleDocsDir.exists() && DBDescSource.get("sample_docs", em) == null) {
-					DBDescSource sampleDocs = new DBDescSource();
-					sampleDocs.setName("Sample docs", em);
-					sampleDocs.setType(SourceDisk.TYPE);
-					sampleDocs.getProperties().put("path", sampleDocsDir.getAbsolutePath());
-					em.persist(sampleDocs);
 				}
 			}
 

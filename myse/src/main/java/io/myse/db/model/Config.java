@@ -18,7 +18,7 @@ import javax.persistence.Table;
 @Table(name = "config")
 public class Config implements Serializable {
 
-	@Column(name = "NAME")
+	@Column(name = "NAME", unique = true)
 	@Id
 	private String name;
 
@@ -28,17 +28,18 @@ public class Config implements Serializable {
 	public static final String PAR_UPDATE_CHANNEL = "update.channel",
 			PAR_HOSTNAME = "hostname",
 			PAR_ALLOW_DOWNLOAD = "allow_download",
-			PAR_ALLOW_LINK = "allow_link";
+			PAR_ALLOW_LINK = "allow_link",
+			PAR_ALLOW_GUEST_LOGIN = "guests.authorized",
+			PAR_ALLOW_GUEST_ADMIN = "guests.admin";
 
 	private static final Map<String, String> cache = Collections.synchronizedMap(new TreeMap());
 
 	public static String get(String name, String defaultValue, boolean save) {
 
-		if (cache.containsKey(name)) {
-			return cache.get(name);
+		String value = cache.get(name);
+		if (value != null) {
+			return value;
 		}
-
-		String value;
 
 		EntityManager em = DBMgmt.getEntityManager();
 		try {

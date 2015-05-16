@@ -47,6 +47,9 @@ public class RestStats extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		if (!Session.get(req).checkIsUser(resp)) {
+			return;
+		}
 		Stats stats = new Stats();
 		stats.sources = new ArrayList<>();
 

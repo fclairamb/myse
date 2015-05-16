@@ -27,7 +27,7 @@ import org.eclipse.persistence.annotations.CascadeOnDelete;
 @Table(
 		name = "source",
 		indexes = {
-			@Index(name = "shortName", columnList = "shortName", unique = true)
+			@Index(name = "shortName", columnList = "shortName")
 		}
 )
 @CascadeOnDelete
@@ -41,7 +41,7 @@ public class DBDescSource implements Serializable {
 	@Column(name = "name")
 	private String name;
 
-	@Column(name = "short_name")
+	@Column(name = "short_name", unique = true)
 	private String shortName;
 
 	@Column(name = "type")
@@ -220,11 +220,11 @@ public class DBDescSource implements Serializable {
 //			em.getTransaction().commit();
 //		}
 	}
-	
+
 	public int getNbDocsToAnalyse(EntityManager em) {
 		return (int) (long) em.createQuery("SELECT COUNT(f) FROM DBDescFile f WHERE f.source = :source AND f.directory = FALSE AND f.toAnalyse = TRUE").setParameter("source", this).getSingleResult();
 	}
-	
+
 	public int getTotalNbDocs(EntityManager em) {
 		return (int) (long) em.createQuery("SELECT COUNT(f) FROM DBDescFile f WHERE f.source = :source AND f.directory = FALSE").setParameter("source", this).getSingleResult();
 	}

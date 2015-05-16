@@ -23,6 +23,10 @@ public class PageDownload extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
+		if ( ! Session.get(req).checkIsUser(resp) ) {
+			return;
+		}
+		
 		if (!Config.get(Config.PAR_ALLOW_DOWNLOAD, true, true)) {
 			resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Download is forbidden !");
 			try (PrintWriter out = resp.getWriter()) {

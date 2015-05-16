@@ -14,6 +14,12 @@ public class PageOAuth extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		
+		
+		if ( ! Session.get(req).checkIsAdmin(resp) ) {
+			return;
+		}
+		
 		try {
 			String sourceId = req.getParameter("source_id");
 			String code = req.getParameter("code");

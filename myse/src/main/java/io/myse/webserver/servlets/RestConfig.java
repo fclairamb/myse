@@ -2,6 +2,7 @@ package io.myse.webserver.servlets;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import io.myse.common.Passwords;
 import io.myse.db.model.Config;
 import io.myse.exploration.DirExplorer;
 import io.myse.webserver.JettyServer;
@@ -45,6 +46,9 @@ public class RestConfig extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		if (!Session.get(req).checkIsAdmin(resp)) {
+			return;
+		}
 		String path = req.getPathInfo();
 		if (path == null) {
 			path = "";
@@ -58,7 +62,10 @@ public class RestConfig extends HttpServlet {
 						new ConfigDescription(JettyServer.PROP_PORT, ConfigDescription.Type.TEXT, "Web server port"),
 						new ConfigDescription(Config.PAR_HOSTNAME, ConfigDescription.Type.TEXT, "Server hostname"),
 						new ConfigDescription(Config.PAR_ALLOW_DOWNLOAD, ConfigDescription.Type.BOOLEAN, "Allow download"),
-						new ConfigDescription(Config.PAR_ALLOW_LINK, ConfigDescription.Type.BOOLEAN, "Allow link")
+						new ConfigDescription(Config.PAR_ALLOW_LINK, ConfigDescription.Type.BOOLEAN, "Allow link"),
+						new ConfigDescription(Config.PAR_ALLOW_GUEST_LOGIN, ConfigDescription.Type.BOOLEAN, "Allow guests to login"),
+						new ConfigDescription(Config.PAR_ALLOW_GUEST_ADMIN, ConfigDescription.Type.BOOLEAN, "Allows guests as admin"),
+						new ConfigDescription(Passwords.CONFIG_SALT, ConfigDescription.Type.TEXT, "Passwords salt")
 				);
 				output = list;
 				break;

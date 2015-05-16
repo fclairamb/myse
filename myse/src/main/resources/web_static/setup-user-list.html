@@ -1,0 +1,22 @@
+<h1 class="page-header">Setup</h1>
+<h3>Users</h3>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>ID</th>
+			<th>Name</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="user in setup.users">
+			<td>{{ user.id}}</td>
+			<td>{{ user.name}}</td>
+			<td>
+				<a href="#/setup/user/edit/{{ user.id}}" class="btn btn-info">Edit</a>
+				<a href ng-click="setup.deleteAfterConfirm(user.id)" class="btn btn-warning">Delete</a>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<a class="btn btn-info" href="#/setup/user/edit">New</a>

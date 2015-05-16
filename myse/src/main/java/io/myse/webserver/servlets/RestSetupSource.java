@@ -15,12 +15,10 @@ import io.myse.db.DBMgmt;
 import io.myse.db.model.DBDescSource;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.persistence.EntityManager;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -29,19 +27,10 @@ import javax.servlet.http.HttpServletResponse;
 import static io.myse.common.LOG.LOG;
 import io.myse.embeddedes.ElasticSearch;
 import java.io.StringWriter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class RestSetupSource extends HttpServlet {
 
 	private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-	static class Context {
-
-		EntityManager em;
-		Map<String, Object> input;
-		private HttpServletRequest req;
-	}
 
 	private Object doProcessList(Context context) {
 		List<DBDescSource> dbList = DBDescSource.allExisting(context.em);
@@ -208,14 +197,15 @@ public class RestSetupSource extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+		if (!Session.get(req).checkIsAdmin(resp)) {
+			return;
+		}
+
 		String path = req.getPathInfo();
 		String action = req.getParameter("action");
-		Context context = new Context();
-		context.req = req;
+		Context context = new Context(req, resp);
 		Object output = null;
-		try (Reader reader = req.getReader()) {
-			context.input = gson.fromJson(reader, Map.class);
-		}
 		try {
 
 			context.em = DBMgmt.getEntityManager();
