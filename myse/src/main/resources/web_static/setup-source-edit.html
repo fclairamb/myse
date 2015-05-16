@@ -36,6 +36,19 @@
 	<div class="form-group">
 		<div class="col-sm-offset-2 col-sm-10">
 			<button type="submit" class="btn btn-info" ng-click="setup.save()">Save</button>
+			<span ng-if="setup.sourceId">
+				<button type="submit" class="btn btn-info" ng-click="setup.test()">Test</button>
+				<div ng-if="setup.testResult"  class="alert" ng-class="{'alert-success': setup.testResult.ok, 'alert-danger': !setup.testResult.ok}">
+					<div ng-if="setup.testResult.ok">
+						<strong>Access to your source was successful!</strong>
+						We listed {{setup.testResult.nbFiles }} files at its root.
+					</div>
+					<div ng-if="!setup.testResult.ok">
+						<strong>Failed to access your source!</strong><br />
+						<pre>{{ setup.testResult.error}}</pre>
+					</div>
+				</div>
+			</span>
 		</div>
 	</div>
 </form>

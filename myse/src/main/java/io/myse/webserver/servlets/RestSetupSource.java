@@ -2,6 +2,7 @@ package io.myse.webserver.servlets;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import io.myse.access.AccessException;
 import io.myse.common.Indexation;
 import io.myse.access.Source;
 import io.myse.access.SourceEditingContext;
@@ -28,6 +29,8 @@ import javax.servlet.http.HttpServletResponse;
 import static io.myse.common.LOG.LOG;
 import io.myse.embeddedes.ElasticSearch;
 import java.io.StringWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class RestSetupSource extends HttpServlet {
 
@@ -96,7 +99,7 @@ public class RestSetupSource extends HttpServlet {
 				source.preSave();
 			}
 			context.em.persist(dbSource);
-			
+
 			context.em.getTransaction().commit();
 			context.em.getTransaction().begin();
 
@@ -113,6 +116,34 @@ public class RestSetupSource extends HttpServlet {
 		} finally {
 			context.em.getTransaction().commit();
 		}
+	}
+
+	private static class TestResult {
+
+		boolean ok;
+		int nbFiles;
+		String error;
+	}
+
+	private Object doProcessTest(Context context) {
+		TestResult tr = new TestResult();
+		try {
+			long id = Long.parseLong((String) context.input.get("_id"));
+			DBDescSource dbSource = DBDescSource.get(id, context.em);
+			Source source = Source.get(dbSource);
+
+			if (source != null) {
+				tr.nbFiles = source.getRootDir().listFiles().size();
+				tr.ok = true;
+			}
+		} catch (AccessException ex) {
+			StringWriter out = new StringWriter();
+			try (PrintWriter pw = new PrintWriter(out)) {
+				ex.printStackTrace(pw);
+			}
+			tr.error = out.toString();
+		}
+		return tr;
 	}
 
 	private Object doProcessDesc(Context context) {
@@ -178,6 +209,7 @@ public class RestSetupSource extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String path = req.getPathInfo();
+		String action = req.getParameter("action");
 		Context context = new Context();
 		context.req = req;
 		Object output = null;
@@ -195,6 +227,9 @@ public class RestSetupSource extends HttpServlet {
 						break;
 					case "/edit":
 						output = doProcessEdit(context);
+						if ("test".equals(action)) {
+							output = doProcessTest(context);
+						}
 						break;
 					case "/get":
 						output = doProcessGet(context);

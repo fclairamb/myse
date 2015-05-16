@@ -256,7 +256,7 @@
 					};
 
 					this.save = function () {
-						$http.post('/rest/setup/source/edit', this.props).success(
+						$http.post('/rest/setup/source/edit?action=save', this.props).success(
 								function (data) {
 									if (data.nextUrl !== undefined) {
 										window.location.href = data.nextUrl;
@@ -276,6 +276,15 @@
 								ctrl.props[ name ] = d.defaultValue;
 							}
 						}
+					};
+					
+					this.test = function() {
+						delete ctrl.testResult;
+						$http.post('/rest/setup/source/edit?action=test', this.props).success(
+							function(data) {
+								ctrl.testResult = data;
+							}
+						);
 					};
 				}
 			]);
