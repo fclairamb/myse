@@ -1,3 +1,24 @@
+myse (0.3.0) unstable; urgency=low
+
+* Sources: Added test function
+* Updater fix: This probably broke any future update
+* Search: Removed title highlighting. It is not used at this stage
+* Embedded jetty: Switching to session support.
+* Added login/logout pages
+* Added authentication constraints on all WS
+* Config cache behavior change
+* Minor Rest Context API change
+* Added users to the database model
+* Added users listing, adding and deletion (through /rest/setup/user)
+* DBMgmt: import cleanup
+* Changed the DBDescFile to add some generic metadata/properties (to prepare for future sources like web indexing)
+* Some idea code of the web source
+* Removed Monitor idea. It should be a disk-specific feature only.
+* Database unique constraints fixes
+* Removed sample docs indexing and the arbitrary FTP server 
+
+ -- Florent Clairambault <florent@clairambault.fr>  Mon, 18 May 2015 23:49:09 +0200
+
 myse (0.2.0) unstable; urgency=low
 
   * General indexation (FileIndexer): Files are now deleted when detected missing
