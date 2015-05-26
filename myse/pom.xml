@@ -19,7 +19,7 @@
 		<dependency>
 			<groupId>org.elasticsearch</groupId>
 			<artifactId>elasticsearch</artifactId>
-			<version>1.5.0</version>
+			<version>1.5.2</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
@@ -60,12 +60,12 @@
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-server</artifactId>
-			<version>9.3.0.M2</version>
+			<version>9.3.0.RC0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-servlet</artifactId>
-			<version>9.3.0.M2</version>
+			<version>9.3.0.RC0</version>
 			<type>jar</type>
 		</dependency>
 		<dependency>
@@ -77,11 +77,6 @@
 			<groupId>org.eclipse.jetty.websocket</groupId>
 			<artifactId>websocket-server</artifactId>
 			<version>9.3.0.M2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.tmatesoft.svnkit</groupId>
-			<artifactId>svnkit</artifactId>
-			<version>1.8.7</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>

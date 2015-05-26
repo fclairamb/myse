@@ -213,9 +213,11 @@ public class DBDescFile implements Serializable {
 		if (deleted) {
 			nextAnalysis = 0;
 		} else {
-			{ // We increment it by its age
+			if (dateMod != null) { // We increment it by its age
 				long elapsed = (System.currentTimeMillis() - dateMod.getTime()) + nbErrors * 3600 * 1000;
 				nextAnalysis += Math.log(elapsed);
+			} else {
+				nextAnalysis += Math.log(48 * 3600 * 1000);
 			}
 
 			if (fileSize > 0) { // And by its size

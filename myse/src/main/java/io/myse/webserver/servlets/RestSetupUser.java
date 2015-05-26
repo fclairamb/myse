@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import static io.myse.common.LOG.LOG;
 import io.myse.db.DBMgmt;
+import io.myse.db.SettingsExporter;
 import io.myse.db.model.DBUser;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -96,6 +97,7 @@ public class RestSetupUser extends HttpServlet {
 			return new UserInfo(user);
 		} finally {
 			context.em.getTransaction().commit();
+			SettingsExporter.autoSave();
 		}
 	}
 

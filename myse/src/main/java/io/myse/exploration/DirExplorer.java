@@ -30,7 +30,7 @@ public class DirExplorer extends SourceExplorer {
 
 	@Override
 	protected void fetchSettings() {
-		super.fetchSettings(); //To change body of generated methods, choose Tools | Templates.
+		super.fetchSettings();
 		confLogDirsExploration = Config.get(CONF_LOG_NEW_DIRS, true, true);
 		confNbDirsToWatchPerPass = Config.get(CONF_NB_DIRS_TO_WATCH_PER_PASS, 5, true);
 	}
@@ -38,6 +38,7 @@ public class DirExplorer extends SourceExplorer {
 	@Override
 	public void explorerRun(EntityManager em) {
 		try {
+			// TODO: Remove this, put it in SourceExplorer
 			if (!source.getDesc().doIndex()) {
 				if (!source.getDesc().deleted()) {
 					LOG.warn("Source got deleted! Cancelling...");

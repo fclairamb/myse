@@ -40,7 +40,7 @@ public class FileIndexer extends ReschedulingRunnable {
 
 	private final boolean reAnalyse = false;
 
-	private static final int FILES_TO_FETCH = 20;
+	private static final int FILES_TO_FETCH = 10;
 
 	DBDescSource dbSource;
 	Source source;
@@ -82,6 +82,7 @@ public class FileIndexer extends ReschedulingRunnable {
 			}
 		} catch (Exception ex) {
 			LOG.error("FileIndexer.run", ex);
+			delay += 5000;
 		}
 	}
 
@@ -168,7 +169,7 @@ public class FileIndexer extends ReschedulingRunnable {
 		}
 	}
 
-	private static final long PERIOD_MIN = 100, PERIOD_MAX = 60000;
+	private static final long PERIOD_MIN = 100, PERIOD_MAX = 120000;
 
 	@Override
 	protected void after() {

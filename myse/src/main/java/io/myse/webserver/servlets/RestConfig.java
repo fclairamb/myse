@@ -3,6 +3,7 @@ package io.myse.webserver.servlets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.myse.common.Passwords;
+import io.myse.db.SettingsExporter;
 import io.myse.db.model.Config;
 import io.myse.exploration.DirExplorer;
 import io.myse.webserver.JettyServer;
@@ -76,6 +77,7 @@ public class RestConfig extends HttpServlet {
 
 				if (value != null) {
 					Config.set(name, value);
+					SettingsExporter.autoSave();
 				}
 
 				output = Config.get(name, (String) null, false);

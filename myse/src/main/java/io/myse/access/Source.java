@@ -6,6 +6,7 @@ import io.myse.access.drive.SourceDrive;
 import io.myse.access.ftps.SourceFTPS;
 import io.myse.access.smb.SourceSMB;
 import io.myse.access.vfs.SourceVFS;
+import io.myse.access.web.SourceWeb;
 import io.myse.db.model.DBDescSource;
 import io.myse.exploration.DirExplorer;
 import io.myse.exploration.SourceExplorer;
@@ -15,6 +16,9 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import org.elasticsearch.common.base.Strings;
 
+/**
+ * Source handling. This object
+ */
 public abstract class Source {
 
 	public static class PropertyDescription {
@@ -73,6 +77,8 @@ public abstract class Source {
 				return new SourceDrive(source);
 			case SourceDBox.TYPE:
 				return new SourceDBox(source);
+			case SourceWeb.TYPE:
+				return new SourceWeb(source);
 			default:
 				return null;
 		}
@@ -105,7 +111,7 @@ public abstract class Source {
 	protected List<PropertyDescription> getSharedProperties() {
 		return Arrays.asList(
 				new PropertyDescription(PROP_FILENAME_INCLUDE, PropertyDescription.Type.TEXT, "Files to include", "*.doc,*.docx,*.xls,*.xlsx,*.ppt,*.pptx,*.pdf,*.odt,*.ods,*.odp"),
-				new PropertyDescription(PROP_FILENAME_EXCLUDE, PropertyDescription.Type.TEXT, "Files to exclude", "*"),
+				new PropertyDescription(PROP_FILENAME_EXCLUDE, PropertyDescription.Type.TEXT, "Files to exclude", ".*,~$*"),
 				new PropertyDescription(PROP_INDEX, PropertyDescription.Type.BOOLEAN, "Do index", "true")
 		);
 	}

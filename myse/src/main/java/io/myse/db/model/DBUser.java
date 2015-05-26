@@ -101,4 +101,34 @@ public class DBUser {
 		}
 		return null;
 	}
+
+	public Map<String, String> asMap() {
+		Map<String, String> map = new HashMap<>();
+		map.put("_id", "" + getId());
+		map.put("_name", getName());
+		map.put("_password", getPassword());
+		for (Map.Entry<String, String> me : properties.entrySet()) {
+			map.put(me.getKey(), me.getValue());
+		}
+		return map;
+	}
+
+	public void fromMap(Map<String, String> map) {
+		for (Map.Entry<String, String> me : map.entrySet()) {
+			switch (me.getKey()) {
+				case "_id":
+					id = Long.parseLong(me.getValue());
+					break;
+				case "_name":
+					name = me.getValue();
+					break;
+				case "_password":
+					password = me.getValue();
+					break;
+				default:
+					properties.put(me.getKey(), me.getValue());
+					break;
+			}
+		}
+	}
 }

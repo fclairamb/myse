@@ -49,7 +49,7 @@ public class Session {
 		}
 	}
 
-	public boolean getConnected() {
+	public boolean getIdentified() {
 		return userId != null;
 	}
 

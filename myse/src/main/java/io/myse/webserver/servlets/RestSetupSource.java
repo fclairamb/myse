@@ -11,6 +11,7 @@ import io.myse.access.disk.SourceDisk;
 import io.myse.access.drive.SourceDrive;
 import io.myse.access.smb.SourceSMB;
 import io.myse.access.vfs.SourceVFS;
+import io.myse.access.web.SourceWeb;
 import io.myse.db.DBMgmt;
 import io.myse.db.model.DBDescSource;
 import java.io.IOException;
@@ -25,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static io.myse.common.LOG.LOG;
+import io.myse.db.SettingsExporter;
 import io.myse.embeddedes.ElasticSearch;
 import java.io.StringWriter;
 
@@ -104,6 +106,7 @@ public class RestSetupSource extends HttpServlet {
 			return editContext;
 		} finally {
 			context.em.getTransaction().commit();
+			SettingsExporter.autoSave();
 		}
 	}
 
@@ -156,6 +159,7 @@ public class RestSetupSource extends HttpServlet {
 			return true;
 		} finally {
 			context.em.getTransaction().commit();
+			SettingsExporter.autoSave();
 		}
 	}
 
@@ -172,6 +176,7 @@ public class RestSetupSource extends HttpServlet {
 			return dst;
 		} finally {
 			context.em.getTransaction().commit();
+			SettingsExporter.autoSave();
 		}
 	}
 
@@ -191,7 +196,8 @@ public class RestSetupSource extends HttpServlet {
 			new SourceType(SourceVFS.TYPE, "VFS"),
 			new SourceType(SourceDisk.TYPE, "Disk"),
 			new SourceType(SourceDrive.TYPE, "Google Drive"),
-			new SourceType(SourceDBox.TYPE, "Dropbox")
+			new SourceType(SourceDBox.TYPE, "Dropbox"),
+			new SourceType(SourceWeb.TYPE, "Web")
 		};
 	}
 

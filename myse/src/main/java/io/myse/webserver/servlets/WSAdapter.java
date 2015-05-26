@@ -3,8 +3,9 @@ package io.myse.webserver.servlets;
 import com.google.gson.Gson;
 import io.myse.common.EventsNotifier;
 import static io.myse.common.LOG.LOG;
+import java.io.IOException;
 import java.util.concurrent.ScheduledFuture;
-import org.eclipse.jetty.websocket.api.Session;
+import javax.servlet.http.HttpSession;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 
 public class WSAdapter extends WebSocketAdapter implements EventsNotifier.EventReceiver {
@@ -16,9 +17,22 @@ public class WSAdapter extends WebSocketAdapter implements EventsNotifier.EventR
 	ScheduledFuture<?> schedule;
 
 	@Override
-	public void onWebSocketConnect(Session sess) {
+	public void onWebSocketConnect(org.eclipse.jetty.websocket.api.Session sess) {
 		super.onWebSocketConnect(sess); //To change body of generated methods, choose Tools | Templates.
 		LOG.info("Session connected !");
+
+		HttpSession httpSession = (HttpSession) sess.getUpgradeRequest().getSession();
+		Session session = Session.get(httpSession);
+
+		if (!session.getIsUser()) {
+			try {
+				getRemote().sendString(gson.toJson(new EventsNotifier.Event("You are not authorized !")));
+			} catch (IOException ex) {
+				LOG.error("error", ex);
+			}
+			return;
+		}
+
 		EventsNotifier.addReceiver(this);
 //		schedule = Tasks.getService().scheduleAtFixedRate(new Runnable() {
 //

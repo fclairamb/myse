@@ -12,10 +12,9 @@
 	</div>
 	<div ng-repeat="result in search.response.results" class="search-result">
 		<div class="pull-right date">{{ result.dateMod | date }}</div>
-		<h3>{{ result.title}}</h3>
+		<h3><a ng-if="search.response.link" href="#/link/{{ result.docId }}" target="_blank">{{ result.title }}</a></h3>
 		<a ng-if="search.response.download" href="/download?docId={{ result.docId }}" class="download" target="_blank">Download</a>
 		<span class="size" ng-show="result.size">( {{ result.size | filesize }} )</span> ... <span class="path">[{{ result.source }}] {{ result.path}}</span>
-		<a ng-if="search.response.link" href="#/link/{{ result.docId }}" class="link" target="_blank">Link</a>
 		<p class="description" ng-bind-html="trusted_html(result.description)"></p>
 	</div>
 </div>

@@ -20,6 +20,7 @@ public class RestLogin extends HttpServlet {
 
 		public boolean ok;
 		public boolean connected;
+		public boolean identified;
 		public boolean admin;
 		public String error;
 	}
@@ -65,7 +66,8 @@ public class RestLogin extends HttpServlet {
 			}
 		}
 
-		result.connected = session.getConnected();
+		result.connected = session.getIsUser();
+		result.identified = session.getIdentified();
 		result.admin = session.getIsAdmin();
 
 		return result;

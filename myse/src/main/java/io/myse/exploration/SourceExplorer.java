@@ -67,17 +67,23 @@ public abstract class SourceExplorer extends ReschedulingRunnable {
 		// File name checking doesn't apply to directories
 		if (!file.isDirectory()) {
 			String name = file.getName();
-			boolean index = true;
+			boolean index;
+
+			if (patternInclude != null) {
+				index = patternInclude.matcher(name).matches();
+			} else {
+				index = true;
+			}
+
+			if (index && patternExclude != null) {
+				index = !patternExclude.matcher(name).matches();
+			}
+
 			// We don't care about hidden files and lock files by default
 			if (name.startsWith("~$") || name.startsWith(".")) {
 				index = false;
 			}
-			if (index && patternExclude != null) {
-				index = !patternExclude.matcher(name).matches();
-			}
-			if (!index && patternInclude != null) {
-				index = patternInclude.matcher(name).matches();
-			}
+
 			if (!index) {
 				//LOG.info("This filename was excluded: " + name);
 				return true;
@@ -139,7 +145,7 @@ public abstract class SourceExplorer extends ReschedulingRunnable {
 			explorerRun(em);
 			LOG.info("{}: Exploration ended... / delay = {}", this, delay);
 		} catch (Exception ex) {
-			LOG.error("{}: Issues running explorerRun", ex);
+			LOG.error(String.format("%s: Issues running explorerRun", this), ex);
 		} finally {
 			em.getTransaction().commit();
 			em.close();

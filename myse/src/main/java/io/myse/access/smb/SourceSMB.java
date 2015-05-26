@@ -31,7 +31,7 @@ public class SourceSMB extends Source {
 				pass = props.get(PROP_PASS),
 				host = props.get(PROP_HOST),
 				dir = props.get(PROP_PATH);
-		return String.format("smb://%s:%s@%s/%s/", user, pass, host, dir);
+		return String.format("smb://%s:%s@%s/%s", user, pass, host, dir);
 	}
 
 	@Override
@@ -39,7 +39,7 @@ public class SourceSMB extends Source {
 		try {
 
 			SmbFile root = new SmbFile(getRootPath());
-			int length = root.getPath().length();
+			//int length = root.getPath().length();
 			return new FileSMB(root, this);
 		} catch (MalformedURLException ex) {
 			LOG.error("Could not create SMB root dir", ex);

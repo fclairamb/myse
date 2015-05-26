@@ -4,6 +4,7 @@ import static io.myse.common.LOG.LOG;
 import io.myse.db.DBMgmt;
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -68,13 +69,9 @@ public class Config implements Serializable {
 		return Boolean.parseBoolean(get(name, Boolean.toString(defaultValue), save));
 	}
 
-	public static void set(String name, String value) {
+	public static void set(String name, String value, EntityManager em) {
 		LOG.warn("CONFIG: {} = {}", name, value);
-
-		EntityManager em = DBMgmt.getEntityManager();
 		try {
-			EntityTransaction tr = em.getTransaction();
-			tr.begin();
 			Config c = getConfig(name, em);
 			if (c == null) {
 				c = new Config();
@@ -82,10 +79,20 @@ public class Config implements Serializable {
 				em.persist(c);
 			}
 			c.value = value;
+		} finally {
+			cache.remove(name);
+		}
+	}
+
+	public static void set(String name, String value) {
+		EntityManager em = DBMgmt.getEntityManager();
+		try {
+			EntityTransaction tr = em.getTransaction();
+			tr.begin();
+			set(name, value, em);
 			tr.commit();
 		} finally {
 			em.close();
-			cache.remove(name);
 		}
 	}
 
@@ -98,6 +105,14 @@ public class Config implements Serializable {
 
 	public static List<Config> all(EntityManager em) {
 		return em.createQuery("SELECT c FROM Config c", Config.class).getResultList();
+	}
+
+	public static Map<String, String> allAsMap(EntityManager em) {
+		Map<String, String> map = new HashMap<>();
+		for (Config c : all(em)) {
+			map.put(c.getName(), c.getValue());
+		}
+		return map;
 	}
 
 	public static void del(String name) {

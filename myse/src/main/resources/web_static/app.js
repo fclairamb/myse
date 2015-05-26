@@ -1,6 +1,6 @@
 (function () {
 	var app = angular.module('myse', ['ngRoute', 'filters']);
-
+	
 	app.config(
 			function ($routeProvider) {
 				$routeProvider
@@ -109,9 +109,18 @@
 									controllerAs: 'link'
 								}
 						)
+						.when(
+								"/first",
+								{
+									templateUrl: '/static/first.html',
+									controller: 'FirstCtrl',
+									controllerAs: 'first'
+								}
+						)
 						.otherwise(
 								{
-									redirectTo: '/search'
+									redirectTo: '/search',
+									//redirectTo: '/first'
 								}
 						);
 			}
@@ -153,7 +162,7 @@
 		function ($location, $http) {
 			ctrl = this;
 			app.nav = this;
-			
+
 			this.isSelected = function (page) {
 				return $location.path().startsWith(page);
 			};
@@ -171,13 +180,13 @@
 					});
 				}
 			};
-			
+
 			this.getAuthStatus = function() {
 				$http.post('/rest/login').success(function (data) {
-						app.nav.auth = data;
-					});
+					app.nav.auth = data;
+				});
 			};
-			
+
 			this.getAuthStatus();
 		}
 	]);
@@ -203,7 +212,7 @@
 					}
 				});
 			};
-			
+
 			this.focus = function() {
 				delete ctrl.response;
 			};
@@ -527,6 +536,13 @@
 							window.location.href = ctrl.data.address;
 						}
 					};
+				}
+			]);
+
+	app.controller('FirstCtrl',
+			['$http',
+				function ($http) {
+					app.nav.checkAuth();
 				}
 			]);
 

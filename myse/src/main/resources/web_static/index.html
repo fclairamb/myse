@@ -15,8 +15,8 @@
 						<li ng-class="nav.class('/setup/source')" ng-if="nav.auth.admin"><a href="#/setup/source/list">Sources</a></li>
 						<li ng-class="nav.class('/setup/user')" ng-if="nav.auth.admin"><a href="#/setup/user/list">Users</a></li>
 						<li ng-class="nav.class('/setup/config')" ng-if="nav.auth.admin"><a href="#/setup/config">Parameters</a></li>
-						<li ng-class="nav.class('/login')" ng-if="!nav.auth.connected"><a href="#/login">Login</a></li>
-						<li ng-class="nav.class('/logout')" ng-if="nav.auth.connected"><a href="#/logout">Logout</a></li>
+						<li ng-class="nav.class('/login')" ng-if="!nav.auth.identified"><a href="#/login">Login</a></li>
+						<li ng-class="nav.class('/logout')" ng-if="nav.auth.identified"><a href="#/logout">Logout</a></li>
 						<li><a href ng-click="nav.quit()" ng-if="nav.auth.admin">Stop server</a></li>
 					</ul>
 				</div>
