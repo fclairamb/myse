@@ -1,3 +1,16 @@
+myse (0.3.1) unstable; urgency=low
+    
+* Fixed users identification / connection handling
+* Fixed a websocket security issue
+* Added a JSON export feature for parameters, users and sources
+* Include/Exclude rules: Changed the way it works
+* Search page: Small design changes
+* First draft of web explorer
+* FileIndexer: Fetching 10 files intead of 20 to reduces issues with row synchronization.
+* Tiny build script change
+
+ -- Florent Clairambault <florent@clairambault.fr>  Mon, 01 Jun 2015 01:04:56 +0200
+
 myse (0.3.0) unstable; urgency=low
 
 * Sources: Added test function
