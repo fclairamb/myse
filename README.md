@@ -30,6 +30,7 @@ It is made in java so it should work everywhere. It requires at least java 1.7. 
 * Dropbox
 * Google drive
 * FTPS / FTPeS (Apache Commons didn't work so well on these)
+* Web exploration (basic web crawler, buggy at this stage)
 
 ## How it works
 
