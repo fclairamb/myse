@@ -186,7 +186,7 @@ public class FileDrive extends File {
 					case TYPE_GD_FOLDER:
 						return null;
 					default:
-						source.getDrive().files().get(fileId).executeAsInputStream();
+						return source.getDrive().files().get(fileId).executeAsInputStream();
 				}
 			}
 		} catch (IOException ex) {
