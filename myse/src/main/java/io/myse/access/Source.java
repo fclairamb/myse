@@ -156,4 +156,13 @@ public abstract class Source {
 	public SourceExplorer getExplorer() {
 		return new DirExplorer(getDesc().getId());
 	}
+	
+	/**
+	 * If an indexer task should be launch. This only returns true if an indexer
+	 * task should be launched.
+	 * @return If an indexer task should be launched
+	 */
+	public boolean launchAnalyser() {
+		return true;
+	}
 }

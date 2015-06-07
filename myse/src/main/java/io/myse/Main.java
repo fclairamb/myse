@@ -12,7 +12,6 @@ import io.myse.db.model.Config;
 import io.myse.db.model.DBDescSource;
 import io.myse.embeddedes.ElasticSearch;
 import io.myse.common.Tasks;
-import io.myse.db.model.DBUser;
 import io.myse.exploration.SourcesDeleter;
 import io.myse.updater.Updater;
 import io.myse.updater.Upgrader;
@@ -76,23 +75,6 @@ public class Main {
 		}
 	}
 
-//	private static void usersCheck() {
-//		EntityManager em = DBMgmt.getEntityManager();
-//		try {
-//			em.getTransaction().begin();
-//			DBUser user = DBUser.get("guest", em);
-//			if (user == null) {
-//				user = new DBUser();
-//				user.setName("guest");
-//				user.setAdmin(true);
-//				em.persist(user);
-//			}
-//			em.getTransaction().commit();
-//		} finally {
-//			em.close();
-//		}
-//	}
-
 	private void signalHandling() {
 		try {
 			Signal.handle(new Signal("TERM"),
@@ -125,8 +107,6 @@ public class Main {
 
 		ElasticSearch.start();  // DDB code
 
-//		usersCheck();
-
 		Browser.showMyse();
 
 		versionCheck();
@@ -135,8 +115,6 @@ public class Main {
 		startIndexation(em);
 
 		deletePreviousSources(em);
-
-		//EventsNotifier.eventTextNotification("Finished loading", "MySE finished loading.");
 	}
 
 	private static boolean stopped = false;

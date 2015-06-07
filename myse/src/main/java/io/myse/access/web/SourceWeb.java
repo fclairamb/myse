@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import javax.persistence.EntityManager;
 
 /**
@@ -94,5 +93,10 @@ public class SourceWeb extends Source {
 	@Override
 	public SourceExplorer getExplorer() {
 		return new WebExplorer(getDesc().getId());
+	}
+
+	@Override
+	public boolean launchAnalyser() {
+		return false;
 	}
 }

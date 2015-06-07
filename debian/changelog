@@ -1,34 +1,47 @@
+myse (0.3.2) unstable; urgency=low
+
+  * Web indexer: 
+    * Fixed JPA transactions conflicts
+    * Indexation period now changes like with other indexers
+    * Fixed some link handling
+    * Improved the caching mechanism
+  * Google drive: Showing file title instead of file extension
+  * Few base model changes (Source abstract class)
+  * Identified an issue with jcifs
+
+ -- Florent Clairambault <florent@clairambault.fr>  Sun, 07 Jun 2015 19:13:41 +0200
+
 myse (0.3.1) unstable; urgency=low
     
-* Fixed users identification / connection handling
-* Fixed a websocket security issue
-* Added a JSON export feature for parameters, users and sources
-* Include/Exclude rules: Changed the way it works
-* Search page: Small design changes
-* First draft of web explorer
-* FileIndexer: Fetching 10 files intead of 20 to reduces issues with row synchronization.
-* Tiny build script change
+  * Fixed users identification / connection handling
+  * Fixed a websocket security issue
+  * Added a JSON export feature for parameters, users and sources
+  * Include/Exclude rules: Changed the way it works
+  * Search page: Small design changes
+  * First draft of web explorer
+  * FileIndexer: Fetching 10 files intead of 20 to reduces issues with row synchronization.
+  * Tiny build script change
 
  -- Florent Clairambault <florent@clairambault.fr>  Mon, 01 Jun 2015 01:04:56 +0200
 
 myse (0.3.0) unstable; urgency=low
 
-* Sources: Added test function
-* Updater fix: This probably broke any future update
-* Search: Removed title highlighting. It is not used at this stage
-* Embedded jetty: Switching to session support.
-* Added login/logout pages
-* Added authentication constraints on all WS
-* Config cache behavior change
-* Minor Rest Context API change
-* Added users to the database model
-* Added users listing, adding and deletion (through /rest/setup/user)
-* DBMgmt: import cleanup
-* Changed the DBDescFile to add some generic metadata/properties (to prepare for future sources like web indexing)
-* Some idea code of the web source
-* Removed Monitor idea. It should be a disk-specific feature only.
-* Database unique constraints fixes
-* Removed sample docs indexing and the arbitrary FTP server 
+  * Sources: Added test function
+  * Updater fix: This probably broke any future update
+  * Search: Removed title highlighting. It is not used at this stage
+  * Embedded jetty: Switching to session support.
+  * Added login/logout pages
+  * Added authentication constraints on all WS
+  * Config cache behavior change
+  * Minor Rest Context API change
+  * Added users to the database model
+  * Added users listing, adding and deletion (through /rest/setup/user)
+  * DBMgmt: import cleanup
+  * Changed the DBDescFile to add some generic metadata/properties (to prepare for future sources like web indexing)
+  * Some idea code of the web source
+  * Removed Monitor idea. It should be a disk-specific feature only.
+  * Database unique constraints fixes
+  * Removed sample docs indexing and the arbitrary FTP server 
 
  -- Florent Clairambault <florent@clairambault.fr>  Mon, 18 May 2015 23:49:09 +0200
 

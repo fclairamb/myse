@@ -336,7 +336,7 @@ public class DBDescFile implements Serializable {
 
 	@Override
 	public String toString() {
-		return String.format("DescFile{path=\"%s\", name=\"%s\"}", getPath(), getName());
+		return String.format("DescFile{id=%d, path=\"%s\", name=\"%s\", lastModified=%s}", getId(), getPath(), getName(), getLastModified());
 	}
 
 	public void performingAnalysis() {
@@ -376,4 +376,6 @@ public class DBDescFile implements Serializable {
 	public void setProperties(Map<String, String> properties) {
 		this.properties = properties;
 	}
+	
+	
 }

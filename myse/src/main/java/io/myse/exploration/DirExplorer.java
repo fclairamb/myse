@@ -47,11 +47,11 @@ public class DirExplorer extends SourceExplorer {
 				return;
 			}
 
-			List<DBDescFile> files = DBDescFile.listFilesAll(dbSource, true, confNbDirsToWatchPerPass, em);
+			List<DBDescFile> dirs = DBDescFile.listFilesAll(dbSource, true, confNbDirsToWatchPerPass, em);
 
 			int nbFiles = 0;
 
-			if (files.isEmpty()) {
+			if (dirs.isEmpty()) {
 				File rootDir = source.getRootDir();
 				if (rootDir == null) {
 					LOG.error("{}: Could not get a rootdir !", this);
@@ -63,12 +63,12 @@ public class DirExplorer extends SourceExplorer {
 			}
 
 			// We analyse all the previously listed dirs
-			for (DBDescFile desc : files) {
+			for (DBDescFile dir : dirs) {
 				if (!Main.running()) {
 					LOG.warn("Bye bye !");
 					return;
 				}
-				nbFiles += analyseFile(desc, em);
+				nbFiles += analyseFile(dir, em);
 			}
 
 			if (nbFiles < 1) {
@@ -102,7 +102,7 @@ public class DirExplorer extends SourceExplorer {
 			delay = PERIOD_MAX;
 		}
 
-		super.after(); //To change body of generated methods, choose Tools | Templates.
+		super.after();
 	}
 
 	protected int analyseFile(DBDescFile desc, EntityManager em) throws Exception {

@@ -51,7 +51,7 @@ public class HTMLLinkExtrator {
 					link = link.substring(1, link.length() - 1);
 				}
 				
-				link = link.replace("&amp;", "&");
+				link = link.trim().replace("&amp;", "&").replace(" ", "%20");
 				
 				set.add(link);
 			}

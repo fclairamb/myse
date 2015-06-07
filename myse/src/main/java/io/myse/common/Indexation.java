@@ -4,7 +4,7 @@ import io.myse.access.Source;
 import static io.myse.common.LOG.LOG;
 import io.myse.db.model.DBDescSource;
 import io.myse.embeddedes.ElasticSearch;
-import io.myse.exploration.FileIndexer;
+import io.myse.exploration.FileAnalyser;
 
 public class Indexation {
 
@@ -15,7 +15,13 @@ public class Indexation {
 		}
 		ElasticSearch.prepare(dbSource);
 		Source source = Source.get(dbSource);
+		
+		// Launch exploration
 		Tasks.schedule(source.getExplorer());
-		Tasks.schedule(new FileIndexer(dbSource.getId()));
+
+		// Launch indexation
+		if (source.launchAnalyser()) {
+			Tasks.schedule(new FileAnalyser(dbSource.getId()));
+		}
 	}
 }

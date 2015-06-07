@@ -7,7 +7,7 @@ import io.myse.access.LinkContext;
 import io.myse.access.Source;
 import static io.myse.common.LOG.LOG;
 import io.myse.db.model.DBDescFile;
-import java.io.ByteArrayInputStream;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -72,7 +72,7 @@ public class FileWeb extends File {
 		try {
 			HTMLLinkExtrator linkExtractor = new HTMLLinkExtrator();
 			StringWriter writer = new StringWriter();
-			IOUtils.copy(getLinkContent().content, writer);
+			IOUtils.copy(getLinkContent().is, writer);
 			List<File> links = new ArrayList<>();
 			for (String link : linkExtractor.grabHTMLLinks(writer.toString())) {
 				File f = handleLink(link);
@@ -140,22 +140,40 @@ public class FileWeb extends File {
 
 	@Override
 	public InputStream getInputStream() throws AccessException {
-		return getLinkContent().content;
+		return getLinkContent().getInputStream();
 	}
 
 	private LinkContent getLinkContent() throws AccessException {
 		return FetchCacher.get(path);
 	}
 
+	/**
+	 * Cached URL content. This class is NOT thread-safe.
+	 */
 	public static class LinkContent {
 
 		public int returnCode;
 		public int size;
 		public Date lastModified;
-		public ByteArrayInputStream content;
-	}
 
-	private LinkContent content;
+		private BufferedInputStream is;
+
+		public void setInputStream(BufferedInputStream is) {
+			this.is = is;
+			// This obviously is dangerous... 50MB in heap max
+			this.is.mark(50*1024*1024); // 50MB buffer max
+		}
+
+		public InputStream getInputStream() throws AccessException {
+			try {
+				is.reset();
+				return is;
+			} catch (IOException ex) {
+				throw new AccessException(AccessException.AccessState.ERROR, ex);
+			}
+		}
+
+	}
 
 	public int getDepth() {
 		return Integer.parseInt(getDesc().getProperties().getOrDefault("depth", "0"));

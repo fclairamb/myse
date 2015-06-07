@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import static io.myse.common.LOG.LOG;
 import io.myse.db.model.Config;
 import io.myse.embeddedes.ElasticSearch;
-import io.myse.exploration.FileIndexer;
+import io.myse.exploration.FileAnalyser;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
@@ -89,7 +89,7 @@ public class RestSearch extends HttpServlet {
 			try (Client client = ElasticSearch.client()) {
 				long before = System.currentTimeMillis();
 				QueryStringQueryBuilder query = QueryBuilders.queryStringQuery(q);
-				SearchRequestBuilder esRequest = client.prepareSearch("_all").setTypes(FileIndexer.ES_DOC_TYPE)
+				SearchRequestBuilder esRequest = client.prepareSearch("_all").setTypes(FileAnalyser.ES_DOC_TYPE)
 						.setSearchType(SearchType.DFS_QUERY_AND_FETCH)
 						//.setQuery(QueryBuilders.termQuery("multi", q)) // Query
 						.setQuery(query)
@@ -104,18 +104,6 @@ public class RestSearch extends HttpServlet {
 						.execute()
 						.actionGet();
 
-//				if (esResponse.getHits().totalHits() == 0) {
-//					esRequest = client.prepareSearch(FileIndexer.ES_INDEX_NAME).setTypes(FileIndexer.ES_DOC_TYPE)
-//							.setSearchType(SearchType.DFS_QUERY_AND_FETCH)
-//							//.setQuery(QueryBuilders.termQuery("multi", q)) // Query
-//							.setQuery(QueryBuilders.wildcardQuery("title", "*" + q + "*"))
-//							.setFrom(0)
-//							.setSize(size);
-//
-//					esResponse = esRequest
-//							.execute()
-//							.actionGet();
-//				}
 				int count = 0;
 				for (SearchHit hit : esResponse.getHits().getHits()) {
 					if (count++ > size) {

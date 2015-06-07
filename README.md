@@ -4,22 +4,24 @@ MySE stands for _my search engine_.
 
 ## Goals
 
-MySE allows to index the content of multiple sources of files into a simple search engine.
+MySE allows to index the content of multiple sources of data into a simple search engine.
+
+## Install
+
+* Windows / Mac Os X / Linux manual : [the JAR](http://update.myse.io)
+* Linux Debian with APT: [The APT repository](http://apt.webingenia.com)
 
 ## Current status
 
-It can only be used for tests. It doesn't even support de-indexing of deleted files at this stage.
-
-That being said, there is very little risk in letting it run in production.
-
-For any release marked as stable, I will try to make sure the data can be upgraded.
+It's not production-ready, use it at your own risk. That being said, there's very little
+risk in letting in run over your files as it only reads them.
 
 ## Supported system
 
 It is made in java so it should work everywhere. It requires at least java 1.7. It has been tested on:
 
-* Linux Ubuntu XFCE
-* Windows 7 / 8 / 8.1
+* Linux Debian
+* Windows 7+
 * Mac Os X
 
 ## Supported sources
@@ -47,11 +49,11 @@ Core libraries are:
 * [H2](http://www.h2database.com/html/main.html) (embedded) with JPA
 * [Apache Tika](https://tika.apache.org/)
 * [Apache Commons VFS](http://commons.apache.org/proper/commons-vfs/)
+* [JCIFS](https://jcifs.samba.org/)
 * [Google Drive API](https://developers.google.com/drive/web/quickstart/quickstart-java)
 * [Dropbox API](https://www.dropbox.com/developers/core/start/java)
 
 ## Known issues
 
-* Deleted files can still be found: Big issue indeed.
-* Indexation is slow: It's actually intended to avoid scanning too much at once. But it's not configurable at this stage.
-* Google Drive & Dropbox files detection isn't optimal: It will be addressed
+* Samba: Files starting with a space are constantly marked for indexation and deletion but never actually indexed. It's a jcifs issue, you can only remove the trailing space at this stage.
+* Indexation is slow: It's actually intended to avoid scanning too much at once.

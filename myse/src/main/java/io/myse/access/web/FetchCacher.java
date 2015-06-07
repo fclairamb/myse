@@ -3,8 +3,7 @@ package io.myse.access.web;
 import io.myse.access.AccessException;
 import io.myse.access.web.FileWeb.LinkContent;
 import io.myse.common.BuildInfo;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -47,29 +46,18 @@ public class FetchCacher {
 			URL url = new URL(path);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestProperty("User-Agent", String.format("MySE/%s (http://www.myse.io)", BuildInfo.VERSION));
-			try (InputStream is = connection.getInputStream()) {
-				newContent.returnCode = connection.getResponseCode();
-				newContent.size = connection.getContentLength();
-				newContent.lastModified = new Date(connection.getLastModified() != 0 ? connection.getLastModified() : System.currentTimeMillis());
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-				// We copy at most 200KB
-				for (int offset = 0; offset < 200 * 1024;) {
-					byte[] buffer = new byte[8192];
-					int read = is.read(buffer);
-					if (read <= 0) {
-						break;
-					}
-					baos.write(buffer, 0, read);
-					offset += read;
-				}
-				byte[] array = baos.toByteArray();
-				if (newContent.size == -1) {
-					newContent.size = array.length;
-				}
-				newContent.content = new ByteArrayInputStream(array);
-				return newContent;
-			}
+			// The input stream is NOT closed. The GC will take care of it. It's 
+			// because it can be later used to continue streaming the
+			// BufferedInputStream.
+			InputStream is = connection.getInputStream();
+			//try (InputStream is = connection.getInputStream()) {
+			newContent.returnCode = connection.getResponseCode();
+			newContent.size = connection.getContentLength();
+			newContent.lastModified = new Date(connection.getLastModified() != 0 ? connection.getLastModified() : System.currentTimeMillis());
+			newContent.setInputStream( new BufferedInputStream(is) );
+			return newContent;
+			//}
 		} catch (Exception ex) {
 			throw new AccessException(AccessException.AccessState.ERROR, ex);
 		}

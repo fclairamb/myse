@@ -5,7 +5,6 @@ import io.myse.access.File;
 import io.myse.access.Link;
 import io.myse.access.LinkContext;
 import io.myse.access.Source;
-import io.myse.db.model.DBDescSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -90,6 +89,11 @@ public class FileSMB extends File {
 
 	@Override
 	public String getPath() {
+		// TODO: Fix the bug with files which start with a space.
+		// When a file starts with a space, the jcifs library removes it from
+		// the file path... It's a known bug but nobody intends to fix it:
+		// - https://lists.samba.org/archive/jcifs/2007-February/007026.html
+		// - https://lists.samba.org/archive/jcifs/2011-August/009726.html
 		return file.getPath().substring(source.getPathOffset());
 	}
 
